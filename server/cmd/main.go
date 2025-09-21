@@ -2,18 +2,13 @@ package main
 
 import (
 	"net/http"
-	"github.com/gin-gonic/gin"
 )
 
 
 func main() {
-  r := gin.Default()
+	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("pong"))
+	})
 
-  r.GET("/ping", func(c *gin.Context) {
-    c.JSON(http.StatusOK, gin.H{
-      "message": "pong",
-    })
-  })
-
-  r.Run()
+	http.ListenAndServe(":8080", nil)
 }
