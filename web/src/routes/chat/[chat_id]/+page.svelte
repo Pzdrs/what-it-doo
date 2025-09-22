@@ -2,14 +2,16 @@
 	import { page } from '$app/stores';
 	import ChatListItem from '$lib/components/ChatListItem.svelte';
 	import ChatMessage from '$lib/components/ChatMessage.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import type { Chat } from '$lib/types';
 	import type { PageProps } from './$types';
+	import { mdiSquareEditOutline } from '@mdi/js';
 
 	let { data }: PageProps = $props();
 
-    $effect(() => {
-        console.log('Load messages for chat:', $page.params.chat_id);
-    });
+	$effect(() => {
+		console.log('Load messages for chat:', $page.params.chat_id);
+	});
 
 	const currentChat = $derived($page.params.chat_id);
 
@@ -21,9 +23,9 @@
 				id: crypto.randomUUID(),
 				chatId: 1,
 				content: 'Hello, how are you?',
-				timestamp: new Date(),
+				timestamp: new Date()
 			},
-            participants: []
+			participants: []
 		},
 		{
 			id: 2,
@@ -32,9 +34,9 @@
 				id: crypto.randomUUID(),
 				chatId: 2,
 				content: "What's up?",
-				timestamp: new Date('2023-10-01T10:00:00Z'),
+				timestamp: new Date('2023-10-01T10:00:00Z')
 			},
-            participants: []
+			participants: []
 		},
 		{
 			id: 3,
@@ -43,32 +45,33 @@
 				id: crypto.randomUUID(),
 				chatId: 3,
 				content: "Let's catch up!",
-				timestamp: new Date('2025-01-15T15:30:00Z'),
+				timestamp: new Date('2025-01-15T15:30:00Z')
 			},
-            participants: []
-		},
+			participants: []
+		}
 	];
 </script>
 
 <div class="mt-3 flex h-full w-full px-5">
-	<section class="flex-1 bg-blue-200">
-		<div class="flex">
-			<p class="p-2 text-2xl font-bold">Chats</p>
-			<button class="ml-4 rounded bg-blue-500 px-4 py-2 text-white">New Chat</button>
+	<section class="flex-1 rounded-xl bg-gray-300 p-4">
+		<div class="flex justify-between">
+			<p class="p-2 text-4xl font-bold">Chats</p>
+			<span class="text-white my-auto">
+				<a href="#new-chat" aria-label="New Chat">
+					<Icon icon={mdiSquareEditOutline} size="30" />
+				</a>
+			</span>
 		</div>
-		<div>
+		<div class="my-4">
 			<input type="text" placeholder="Search What It Doo" />
 		</div>
 		<div>
 			{#each chats as chat}
-				<ChatListItem
-					chat={chat}
-					active={parseInt(currentChat) === chat.id}
-				/>
+				<ChatListItem {chat} active={parseInt(currentChat) === chat.id} />
 			{/each}
 		</div>
 	</section>
-	<section class="flex-3 ml-3 bg-green-200">
+	<section class="flex-3 ml-3 rounded-xl bg-gray-100 p-4">
 		<div class="flex">
 			<div class="flex items-center rounded-lg p-2 transition-colors duration-200">
 				<img
