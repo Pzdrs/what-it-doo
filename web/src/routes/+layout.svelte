@@ -1,13 +1,10 @@
 <script lang="ts">
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import Navbar from '$lib/components/Navbar.svelte';
 
 	let { children } = $props();
 </script>
 
-<nav class="bg-gray-400 flex justify-end">
-	<button>Dark Mode</button>
-	<span>Profile</span>
-</nav>
+<Navbar />
 
 {@render children?.()}
