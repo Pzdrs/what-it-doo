@@ -1,5 +1,7 @@
-<div class="inline-grid *:[grid-area:1/1]">
-	<div class="status status-success animate-ping"></div>
-	<div class="status status-success"></div>
+<div class="flex items-center space-x-2">
+	<div class="inline-grid *:[grid-area:1/1]">
+		<div class="status status-success animate-ping"></div>
+		<div class="status status-success"></div>
+	</div>
+	<span class="mr-5">API is healthy</span>
 </div>
-<span class="mr-5">API is healthy</span>
