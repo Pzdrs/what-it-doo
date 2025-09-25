@@ -50,6 +50,61 @@
 				timestamp: new Date('2025-01-15T15:30:00Z')
 			},
 			participants: []
+		},
+		{
+			id: 3,
+			title: 'Chat 3',
+			lastMessage: {
+				id: crypto.randomUUID(),
+				chatId: 3,
+				content: "Let's catch up!",
+				timestamp: new Date('2025-01-15T15:30:00Z')
+			},
+			participants: []
+		},
+		{
+			id: 3,
+			title: 'Chat 3',
+			lastMessage: {
+				id: crypto.randomUUID(),
+				chatId: 3,
+				content: "Let's catch up!",
+				timestamp: new Date('2025-01-15T15:30:00Z')
+			},
+			participants: []
+		},
+		{
+			id: 3,
+			title: 'Chat 3',
+			lastMessage: {
+				id: crypto.randomUUID(),
+				chatId: 3,
+				content: "Let's catch up!",
+				timestamp: new Date('2025-01-15T15:30:00Z')
+			},
+			participants: []
+		},
+		{
+			id: 3,
+			title: 'Chat 3',
+			lastMessage: {
+				id: crypto.randomUUID(),
+				chatId: 3,
+				content: "Let's catch up!",
+				timestamp: new Date('2025-01-15T15:30:00Z')
+			},
+			participants: []
+		},
+		{
+			id: 3,
+			title: 'Chat 3',
+			lastMessage: {
+				id: crypto.randomUUID(),
+				chatId: 3,
+				content: "Let's catch up!",
+				timestamp: new Date('2025-01-15T15:30:00Z')
+			},
+			participants: []
 		}
 	];
 
@@ -67,8 +122,8 @@
 	}
 </script>
 
-<div class="bg-base-100 mt-3 flex h-auto w-full px-5">
-	<section class="rounded-box bg-base-300 h-max flex-1 p-4">
+<div class="bg-base-100 px-5h flex h-[calc(100vh-80px)] w-full px-4 pb-6 pt-4">
+	<section class="rounded-box bg-base-300 flex h-full flex-col p-4 w-1/3">
 		<div class="flex justify-between">
 			<p class="text-primary p-2 text-4xl font-bold">Chats</p>
 			<span class="my-auto text-white">
@@ -102,14 +157,14 @@
 				<input type="search" required placeholder="Search conversations" />
 			</label>
 		</div>
-		<ul class="menu rounded-box h-full w-full px-0">
+		<ul class="rounded-box flex w-full flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden">
 			{#each chats as chat}
 				<ChatListItem {chat} active={parseInt(currentChat) === chat.id} />
 			{/each}
 		</ul>
 		<div></div>
 	</section>
-	<section class="flex-3 rounded-box bg-base-300 ml-3 flex flex-col p-4">
+	<section class="flex-3 rounded-box bg-base-300 ml-3 flex h-full flex-col p-4 w-2/3">
 		<div class="flex">
 			<div class="flex items-center rounded-lg p-2 transition-colors duration-200">
 				<div class="avatar avatar-online">
@@ -127,17 +182,40 @@
 			</div>
 			<div></div>
 		</div>
-		<div class="flex-grow">
+		<div class="flex-grow overflow-auto">
 			{#if true}
 				<ChatMessage message="Hello! How can I help you today?" origin="them" />
 				<ChatMessage message="I have a question about my order." origin="us" />
+				<ChatMessage message="Hello! How can I help you today?" origin="them" /><ChatMessage
+					message="Hello! How can I help you today?"
+					origin="them"
+				/><ChatMessage message="Hello! How can I help you today?" origin="them" /><ChatMessage
+					message="Hello! How can I help you today?"
+					origin="them"
+				/>
+				<ChatMessage message="Hello! How can I help you today?" origin="them" /><ChatMessage
+					message="Hello! How can I help you today?"
+					origin="them"
+				/><ChatMessage message="Hello! How can I help you today?" origin="them" /><ChatMessage
+					message="Hello! How can I help you today?"
+					origin="them"
+				/><ChatMessage message="Hello! How can I help you today?" origin="them" /><ChatMessage
+					message="Hello! How can I help you today?"
+					origin="them"
+				/><ChatMessage message="Hello! How can I help you today?" origin="them" /><ChatMessage
+					message="Hello! How can I help you today?"
+					origin="them"
+				/><ChatMessage message="Hello! How can I help you today?" origin="them" /><ChatMessage
+					message="Hello! How can I help you today?"
+					origin="them"
+				/>
 			{:else}
 				<p class="text-base-content/50 mt-20 text-center">
 					No messages yet. Start the conversation!
 				</p>
 			{/if}
 		</div>
-		<div class="flex justify-between gap-2">
+		<div class="mt-2 flex justify-between gap-2">
 			<input
 				type="text"
 				placeholder="Aa"

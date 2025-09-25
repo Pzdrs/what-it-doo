@@ -3,7 +3,7 @@
 	import ThemeSwitch from './ThemeSwitch.svelte';
 </script>
 
-<div class="navbar bg-base-100 shadow-sm">
+<div class="navbar bg-base-100 shadow-sm my-1 h-20">
 	<div class="navbar-start">
 		<a href="/" class="btn btn-ghost text-primary text-xl">what it doo</a>
 	</div>
