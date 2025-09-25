@@ -122,8 +122,8 @@
 	}
 </script>
 
-<div class="bg-base-100 px-5h flex h-[calc(100vh-80px)] w-full px-4 pb-6 pt-4">
-	<section class="rounded-box bg-base-300 flex h-full flex-col p-4 w-1/3">
+<div class="bg-base-100 flex md:h-[calc(100vh-80px)] h-full w-full px-4 pb-6 pt-4 flex-col md:flex-row gap-x-0 gap-y-4 md:gap-x-4 md:gap-y-0">
+	<section class="rounded-box bg-base-300 flex h-full flex-col p-4 w-full md:w-1/3">
 		<div class="flex justify-between">
 			<p class="text-primary p-2 text-4xl font-bold">Chats</p>
 			<span class="my-auto text-white">
@@ -164,7 +164,7 @@
 		</ul>
 		<div></div>
 	</section>
-	<section class="flex-3 rounded-box bg-base-300 ml-3 flex h-full flex-col p-4 w-2/3">
+	<section class="flex-3 rounded-box bg-base-300 flex h-full flex-col p-4 w-full md:w-2/3">
 		<div class="flex">
 			<div class="flex items-center rounded-lg p-2 transition-colors duration-200">
 				<div class="avatar avatar-online">
