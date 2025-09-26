@@ -1,30 +1,15 @@
 <script lang="ts">
-	const states = {
-		dark: true,
-		light: false
-	};
-	let currentTheme = 'light';
-
-	function setTheme(theme: string) {
-		currentTheme = theme;
-		document.documentElement.setAttribute('data-theme', theme);
-		localStorage.setItem('daisy-theme', theme);
-		document.querySelector("input[name='theme']")!.checked = states[theme];
+	function toggleTheme() {
+		const currentTheme = localStorage.getItem('daisy-theme');
+		const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+		document.documentElement.setAttribute('data-theme', nextTheme);
+		localStorage.setItem('daisy-theme', nextTheme);
 	}
 
 	$effect(() => {
 		const savedTheme = localStorage.getItem('daisy-theme');
-		if (savedTheme) {
-			setTheme(savedTheme);
-		} else {
-			setTheme('light');
-		}
+		document.querySelector<HTMLInputElement>("input[name='theme']")!.checked = savedTheme === 'dark';
 	});
-
-	function toggleTheme() {
-		const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
-		setTheme(nextTheme);
-	}
 </script>
 
 <label class="flex cursor-pointer gap-2">

@@ -1,25 +1,47 @@
 <script lang="ts">
+	import type { ChatMessage, User } from '$lib/types';
+	import { formatDateOrTime } from '$lib/utils';
+	import { getUser } from '$lib/stores/user.svelte';
+
 	type ChatMessageOrigin = 'us' | 'them';
 
 	interface Props {
-		message: string;
-		origin: ChatMessageOrigin;
+		message: ChatMessage;
 	}
 
-	let { message, origin = 'them' }: Props = $props();
+	let { message}: Props = $props();
+
+	const user = getUser();
+
+	const origin = user.id === message.sender.id ? 'us' : 'them';
 </script>
 
-<div class="my-2 flex" class:justify-end={origin === 'us'} class:justify-start={origin === 'them'}>
+<div class="chat" class:chat-start={origin === 'them'} class:chat-end={origin === 'us'}>
+	<div class="chat-image avatar">
+		<div class="w-10 rounded-full">
+			<img alt="{message.sender.name} Avatar" src={message.sender.avatarUrl} />
+		</div>
+	</div>
+	<div class="chat-header">
+		{message.sender.name}
+		<time class="text-xs opacity-50">{formatDateOrTime(message.timestamp)}</time>
+	</div>
 	<div
-		class="rounded-selector max-w-xs p-3"
+		class="chat-bubble"
 		class:bg-primary={origin === 'us'}
 		class:bg-neutral={origin === 'them'}
+		class:text-primary-content={origin === 'us'}
+		class:text-neutral-content={origin === 'them'}
 	>
-		<span
-			class:text-primary-content={origin === 'us'}
-			class:text-neutral-content={origin === 'them'}
-		>
-			{message}
-		</span>
+		{message.content}
+	</div>
+	<div class="chat-footer opacity-50">
+		{#if message.readAt}
+			<span class="text-xs">Seen at {formatDateOrTime(message.readAt)}</span>
+		{:else if message.deliveredAt}
+			<span class="text-xs">Delivered</span>
+		{:else}
+			<span class="text-xs">Sent</span>
+		{/if}
 	</div>
 </div>

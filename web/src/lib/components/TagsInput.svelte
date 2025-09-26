@@ -4,7 +4,7 @@
 
 	let query = $state(''); // text in the input
 	let tags: string[] = $state([]); // chosen tags
-	let focused = $state(true); // whether the input is focused
+	let focused = $state(false); // whether the input is focused
 
 	// derived list filtered by query and not already chosen
 	let filtered = $derived(() => {
@@ -27,9 +27,21 @@
 	<!-- Selected tags -->
 	<div class="mb-2 flex flex-wrap gap-2">
 		{#each tags as tag}
-			<div class="badge badge-primary gap-1">
+			<div class="bg-base-200 rounded-field text-base-content gap-1 p-2">
+				<div class="avatar mr-2">
+					<div class="w-12 rounded-full">
+						<img
+							src="https://scontent-prg1-1.xx.fbcdn.net/v/t39.30808-1/385763548_6948274105206399_3560856272069698376_n.jpg?stp=dst-jpg_p100x100_tt6&_nc_cat=103&ccb=1-7&_nc_sid=e99d92&_nc_ohc=KBdDtGYe2KEQ7kNvwFDpOhW&_nc_oc=Adlz9gFlsgmnZdW0y8Hk2W2uryRA3duwN5KZf5g4bX_RH-RnCC_jQEIh_6ns4sQBjIo&_nc_ad=z-m&_nc_cid=1097&_nc_zt=24&_nc_ht=scontent-prg1-1.xx&_nc_gid=_yd9s4D9R7GqfZ-DtwCVWQ&oh=00_Afar8I8NEQnekKKjagUfvYNsvrOyjnKez2h0w7dM6F1kXg&oe=68DC7488"
+							alt="Chat Icon"
+						/>
+					</div>
+				</div>
 				{tag}
-				<button type="button" class="ml-1 hover:text-white" onclick={() => removeTag(tag)}>
+				<button
+					type="button"
+					class="hover:text-base-content/50 ml-1"
+					onclick={() => removeTag(tag)}
+				>
 					✕
 				</button>
 			</div>
@@ -51,19 +63,17 @@
 			<ul class="menu bg-base-100 rounded-box absolute z-10 mt-1 w-full shadow">
 				{#each filtered() as option}
 					<li>
-						<div class="flex gap-3">
+						<button type="button" class="flex gap-3" onclick={() => addTag(option)}>
 							<div class="avatar">
 								<div class="w-12 rounded-full">
 									<img
-										src="https://scontent-prg1-1.xx.fbcdn.net/v/t39.30808-1/385763548_6948274105206399_3560856272069698376_n.jpg?stp=dst-jpg_p200x200_tt6&_nc_cat=103&ccb=1-7&_nc_sid=e99d92&_nc_ohc=bW-Nk_SfhrEQ7kNvwEYj1ab&_nc_oc=AdmnK9O53ElfigOxXct-Vi8G0jm10Q64AR71Rb62wFxLKOt4gJJsq8UQPuRQm9IpmMI&_nc_ad=z-m&_nc_cid=1097&_nc_zt=24&_nc_ht=scontent-prg1-1.xx&_nc_gid=iTU3jBr-XOTG0tPi5IzqBA&oh=00_AfZm3SJPNquCb3o8xQWx0bJc7fl10-3xZwVbUlw_WVim9g&oe=68D61548"
+										src="https://scontent-prg1-1.xx.fbcdn.net/v/t39.30808-1/385763548_6948274105206399_3560856272069698376_n.jpg?stp=dst-jpg_p100x100_tt6&_nc_cat=103&ccb=1-7&_nc_sid=e99d92&_nc_ohc=KBdDtGYe2KEQ7kNvwFDpOhW&_nc_oc=Adlz9gFlsgmnZdW0y8Hk2W2uryRA3duwN5KZf5g4bX_RH-RnCC_jQEIh_6ns4sQBjIo&_nc_ad=z-m&_nc_cid=1097&_nc_zt=24&_nc_ht=scontent-prg1-1.xx&_nc_gid=_yd9s4D9R7GqfZ-DtwCVWQ&oh=00_Afar8I8NEQnekKKjagUfvYNsvrOyjnKez2h0w7dM6F1kXg&oe=68DC7488"
 										alt="Chat Icon"
 									/>
 								</div>
 							</div>
-							<button type="button" class="w-full text-left" onclick={() => addTag(option)}>
-								{option}
-							</button>
-						</div>
+							{option}
+						</button>
 					</li>
 				{/each}
 			</ul>

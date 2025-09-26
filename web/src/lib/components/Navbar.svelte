@@ -15,7 +15,7 @@
 		<ServerHealth />
 		<ThemeSwitch />
 
-		<div class="bg-primary ml-3 inline-block w-0.5 self-stretch"></div>
+		<div class="divider divider-horizontal"></div>
 
 		<!-- Notifikace -->
 		<div class="dropdown dropdown-end">
