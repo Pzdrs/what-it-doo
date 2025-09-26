@@ -50,7 +50,7 @@ type ChatMessage = {
     chatId: number;
     content: string;
     sender: User;
-    timestamp: Date;
+    timestamp?: Date;
     deliveredAt?: Date;
     readAt?: Date;
 }

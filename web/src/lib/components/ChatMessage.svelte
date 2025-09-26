@@ -9,7 +9,7 @@
 		message: ChatMessage;
 	}
 
-	let { message}: Props = $props();
+	let { message }: Props = $props();
 
 	const user = getUser();
 
@@ -24,7 +24,9 @@
 	</div>
 	<div class="chat-header">
 		{message.sender.name}
-		<time class="text-xs opacity-50">{formatDateOrTime(message.timestamp)}</time>
+		{#if message.timestamp}
+			<time class="text-xs opacity-50">{formatDateOrTime(message.timestamp)}</time>
+		{/if}
 	</div>
 	<div
 		class="chat-bubble"
@@ -35,13 +37,17 @@
 	>
 		{message.content}
 	</div>
-	<div class="chat-footer opacity-50">
-		{#if message.readAt}
-			<span class="text-xs">Seen at {formatDateOrTime(message.readAt)}</span>
-		{:else if message.deliveredAt}
-			<span class="text-xs">Delivered</span>
-		{:else}
-			<span class="text-xs">Sent</span>
-		{/if}
-	</div>
+	{#if message.sender.id === user.id}
+		<div class="chat-footer opacity-50">
+			{#if message.readAt}
+				<span class="text-xs">Seen at {formatDateOrTime(message.readAt)}</span>
+			{:else if message.deliveredAt}
+				<span class="text-xs">Delivered</span>
+			{:else if message.timestamp}
+				<span class="text-xs">Sent</span>
+			{:else}
+				<span class="text-xs">Sending</span>
+			{/if}
+		</div>
+	{/if}
 </div>

@@ -54,7 +54,7 @@ let messages = $state<ChatMessage[]>([
             avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg'
         },
         content: 'Hi Bob! I am good, thanks!',
-        timestamp: new Date(Date.now() - 300 * 1000) // 5 minutes ago
+        //timestamp: new Date(Date.now() - 300 * 1000) // 5 minutes ago
     }
 ]);
 
