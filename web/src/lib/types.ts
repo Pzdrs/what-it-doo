@@ -13,6 +13,7 @@ export class Chat {
     participants: User[];
     nicknames?: Record<UUID, string>;
     avatarUrl?: string;
+    typingUsers?: UUID[];
 
     constructor(
         id: number,
@@ -22,6 +23,7 @@ export class Chat {
             lastMessage?: ChatMessage;
             nicknames?: Record<UUID, string>;
             avatarUrl?: string;
+            typingUsers?: UUID[];
         } = {}
     ) {
         this.id = id;
@@ -30,6 +32,7 @@ export class Chat {
         this.lastMessage = options.lastMessage;
         this.nicknames = options.nicknames;
         this.avatarUrl = options.avatarUrl;
+        this.typingUsers = options.typingUsers;
     }
 
     getTitle(): string {
@@ -42,6 +45,10 @@ export class Chat {
 
     getAvatarUrl(): string {
         return this.avatarUrl ?? 'https://randomuser.me/api/portraits/men/1.jpg';
+    }
+
+    getTypingUsers(): User[] {
+        return this.typingUsers?.map(id => this.participants.find(user => user.id === id)).filter(Boolean) as User[] || [];
     }
 }
 

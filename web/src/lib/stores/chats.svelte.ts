@@ -2,7 +2,13 @@ import { Chat, type ChatMessage } from "$lib/types";
 import { getUser } from "./user.svelte";
 
 let chats = $state<Chat[]>([
-    new Chat(1, [], {
+    new Chat(1, [
+        {
+            id: 'c175258b-88fe-4035-8c0b-c78c49ffee67',
+            name: 'Alice',
+            avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg'
+        }, getUser()
+    ], {
         title: 'Chat 1', lastMessage: {
             id: crypto.randomUUID(),
             chatId: 1,
@@ -10,7 +16,8 @@ let chats = $state<Chat[]>([
             content: 'Hello, how are you?',
             timestamp: new Date(Date.now() - 300 * 1000), // 5 minutes ago
             readAt: new Date(Date.now() - 200 * 1000) // 3 minutes ago
-        }
+        },
+        typingUsers: []
     }),
     new Chat(2, [], {
         title: 'Chat 2',
@@ -42,7 +49,7 @@ let messages = $state<ChatMessage[]>([
             name: 'Bob',
             avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg'
         },
-        content: 'Hello, how are you?',
+        content: 'Hello, how are you? lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         timestamp: new Date(Date.now() - 600 * 1000) // 10 minutes ago
     },
     {

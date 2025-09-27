@@ -12,7 +12,7 @@
 	let chatsPromis: Promise<Chat[]> = Promise.resolve(getChats());
 </script>
 
-<ul class="rounded-box flex w-full flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden">
+<ul class="menu flex w-full flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden">
 	{#await chatsPromis}
 		<div class="mt-10 text-center">
 			<span class="loading loading-spinner loading-xl"></span>

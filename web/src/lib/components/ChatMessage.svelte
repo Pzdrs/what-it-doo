@@ -37,6 +37,7 @@
 	>
 		{message.content}
 	</div>
+
 	{#if message.sender.id === user.id}
 		<div class="chat-footer opacity-50">
 			{#if message.readAt}

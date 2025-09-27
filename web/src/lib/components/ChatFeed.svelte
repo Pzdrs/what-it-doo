@@ -4,12 +4,14 @@
 	import { mdiHandWaveOutline, mdiSendOutline } from '@mdi/js';
 	import ChatMessage from './ChatMessage.svelte';
 	import Icon from './Icon.svelte';
+	import TypingIndicator from './TypingIndicator.svelte';
 
 	interface Props {
 		chat: Chat;
 	}
 
 	const { chat }: Props = $props();
+
 
 	$effect(() => {
 		// TODO: send typing indicator to server
@@ -64,6 +66,10 @@
 	{:else}
 		<p class="text-base-content/50 mt-20 text-center">No messages yet. Start the conversation!</p>
 	{/if}
+
+    {#each chat.getTypingUsers() as user (user.id)}
+        <TypingIndicator {user}/>
+    {/each}
 </div>
 <div class="mt-2 flex justify-between gap-2">
 	<input
