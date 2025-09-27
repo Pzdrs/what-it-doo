@@ -1,20 +1,21 @@
 {
-  outputs =
-    { self, nixpkgs, ... }:
-    let
-      system = "aarch64-darwin";
-      pkgs = import nixpkgs { inherit system; };
-    in
-    {
-      devShells.${system}.default = pkgs.mkShell { 
-        buildInputs = with pkgs; [
-          go
-          websocat
-        ];
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+    goflake.url = "github:sagikazarmark/go-flake";
+    goflake.inputs.nixpkgs.follows = "nixpkgs";
+  };
 
-        shellHook = ''
-          go mod download
-        '';
-      };
-    };
+  outputs = { self, nixpkgs, flake-utils, goflake, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+
+          overlays = [ goflake.overlay ];
+        };
+        buildDeps = with pkgs; [ git go_1_25 ];
+        devDeps = with pkgs; buildDeps ++ [];
+      in
+      { devShell = pkgs.mkShell { buildInputs = devDeps; }; });
 }

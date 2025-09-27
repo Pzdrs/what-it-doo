@@ -1,28 +1,17 @@
 {
-  description = "Dev shell for Node.js on macOS (arm64) and Linux (x86_64)";
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
 
-  outputs = { self, nixpkgs, ... }:
-    let
-      # Pick the correct pkgs for each host automatically
-      forAllSystems = systems: f:
-        builtins.listToAttrs (map (system: {
-          name = system;
-          value = f system;
-        }) systems);
-
-      supportedSystems = [ "aarch64-darwin" "x86_64-linux" ];
-    in
-    {
-      devShells = forAllSystems supportedSystems (system:
-        let pkgs = import nixpkgs { inherit system; };
-        in {
-          default = pkgs.mkShell {
-            buildInputs = with pkgs; [ nodejs ];
-
-            shellHook = ''
-              npm install
-            '';
-          };
-        });
-    };
+  outputs = { self, nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+        };
+        buildDeps = with pkgs; [ nodejs_24 ];
+        devDeps = with pkgs; buildDeps ++ [];
+      in
+      { devShell = pkgs.mkShell { buildInputs = devDeps; }; });
 }
