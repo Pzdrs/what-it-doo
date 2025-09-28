@@ -17,8 +17,8 @@ import (
 // @title What-it-doo API
 // @version 1.0
 // @description API for the messanger of the future - What-it-doo.
-func run(ctx context.Context, w io.Writer, args []string) error {
-	srv := apiserver.NewServer()
+func run(ctx context.Context, getenv func(string) string, w io.Writer, args []string) error {
+	srv := apiserver.NewServer(getenv)
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort("0.0.0.0", "8080"),
 		Handler: srv,
@@ -48,7 +48,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 
 func main() {
 	ctx := context.Background()
-	if err := run(ctx, os.Stdout, os.Args); err != nil {
+	if err := run(ctx, os.Getenv, os.Stdout, os.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(1)
 	}

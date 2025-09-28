@@ -2,14 +2,10 @@ package apiserver
 
 import (
 	"encoding/json"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
-)
 
-var users = map[string]string{
-	"alice": "password123",
-	"bob":   "securepassword",
-}
+	"pycrs.cz/what-it-do/internal/apiserver/services"
+)
 
 type loginRequest struct {
 	Username string `json:"username"`
@@ -32,13 +28,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	if storedPassword, ok := users[t.Username]; ok {
-		if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(t.Password)); err == nil {
-			w.Write([]byte("Login successful"))
-			return
-		}
+	if services.AuthenticateUser(t.Username, t.Password) {
+		w.Write([]byte("Login successful"))
+	} else {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 	}
-	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }
 
 func handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -48,16 +42,13 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	if _, ok := users[t.Username]; ok {
-		http.Error(w, "User already exists", http.StatusConflict)
+
+	msg, err := services.RegisterUser(t.Username, t.Password)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusConflict)
 		return
 	}
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(t.Password), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
-	users[t.Username] = string(hashedPassword)
-	w.Write([]byte("Registration successful"))
+	w.Write([]byte(msg))
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
