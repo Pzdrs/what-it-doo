@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"fmt"
@@ -30,6 +30,8 @@ func mapUserToModel(user database.User) model.User {
 		Email:     user.Email,
 		AvatarUrl: user.AvatarUrl.String,
 		Bio:       user.Bio.String,
+		CreatedAt: user.CreatedAt.Time,
+		UpdatedAt: user.UpdatedAt.Time,
 	}
 }
 

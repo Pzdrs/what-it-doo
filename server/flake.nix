@@ -6,16 +6,38 @@
     goflake.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, flake-utils, goflake, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      goflake,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs {
           inherit system;
 
           overlays = [ goflake.overlay ];
         };
-        buildDeps = with pkgs; [ git go_1_25 go-swag sqlc ];
-        devDeps = buildDeps ++ [];
+        buildDeps = with pkgs; [
+          git
+          go_1_25
+          go-swag
+          sqlc
+          goose
+        ];
+        devDeps = buildDeps ++ [ ];
       in
-      { devShell = pkgs.mkShell { buildInputs = devDeps; }; });
+      {
+        devShell = pkgs.mkShell {
+          buildInputs = devDeps;
+          
+          GOOSE_DRIVER = "postgres";
+          GOOSE_MIGRATION_DIR = "infra/db/migrations";
+        };
+      }
+    );
 }

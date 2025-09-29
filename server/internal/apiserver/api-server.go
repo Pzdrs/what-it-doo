@@ -6,21 +6,24 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"pycrs.cz/what-it-do/internal/apiserver/repository"
-	"pycrs.cz/what-it-do/internal/apiserver/services"
+	"pycrs.cz/what-it-do/internal/apiserver/service"
 	"pycrs.cz/what-it-do/internal/database"
 )
 
 type Server struct {
 	Handler http.Handler
 
-	authService *services.AuthService
+	authService *service.AuthService
+	chatService *service.ChatService
 }
 
 func NewServer(q *database.Queries) *Server {
 	userRepository := repository.NewUserRepository(q)
+	chatRepository := repository.NewChatRepository(q)
 	
 	server := &Server{
-		authService: services.NewAuthService(userRepository),
+		authService: service.NewAuthService(userRepository),
+		chatService: service.NewChatService(chatRepository),
 	}
 
 	r := chi.NewRouter()
@@ -28,6 +31,7 @@ func NewServer(q *database.Queries) *Server {
 	addRoutes(
 		r,
 		server.authService,
+		server.chatService,
 	)
 
 	server.Handler = r
