@@ -11,17 +11,43 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/joho/godotenv"
+	
 	"pycrs.cz/what-it-do/internal/apiserver"
+	"pycrs.cz/what-it-do/internal/database"
 )
+
+func initDB(getenv func(string) string) (*pgx.Conn, error) {
+	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s",
+		getenv("DB_USER"), getenv("DB_PASSWORD"), getenv("DB_HOST"), getenv("DB_PORT"), getenv("DB_NAME"),
+	)
+	conn, err := pgx.Connect(context.Background(), dsn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+	if err := conn.Ping(context.Background()); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+	return conn, nil
+}
 
 // @title What-it-doo API
 // @version 1.0
 // @description API for the messanger of the future - What-it-doo.
 func run(ctx context.Context, getenv func(string) string, w io.Writer, args []string) error {
-	srv := apiserver.NewServer(getenv)
+	godotenv.Load()
+	conn, err := initDB(getenv)
+	if err != nil {
+		return fmt.Errorf("failed to initialize database: %w", err)
+	}
+
+	q := database.New(conn)
+
+	server := apiserver.NewServer(q)
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort("0.0.0.0", "8080"),
-		Handler: srv,
+		Handler: server.Handler,
 	}
 	go func() {
 		log.Printf("listening on %s\n", httpServer.Addr)
@@ -44,7 +70,6 @@ func run(ctx context.Context, getenv func(string) string, w io.Writer, args []st
 	wg.Wait()
 	return nil
 }
-
 
 func main() {
 	ctx := context.Background()

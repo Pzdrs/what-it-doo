@@ -4,8 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"pycrs.cz/what-it-do/internal/apiserver/model"
 	"pycrs.cz/what-it-do/internal/apiserver/services"
 )
+
+type AuthController struct {
+	authService *services.AuthService
+}
+
+func NewAuthController(authService *services.AuthService) *AuthController {
+	return &AuthController{authService: authService}
+}
 
 type loginRequest struct {
 	Username string `json:"username"`
@@ -21,21 +30,21 @@ func handleHello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello, World!"))
 }
 
-func handleLogin(w http.ResponseWriter, r *http.Request) {
+func (c *AuthController) handleLogin(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var t loginRequest
 	err := decoder.Decode(&t)
 	if err != nil {
 		panic(err)
 	}
-	if services.AuthenticateUser(t.Username, t.Password) {
+	if c.authService.AuthenticateUser(t.Username, t.Password) {
 		w.Write([]byte("Login successful"))
 	} else {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 	}
 }
 
-func handleRegister(w http.ResponseWriter, r *http.Request) {
+func (c *AuthController) handleRegister(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var t registerRequest
 	err := decoder.Decode(&t)
@@ -43,14 +52,18 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	msg, err := services.RegisterUser(t.Username, t.Password)
+	u, err := c.authService.RegisterUser(
+		model.User{
+			Username:  t.Username,
+		}, t.Password,
+	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusConflict)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	w.Write([]byte(msg))
+	w.Write([]byte("User registered: " + u.Username))
 }
 
-func handleLogout(w http.ResponseWriter, r *http.Request) {
+func (c *AuthController) handleLogout(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Logout endpoint"))
 }

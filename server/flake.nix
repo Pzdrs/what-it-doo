@@ -14,8 +14,8 @@
 
           overlays = [ goflake.overlay ];
         };
-        buildDeps = with pkgs; [ git go_1_25 go-swag ];
-        devDeps = with pkgs; buildDeps ++ [];
+        buildDeps = with pkgs; [ git go_1_25 go-swag sqlc ];
+        devDeps = buildDeps ++ [];
       in
       { devShell = pkgs.mkShell { buildInputs = devDeps; }; });
 }

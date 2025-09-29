@@ -1,0 +1,15 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema: "schema.sql"
+    queries: "query.sql"
+    gen:
+      go:
+        out: "../../internal/database"
+        package: "database"
+        sql_package: "pgx/v5"
+        overrides:
+          - column: users.username
+            go_type: "string"
+          - column: users.email
+            go_type: "string"

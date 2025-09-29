@@ -1,25 +1,39 @@
 package repository
 
-import "fmt"
+import (
+	"context"
+	"fmt"
 
-var users = map[string]string{}
+	"pycrs.cz/what-it-do/internal/database"
+)
 
-var ErrUserExists = fmt.Errorf("user already exists")
-
-func SaveUser(username, hashedPassword string) error {
-	if _, ok := users[username]; ok {
-		return ErrUserExists
-	}
-	users[username] = hashedPassword
-	return nil
+type UserRepository struct {
+	q *database.Queries
 }
 
-func GetHashedPassword(username string) (string, bool) {
-	storedPassword, ok := users[username]
-	return storedPassword, ok
+func NewUserRepository(q *database.Queries) *UserRepository {
+	return &UserRepository{q: q}
 }
 
-func UserExists(username string) bool {
-	_, ok := users[username]
-	return ok
+func (r *UserRepository) UserExists(username string) bool {
+	_, err := r.q.GetUserByUsername(context.Background(), username)
+	return err == nil
+}
+
+func (r UserRepository) SaveUser(user database.User) (database.User, error) {
+	fmt.Println("Saving user:", user)
+	user, err := r.q.CreateUser(context.Background(), database.CreateUserParams{
+		FirstName:      user.FirstName,
+		LastName:       user.LastName,
+		Username:       user.Username,
+		Email:          user.Email,
+		HashedPassword: user.HashedPassword,
+		AvatarUrl:      user.AvatarUrl,
+		Bio:            user.Bio,
+	})
+	return user, err
+}
+
+func (r *UserRepository) GetUserByUsername(username string) (database.User, error) {
+	return r.q.GetUserByUsername(context.Background(), username)
 }
