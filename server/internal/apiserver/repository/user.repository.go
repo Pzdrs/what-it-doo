@@ -16,12 +16,15 @@ func NewUserRepository(q *database.Queries) *UserRepository {
 }
 
 func (r *UserRepository) UserExists(username string) bool {
-	_, err := r.q.GetUserByUsername(context.Background(), username)
+	_, err := r.q.GetUserByUsernameOrEmail(context.Background(), username)
 	return err == nil
 }
 
 func (r UserRepository) SaveUser(user database.User) (database.User, error) {
-	fmt.Println("Saving user:", user)
+	if user.Email == "" || user.Username == "" {
+		return database.User{}, fmt.Errorf("username and email are required")
+	}
+
 	user, err := r.q.CreateUser(context.Background(), database.CreateUserParams{
 		FirstName:      user.FirstName,
 		LastName:       user.LastName,
@@ -35,5 +38,9 @@ func (r UserRepository) SaveUser(user database.User) (database.User, error) {
 }
 
 func (r *UserRepository) GetUserByUsername(username string) (database.User, error) {
-	return r.q.GetUserByUsername(context.Background(), username)
+	return r.q.GetUserByUsernameOrEmail(context.Background(), username)
+}
+
+func (r *UserRepository) CreateSession(params database.CreateSessionParams) (database.Session, error) {
+	return r.q.CreateSession(context.Background(), params)
 }

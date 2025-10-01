@@ -1,4 +1,4 @@
-package controller 
+package controller
 
 import (
 	"encoding/json"
@@ -23,6 +23,7 @@ type loginRequest struct {
 
 type registerRequest struct {
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -37,11 +38,22 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	if c.authService.AuthenticateUser(t.Username, t.Password) {
-		w.Write([]byte("Login successful"))
-	} else {
+
+	user, err := c.authService.GetUserByUsername(t.Username)
+	if err != nil || !c.authService.AuthenticateUser(t.Username, t.Password) {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
 	}
+	
+	session, err := c.authService.CreateSession(user.ID, "web", "unknown")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:  "wid_session",
+		Value: session.Token,
+	})
 }
 
 func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +66,7 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 
 	u, err := c.authService.RegisterUser(
 		model.User{
-			Username:  t.Username,
+			Username: t.Username, Email: t.Email,
 		}, t.Password,
 	)
 	if err != nil {

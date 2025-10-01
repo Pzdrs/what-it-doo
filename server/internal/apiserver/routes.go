@@ -21,9 +21,9 @@ func addRoutes(
 	r.With(browserOnly).Get("/hello", controller.HandleHello)
 
 	r.Route("/auth", func(r chi.Router) {
-		r.With(requireUnauthenticated).Post("/login", authController.HandleLogin)
+		r.With().Post("/login", authController.HandleLogin)
 		r.With(requireAuthenticated).Post("/logout", authController.HandleLogout)
-		r.With(requireUnauthenticated).Post("/register", authController.HandleRegister)
+		r.With().Post("/register", authController.HandleRegister)
 	})
 
 	r.Route("/chats", func(r chi.Router) {

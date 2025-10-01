@@ -20,10 +20,11 @@ VALUES
 RETURNING
     *;
 
--- name: GetUserByUsername :one
+-- name: GetUserByUsernameOrEmail :one
 SELECT
     *
 FROM
     users
 WHERE
-    username = $1;
+    username = $1
+    OR email = $1;
