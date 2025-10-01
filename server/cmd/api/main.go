@@ -13,7 +13,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
-	
+
 	"pycrs.cz/what-it-do/internal/apiserver"
 	"pycrs.cz/what-it-do/internal/database"
 )
@@ -32,9 +32,9 @@ func initDB(getenv func(string) string) (*pgx.Conn, error) {
 	return conn, nil
 }
 
-// @title What-it-doo API
-// @version 1.0
-// @description API for the messanger of the future - What-it-doo.
+// @title			What-it-doo API
+// @version		1.0
+// @description	API for the messanger of the future - What-it-doo.
 func run(ctx context.Context, getenv func(string) string, w io.Writer, args []string) error {
 	godotenv.Load()
 	conn, err := initDB(getenv)

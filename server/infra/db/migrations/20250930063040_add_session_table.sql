@@ -13,6 +13,9 @@ CREATE TABLE
         updated_at TIMESTAMPTZ DEFAULT NOW ()
     );
 
+CREATE INDEX idx_sessions_token ON sessions (token);
+CREATE INDEX idx_sessions_user_id ON sessions (user_id);
+
 CREATE TRIGGER update_sessions_updated_at BEFORE
 UPDATE ON sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column ();
 -- +goose StatementEnd

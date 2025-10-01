@@ -41,6 +41,3 @@ func (r *UserRepository) GetUserByUsername(username string) (database.User, erro
 	return r.q.GetUserByUsernameOrEmail(context.Background(), username)
 }
 
-func (r *UserRepository) CreateSession(params database.CreateSessionParams) (database.Session, error) {
-	return r.q.CreateSession(context.Background(), params)
-}

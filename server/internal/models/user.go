@@ -5,10 +5,10 @@ import (
 )
 
 type User struct {
-	ID uuid.UUID `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName string `json:"last_name"`
-	Email string `json:"email"`
+	ID        uuid.UUID `json:"id"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
 }
 
 func (u *User) FullName() string {
@@ -16,6 +16,6 @@ func (u *User) FullName() string {
 }
 
 type UserIdPLink struct {
-	UserID uuid.UUID
+	UserID      uuid.UUID
 	ProviderUID string
 }

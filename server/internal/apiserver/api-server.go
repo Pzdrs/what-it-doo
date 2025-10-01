@@ -21,7 +21,7 @@ func NewServer(q *database.Queries) *Server {
 	userRepository := repository.NewUserRepository(q)
 	sessionRepository := repository.NewSessionRepository(q)
 	chatRepository := repository.NewChatRepository(q)
-	
+
 	server := &Server{
 		authService: service.NewAuthService(userRepository, sessionRepository),
 		chatService: service.NewChatService(chatRepository),

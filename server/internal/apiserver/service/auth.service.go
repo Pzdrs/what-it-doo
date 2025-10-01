@@ -95,8 +95,9 @@ func (s *AuthService) AuthenticateUser(username, password string) bool {
 
 func (s *AuthService) CreateSession(userID uuid.UUID, deviceType, deviceOs string) (model.UserSession, error) {
 	return func() (model.UserSession, error) {
-		session, err := s.repository.CreateSession(database.CreateSessionParams{
+		session, err := s.sessionRepository.CreateSession(database.CreateSessionParams{
 			UserID:     userID,
+			// TODO: Use a more secure token generation method
 			Token:      uuid.NewString(),
 			DeviceType: pgtype.Text{String: deviceType, Valid: true},
 			DeviceOs:   pgtype.Text{String: deviceOs, Valid: true},
@@ -107,4 +108,15 @@ func (s *AuthService) CreateSession(userID uuid.UUID, deviceType, deviceOs strin
 		}
 		return mapSessionToModel(session), nil
 	}()
+}
+
+func (s *AuthService) ValidateSession(token string) bool {
+	session, err := s.sessionRepository.GetSessionByToken(token)
+	if err != nil {
+		return false
+	}
+	if session.ExpiresAt.Time.Before(time.Now()) || session.RevokedAt.Valid {
+		return false
+	}
+	return true
 }
