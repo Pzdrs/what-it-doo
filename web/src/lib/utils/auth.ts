@@ -3,6 +3,7 @@ import { AppRoute } from "$lib/constants";
 import { redirect } from "@sveltejs/kit";
 import { getUser, setUser } from "$lib/stores/user.svelte";
 import type { User } from "$lib/types";
+import { postAuthLogin } from "$lib/api/client";
 
 export interface AuthOptions {
     public?: boolean
