@@ -1,9 +1,8 @@
 import { browser } from "$app/environment";
-import { AppRoute } from "$lib/constants";
-import { redirect } from "@sveltejs/kit";
+import { AppRoute, SESSION_COOKIE_NAME } from "$lib/constants";
 import { getUser, setUser } from "$lib/stores/user.svelte";
 import type { User } from "$lib/types";
-import { postAuthLogin } from "$lib/api/client";
+import { redirect } from "@sveltejs/kit";
 
 export interface AuthOptions {
     public?: boolean
@@ -34,15 +33,13 @@ export const loadUser = async () => {
 };
 
 const hasAuthCookie = (): boolean => {
-    return true; // For development purposes, assume always authenticated
-
     if (!browser) {
         return false;
     }
 
     for (const cookie of document.cookie.split('; ')) {
         const [name] = cookie.split('=');
-        if (name === 'wid_is_authenticated') {
+        if (name === SESSION_COOKIE_NAME) {
             return true;
         }
     }
