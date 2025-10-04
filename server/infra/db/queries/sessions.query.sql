@@ -8,3 +8,6 @@ SELECT * FROM sessions WHERE token = $1;
 
 -- name: GetUserSessions :many
 SELECT * FROM sessions WHERE user_id = $1 ORDER BY created_at DESC;
+
+-- name: DeleteSessionByID :exec
+DELETE FROM sessions WHERE id = $1;

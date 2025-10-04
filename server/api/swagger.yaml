@@ -1,9 +1,24 @@
 definitions:
   LoginRequest:
     properties:
+      email:
+        type: string
       password:
         type: string
-      username:
+      remember_me:
+        type: boolean
+    type: object
+  ProblemDetails:
+    properties:
+      detail:
+        type: string
+      instance:
+        type: string
+      status:
+        type: integer
+      title:
+        type: string
+      type:
         type: string
     type: object
   RegisterRequest:
@@ -12,7 +27,31 @@ definitions:
         type: string
       password:
         type: string
-      username:
+    type: object
+  dto.LogoutResponse:
+    properties:
+      redirect_url:
+        type: string
+      success:
+        type: boolean
+    type: object
+  model.User:
+    properties:
+      avatar_url:
+        type: string
+      bio:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      updated_at:
         type: string
     type: object
 info:
@@ -26,6 +65,7 @@ paths:
       consumes:
       - application/json
       description: Authenticate user with username and password
+      operationId: login
       parameters:
       - description: Login request
         in: body
@@ -37,28 +77,38 @@ paths:
         "200":
           description: Login successful
         "400":
-          description: Already authenticated
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ProblemDetails'
         "401":
-          description: Invalid credentials
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ProblemDetails'
       summary: Authenticate user
       tags:
-      - auth
+      - Authentication
   /auth/logout:
     post:
       description: Logout the authenticated user
+      operationId: logout
       responses:
         "200":
-          description: Logout successful
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LogoutResponse'
         "401":
-          description: Not authenticated
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ProblemDetails'
       summary: Logout user
       tags:
-      - auth
+      - Authentication
   /auth/register:
     post:
       consumes:
       - application/json
       description: Register a new user with credentials
+      operationId: register
       parameters:
       - description: Register request
         in: body
@@ -73,5 +123,19 @@ paths:
           description: Invalid input or user already exists
       summary: Register user
       tags:
-      - auth
+      - Authentication
+  /users/me:
+    get:
+      description: Get details of the currently authenticated user
+      operationId: getMyself
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      summary: Get current user
+      tags:
+      - users
 swagger: "2.0"

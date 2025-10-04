@@ -10,6 +10,7 @@ sqlc:
 	sqlc generate -f infra/db/sqlc.yaml
 
 swag:
+	swag fmt
 	swag init -d ./cmd/api,./internal/apiserver -o ./api
 
 clean:

@@ -13,7 +13,5 @@ sql:
             go_type:
               import: "github.com/google/uuid"
               type: "UUID"
-          - column: users.username
-            go_type: "string"
           - column: users.email
             go_type: "string"

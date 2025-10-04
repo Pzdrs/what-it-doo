@@ -24,20 +24,6 @@ func NewAuthService(repo *repository.UserRepository, sessionRepo *repository.Ses
 	}
 }
 
-func mapUserToModel(user database.User) model.User {
-	return model.User{
-		ID:        user.ID,
-		FirstName: user.FirstName.String,
-		LastName:  user.LastName.String,
-		Username:  user.Username,
-		Email:     user.Email,
-		AvatarUrl: user.AvatarUrl.String,
-		Bio:       user.Bio.String,
-		CreatedAt: user.CreatedAt.Time,
-		UpdatedAt: user.UpdatedAt.Time,
-	}
-}
-
 func mapSessionToModel(session database.Session) model.UserSession {
 	return model.UserSession{
 		ID:         session.ID,
@@ -52,7 +38,7 @@ func mapSessionToModel(session database.Session) model.UserSession {
 }
 
 func (s *AuthService) RegisterUser(user model.User, password string) (model.User, error) {
-	if s.repository.UserExists(user.Username) {
+	if s.repository.UserExists(user.Email) {
 		return model.User{}, fmt.Errorf("user already exists")
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -60,7 +46,6 @@ func (s *AuthService) RegisterUser(user model.User, password string) (model.User
 		panic(err)
 	}
 	u, err := s.repository.SaveUser(database.User{
-		Username:       user.Username,
 		FirstName:      pgtype.Text{String: user.FirstName, Valid: true},
 		LastName:       pgtype.Text{String: user.LastName, Valid: true},
 		Email:          user.Email,
@@ -74,9 +59,9 @@ func (s *AuthService) RegisterUser(user model.User, password string) (model.User
 	return mapUserToModel(u), nil
 }
 
-func (s *AuthService) GetUserByUsername(username string) (model.User, error) {
+func (s *AuthService) GetUserByEmail(email string) (model.User, error) {
 	return func() (model.User, error) {
-		user, err := s.repository.GetUserByUsername(username)
+		user, err := s.repository.GetUserByEmail(email)
 		if err != nil {
 			return model.User{}, err
 		}
@@ -84,8 +69,8 @@ func (s *AuthService) GetUserByUsername(username string) (model.User, error) {
 	}()
 }
 
-func (s *AuthService) AuthenticateUser(username, password string) bool {
-	user, err := s.repository.GetUserByUsername(username)
+func (s *AuthService) AuthenticateUser(email, password string) bool {
+	user, err := s.repository.GetUserByEmail(email)
 	if err != nil {
 		return false
 	}
@@ -96,7 +81,7 @@ func (s *AuthService) AuthenticateUser(username, password string) bool {
 func (s *AuthService) CreateSession(userID uuid.UUID, deviceType, deviceOs string) (model.UserSession, error) {
 	return func() (model.UserSession, error) {
 		session, err := s.sessionRepository.CreateSession(database.CreateSessionParams{
-			UserID:     userID,
+			UserID: userID,
 			// TODO: Use a more secure token generation method
 			Token:      uuid.NewString(),
 			DeviceType: pgtype.Text{String: deviceType, Valid: true},
@@ -110,13 +95,17 @@ func (s *AuthService) CreateSession(userID uuid.UUID, deviceType, deviceOs strin
 	}()
 }
 
-func (s *AuthService) ValidateSession(token string) bool {
+func (s *AuthService) FindSession(token string) (model.UserSession, bool) {
 	session, err := s.sessionRepository.GetSessionByToken(token)
 	if err != nil {
-		return false
+		return model.UserSession{}, false
 	}
 	if session.ExpiresAt.Time.Before(time.Now()) || session.RevokedAt.Valid {
-		return false
+		return mapSessionToModel(session), false
 	}
-	return true
+	return mapSessionToModel(session), true
+}
+
+func (s *AuthService) Logout(session model.UserSession) error {
+	return s.sessionRepository.DeleteSessionByID(session.ID)
 }

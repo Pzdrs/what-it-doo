@@ -15,6 +15,7 @@ type Server struct {
 
 	authService *service.AuthService
 	chatService *service.ChatService
+	userService *service.UserService
 }
 
 func NewServer(q *database.Queries) *Server {
@@ -25,15 +26,20 @@ func NewServer(q *database.Queries) *Server {
 	server := &Server{
 		authService: service.NewAuthService(userRepository, sessionRepository),
 		chatService: service.NewChatService(chatRepository),
+		userService: service.NewUserService(userRepository),
 	}
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	addRoutes(
-		r,
-		server.authService,
-		server.chatService,
-	)
+
+	r.Route("/api/v1", func(api chi.Router) {
+		addRoutes(
+			api,
+			server.authService,
+			server.chatService,
+			server.userService,
+		)
+	})
 
 	server.Handler = r
 

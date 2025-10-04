@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"pycrs.cz/what-it-do/internal/database"
 )
 
@@ -20,4 +21,8 @@ func (r *SessionRepository) GetSessionByToken(token string) (database.Session, e
 
 func (r *SessionRepository) CreateSession(params database.CreateSessionParams) (database.Session, error) {
 	return r.q.CreateSession(context.Background(), params)
+}
+
+func (r *SessionRepository) DeleteSessionByID(sessionID uuid.UUID) error {
+	return r.q.DeleteSessionByID(context.Background(), sessionID)
 }

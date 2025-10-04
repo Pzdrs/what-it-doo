@@ -7,26 +7,30 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "pycrs.cz/what-it-do/api" // Swagger docs
 	"pycrs.cz/what-it-do/internal/apiserver/controller"
+	"pycrs.cz/what-it-do/internal/apiserver/middleware"
 	"pycrs.cz/what-it-do/internal/apiserver/service"
 )
 
 func addRoutes(
-	r *chi.Mux,
+	r chi.Router,
 	authService *service.AuthService,
 	chatService *service.ChatService,
+	userService *service.UserService,
 ) {
-	browserOnly := newBrowserOnly("This endpoint is only accessible from a web browser")
-	requireAuthenticated := requireAuthenticated(authService)
+	RequireAuthenticated := middleware.RequireAuthenticated(authService, userService)
 
 	authController := controller.NewAuthController(authService)
 	chatController := controller.NewChatController(chatService)
-
-	r.With(browserOnly).Get("/hello", controller.HandleHello)
+	userController := controller.NewUserController(userService)
 
 	r.Route("/auth", func(r chi.Router) {
-		r.With(requireUnauthenticated).Post("/login", authController.HandleLogin)
-		r.With(requireAuthenticated).Post("/logout", authController.HandleLogout)
-		r.With(requireUnauthenticated).Post("/register", authController.HandleRegister)
+		r.With().Post("/login", authController.HandleLogin)
+		r.With(RequireAuthenticated).Post("/logout", authController.HandleLogout)
+		r.With(middleware.RequireUnauthenticated).Post("/register", authController.HandleRegister)
+	})
+
+	r.Route("/users", func(r chi.Router) {
+		r.With(RequireAuthenticated).Get("/me", userController.HandleGetMyself)
 	})
 
 	r.Route("/chats", func(r chi.Router) {

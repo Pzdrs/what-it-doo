@@ -22,9 +22,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Authentication"
                 ],
                 "summary": "Authenticate user",
+                "operationId": "login",
                 "parameters": [
                     {
                         "description": "Login request",
@@ -41,10 +42,16 @@ const docTemplate = `{
                         "description": "Login successful"
                     },
                     "400": {
-                        "description": "Already authenticated"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ProblemDetails"
+                        }
                     },
                     "401": {
-                        "description": "Invalid credentials"
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ProblemDetails"
+                        }
                     }
                 }
             }
@@ -53,15 +60,22 @@ const docTemplate = `{
             "post": {
                 "description": "Logout the authenticated user",
                 "tags": [
-                    "auth"
+                    "Authentication"
                 ],
                 "summary": "Logout user",
+                "operationId": "logout",
                 "responses": {
                     "200": {
-                        "description": "Logout successful"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LogoutResponse"
+                        }
                     },
                     "401": {
-                        "description": "Not authenticated"
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ProblemDetails"
+                        }
                     }
                 }
             }
@@ -73,9 +87,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Authentication"
                 ],
                 "summary": "Register user",
+                "operationId": "register",
                 "parameters": [
                     {
                         "description": "Register request",
@@ -96,16 +111,60 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/users/me": {
+            "get": {
+                "description": "Get details of the currently authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get current user",
+                "operationId": "getMyself",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
         "LoginRequest": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },
-                "username": {
+                "remember_me": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "ProblemDetails": {
+            "type": "object",
+            "properties": {
+                "detail": {
+                    "type": "string"
+                },
+                "instance": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -118,8 +177,45 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.LogoutResponse": {
+            "type": "object",
+            "properties": {
+                "redirect_url": {
+                    "type": "string"
                 },
-                "username": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.User": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "bio": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
