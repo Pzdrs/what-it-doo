@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -10,6 +11,10 @@ import (
 	"pycrs.cz/what-it-do/internal/apiserver/model"
 	"pycrs.cz/what-it-do/internal/apiserver/repository"
 	"pycrs.cz/what-it-do/internal/database"
+)
+
+var (
+	ErrUserAlreadyExists = errors.New("user already exists")
 )
 
 type AuthService struct {
@@ -39,15 +44,16 @@ func mapSessionToModel(session database.Session) model.UserSession {
 
 func (s *AuthService) RegisterUser(user model.User, password string) (model.User, error) {
 	if s.repository.UserExists(user.Email) {
-		return model.User{}, fmt.Errorf("user already exists")
+		return model.User{}, ErrUserAlreadyExists
 	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		panic(err)
+		return model.User{}, fmt.Errorf("failed to hash password: %w", err)
 	}
+
 	u, err := s.repository.SaveUser(database.User{
-		FirstName:      pgtype.Text{String: user.FirstName, Valid: true},
-		LastName:       pgtype.Text{String: user.LastName, Valid: true},
+		Name:           pgtype.Text{String: user.Name, Valid: true},
 		Email:          user.Email,
 		HashedPassword: pgtype.Text{String: string(hashedPassword), Valid: true},
 		CreatedAt:      pgtype.Timestamptz{Time: time.Now()},

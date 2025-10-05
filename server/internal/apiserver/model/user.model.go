@@ -8,8 +8,7 @@ import (
 
 type User struct {
 	ID        uuid.UUID `json:"id"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
+	Name      string    `json:"name"`
 	Email     string    `json:"email"`
 	AvatarUrl string    `json:"avatar_url"`
 	Bio       string    `json:"bio"`
@@ -26,8 +25,4 @@ type UserSession struct {
 	CreatedAt  time.Time `json:"created_at"`
 	ExpiresAt  time.Time `json:"expires_at"`
 	RevokedAt  time.Time `json:"revoked_at"`
-}
-
-func (u *User) FullName() string {
-	return u.FirstName + " " + u.LastName
 }

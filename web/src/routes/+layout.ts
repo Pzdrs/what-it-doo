@@ -1,5 +1,8 @@
-import { initLanguage } from '$lib/utils/i18n.js';
+import { init } from '$lib/utils/server.js';
+import type { LayoutLoad } from './$types';
 
-export const load = async ({ }) => {
-    await initLanguage();
-};
+export const ssr = false;
+
+export const load = (async ({ fetch }) => {
+	await init(fetch);
+}) satisfies LayoutLoad;

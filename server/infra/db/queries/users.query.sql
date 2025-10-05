@@ -7,15 +7,14 @@ FROM
 -- name: CreateUser :one
 INSERT INTO
     users (
-        first_name,
-        last_name,
+        name,
         email,
         hashed_password,
         avatar_url,
         bio
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6)
+    ($1, $2, $3, $4, $5)
 RETURNING
     *;
 

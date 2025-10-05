@@ -12,7 +12,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"gen:api": "npx oazapfts ../server/api/swagger.json src/lib/api/client.ts"
+		"gen:api": "npx oazapfts --optimistic --useEnumType ../server/api/swagger.json src/lib/api/client.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
@@ -27,6 +27,7 @@
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^3.0.0",
 		"globals": "^16.0.0",
+		"oazapfts": "^6.3.1",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
 		"prettier-plugin-tailwindcss": "^0.6.14",
@@ -39,7 +40,7 @@
 	},
 	"dependencies": {
 		"@mdi/js": "^7.4.47",
-		"oazapfts": "^6.3.1",
+		"@oazapfts/runtime": "^1.0.4",
 		"svelte-i18n": "^4.0.1",
 		"timeago.js": "^4.0.2"
 	}

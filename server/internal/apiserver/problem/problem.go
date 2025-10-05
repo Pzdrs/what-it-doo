@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
+
+	"pycrs.cz/what-it-do/internal"
 )
 
 type ProblemDetails struct {
@@ -14,14 +17,14 @@ type ProblemDetails struct {
 	Instance string `json:"instance,omitempty"`
 } //	@name	ProblemDetails
 
-type ValidationError struct {
+type FieldValidationError struct {
 	Type    string `json:"type"`
 	Message string `json:"message"`
-}
+} //	@name	FieldValidationError
 
 type ValidationProblemDetails struct {
 	ProblemDetails
-	Errors map[string][]ValidationError `json:"errors,omitempty"`
+	Errors map[string]FieldValidationError `json:"errors,omitempty"`
 }
 
 type Problem interface {
@@ -38,6 +41,25 @@ func (p ProblemDetails) GetDetail() string   { return p.Detail }
 func (p ProblemDetails) GetType() string     { return p.Type }
 func (p ProblemDetails) GetInstance() string { return p.Instance }
 
+func NewProblemDetails(r *http.Request, status int, title, detail, problemType string) ProblemDetails {
+	return ProblemDetails{
+		Status:   status,
+		Title:    title,
+		Detail:   detail,
+		Type:     wrapType(problemType),
+		Instance: r.URL.Path,
+	}
+}
+
+func NewInternalServerError(r *http.Request, err error) ProblemDetails {
+	return NewProblemDetails(
+		r, http.StatusInternalServerError,
+		"Internal Server Error",
+		internal.FirstUpper(strings.TrimSpace(err.Error())),
+		"internal-server-error",
+	)
+}
+
 func WriteProblemDetails(w http.ResponseWriter, p Problem) error {
 
 	w.Header().Set("Content-Type", "application/problem+json")
@@ -46,6 +68,6 @@ func WriteProblemDetails(w http.ResponseWriter, p Problem) error {
 	return json.NewEncoder(w).Encode(p)
 }
 
-func getDefaultType(statusCode int) string {
-	return fmt.Sprintf("https://httpstatuses.io/%d", statusCode)
+func wrapType(problem string) string {
+	return fmt.Sprintf("https://wid.pycrs.cz/probs/%s", problem)
 }

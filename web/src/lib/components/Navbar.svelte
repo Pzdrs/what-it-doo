@@ -1,13 +1,21 @@
 <script>
+	import { goto } from '$app/navigation';
+	import { logout } from '$lib/api/client';
+	import { AppRoute } from '$lib/constants';
 	import ServerHealth from './ServerHealth.svelte';
 	import ThemeSwitch from './ThemeSwitch.svelte';
 	let menuOpen = false;
+
+	const _logout = async () => {
+		const { redirect_url } = await logout();
+		await goto(redirect_url ?? AppRoute.AUTH_LOGIN);
+	};
 </script>
 
-<div class="navbar bg-base-100 my-1 h-20 shadow-sm">
+<div class="my-1 navbar h-20 bg-base-100 shadow-sm">
 	<!-- LEVÁ STRANA -->
 	<div class="navbar-start">
-		<a href="/" class="btn btn-ghost text-primary text-xl">what it doo</a>
+		<a href="/" class="btn text-xl text-primary btn-ghost">what it doo</a>
 	</div>
 
 	<!-- PRAVÁ STRANA – DESKTOP -->
@@ -19,7 +27,7 @@
 
 		<!-- Notifikace -->
 		<div class="dropdown dropdown-end">
-			<button aria-label="Notifications" class="btn btn-ghost btn-circle">
+			<button aria-label="Notifications" class="btn btn-circle btn-ghost">
 				<div class="indicator">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -35,10 +43,10 @@
 							d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
 						/>
 					</svg>
-					<span class="badge badge-xs badge-primary indicator-item"></span>
+					<span class="indicator-item badge badge-xs badge-primary"></span>
 				</div>
 			</button>
-			<ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm">
+			<ul class="dropdown-content menu z-10 w-52 rounded-box bg-base-100 p-2 shadow-sm">
 				<li><a>Item 1</a></li>
 				<li><a>Item 2</a></li>
 			</ul>
@@ -46,7 +54,7 @@
 
 		<!-- Avatar -->
 		<div class="dropdown dropdown-end">
-			<div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+			<div tabindex="0" role="button" class="btn avatar btn-circle btn-ghost">
 				<div class="w-10 rounded-full">
 					<img
 						alt="user avatar"
@@ -54,19 +62,19 @@
 					/>
 				</div>
 			</div>
-			<ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow">
+			<ul class="dropdown-content menu z-10 mt-3 w-52 menu-sm rounded-box bg-base-100 p-2 shadow">
 				<li>
 					<a href="#profile" class="justify-between">Profile <span class="badge">New</span></a>
 				</li>
 				<li><a href="#settings">Settings</a></li>
-				<li><a href="#logout">Logout</a></li>
+				<li><button onclick={_logout}>Logout</button></li>
 			</ul>
 		</div>
 	</div>
 
 	<!-- MOBILE BURGER -->
 	<div class="navbar-end lg:hidden">
-		<button class="btn btn-ghost btn-circle" on:click={() => (menuOpen = !menuOpen)}>
+		<button class="btn btn-circle btn-ghost" onclick={() => (menuOpen = !menuOpen)}>
 			<!-- ikonka hamburgeru -->
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -88,14 +96,14 @@
 
 <!-- MOBILE MENU -->
 {#if menuOpen}
-	<div class="bg-base-100 border-base-200 border-t shadow-md lg:hidden">
+	<div class="border-t border-base-200 bg-base-100 shadow-md lg:hidden">
 		<div class="flex flex-col items-center gap-3 p-4">
 			<ServerHealth />
 			<ThemeSwitch />
-			<a href="#notifications" class="btn btn-ghost justify-start">Notifications</a>
-			<a href="#profile" class="btn btn-ghost justify-start">Profile</a>
-			<a href="#settings" class="btn btn-ghost justify-start">Settings</a>
-			<a href="#logout" class="btn btn-ghost justify-start">Logout</a>
+			<a href="#notifications" class="btn justify-start btn-ghost">Notifications</a>
+			<a href="#profile" class="btn justify-start btn-ghost">Profile</a>
+			<a href="#settings" class="btn justify-start btn-ghost">Settings</a>
+			<a href="#logout" class="btn justify-start btn-ghost">Logout</a>
 		</div>
 	</div>
 {/if}

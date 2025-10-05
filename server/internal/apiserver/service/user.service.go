@@ -14,8 +14,7 @@ type UserService struct {
 func mapUserToModel(user database.User) model.User {
 	return model.User{
 		ID:        user.ID,
-		FirstName: user.FirstName.String,
-		LastName:  user.LastName.String,
+		Name:      user.Name.String,
 		Email:     user.Email,
 		AvatarUrl: user.AvatarUrl.String,
 		Bio:       user.Bio.String,

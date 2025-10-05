@@ -1,13 +1,4 @@
 definitions:
-  LoginRequest:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-      remember_me:
-        type: boolean
-    type: object
   ProblemDetails:
     properties:
       detail:
@@ -21,12 +12,17 @@ definitions:
       type:
         type: string
     type: object
-  RegisterRequest:
+  dto.LoginRequest:
     properties:
       email:
         type: string
       password:
         type: string
+      remember_me:
+        type: boolean
+    required:
+    - email
+    - password
     type: object
   dto.LogoutResponse:
     properties:
@@ -34,6 +30,37 @@ definitions:
         type: string
       success:
         type: boolean
+    type: object
+  dto.RegistrationRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.RegistrationResponse:
+    properties:
+      success:
+        type: boolean
+      user:
+        $ref: '#/definitions/dto.UserDetails'
+    type: object
+  dto.UserDetails:
+    properties:
+      avatar_url:
+        type: string
+      bio:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
     type: object
   model.User:
     properties:
@@ -45,11 +72,9 @@ definitions:
         type: string
       email:
         type: string
-      first_name:
-        type: string
       id:
         type: string
-      last_name:
+      name:
         type: string
       updated_at:
         type: string
@@ -72,7 +97,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/LoginRequest'
+          $ref: '#/definitions/dto.LoginRequest'
       responses:
         "200":
           description: Login successful
@@ -115,12 +140,20 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/RegisterRequest'
+          $ref: '#/definitions/dto.RegistrationRequest'
       responses:
-        "200":
-          description: User registered
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.RegistrationResponse'
         "400":
-          description: Invalid input or user already exists
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ProblemDetails'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ProblemDetails'
       summary: Register user
       tags:
       - Authentication

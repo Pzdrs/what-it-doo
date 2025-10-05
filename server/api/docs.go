@@ -33,7 +33,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/LoginRequest"
+                            "$ref": "#/definitions/dto.LoginRequest"
                         }
                     }
                 ],
@@ -98,16 +98,28 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/RegisterRequest"
+                            "$ref": "#/definitions/dto.RegistrationRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "User registered"
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegistrationResponse"
+                        }
                     },
                     "400": {
-                        "description": "Invalid input or user already exists"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ProblemDetails"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ProblemDetails"
+                        }
                     }
                 }
             }
@@ -135,20 +147,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "LoginRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "remember_me": {
-                    "type": "boolean"
-                }
-            }
-        },
         "ProblemDetails": {
             "type": "object",
             "properties": {
@@ -169,14 +167,21 @@ const docTemplate = `{
                 }
             }
         },
-        "RegisterRequest": {
+        "dto.LoginRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
                 "password": {
                     "type": "string"
+                },
+                "remember_me": {
+                    "type": "boolean"
                 }
             }
         },
@@ -188,6 +193,53 @@ const docTemplate = `{
                 },
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "dto.RegistrationRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                }
+            }
+        },
+        "dto.RegistrationResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                },
+                "user": {
+                    "$ref": "#/definitions/dto.UserDetails"
+                }
+            }
+        },
+        "dto.UserDetails": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "bio": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -206,13 +258,10 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "first_name": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
-                "last_name": {
+                "name": {
                     "type": "string"
                 },
                 "updated_at": {

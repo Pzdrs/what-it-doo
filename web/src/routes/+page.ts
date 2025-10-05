@@ -1,12 +1,12 @@
 import { AppRoute } from "$lib/constants";
-import { loadUser } from "$lib/utils/auth";
-import { initLanguage } from "$lib/utils/i18n";
+import { init } from "$lib/utils/server";
 import { redirect } from "@sveltejs/kit";
+import type { LayoutLoad } from "./$types";
 
-export const load = async () => {
-    await initLanguage();
+export const ssr = false;
 
-    const authenticated = await loadUser();
+export const load = (async ({fetch}) => {
+    await init(fetch);
 
-    if (authenticated) redirect(302, AppRoute.CHAT);
-};
+    redirect(302, AppRoute.CHAT);
+}) satisfies LayoutLoad;

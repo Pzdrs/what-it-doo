@@ -1,12 +1,12 @@
-import type { User } from "$lib/types";
+import type { ModelUser } from "$lib/api/client";
 
-let user = $state<User>();
+let user = $state<ModelUser>();
 
-export const getUser = (): User | undefined => {
+export const getUser = (): ModelUser | undefined => {
     return user;
 };
 
-export const setUser = (_user: User) => {
+export const setUser = (_user: ModelUser) => {
     user = _user;
     return user;
 };

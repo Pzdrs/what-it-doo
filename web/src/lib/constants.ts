@@ -1,6 +1,7 @@
-export const SESSION_COOKIE_NAME = 'wid_session';
+export const SESSION_COOKIE_NAME = 'wid_is_authenticated';
 
 export enum AppRoute {
+	HOME = '/',
 	CHAT = '/chat',
 
 	AUTH_LOGIN = '/auth/login',
@@ -16,5 +17,6 @@ interface Lang {
 export const defaultLang: Lang = { name: 'English', code: 'en', loader: () => import('$i18n/en.json') };
 
 export const langs: Lang[] = [
-	{ name: 'English', code: 'en', loader: () => import('$i18n/en.json') }
+	{ name: 'English', code: 'en', loader: () => import('$i18n/en.json') },
+	{ name: 'Czech', code: 'cs', loader: () => import('$i18n/cs.json') }
 ];

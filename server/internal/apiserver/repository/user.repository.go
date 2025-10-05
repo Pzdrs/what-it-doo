@@ -27,8 +27,7 @@ func (r UserRepository) SaveUser(user database.User) (database.User, error) {
 	}
 
 	user, err := r.q.CreateUser(context.Background(), database.CreateUserParams{
-		FirstName:      user.FirstName,
-		LastName:       user.LastName,
+		Name:           user.Name,
 		Email:          user.Email,
 		HashedPassword: user.HashedPassword,
 		AvatarUrl:      user.AvatarUrl,
