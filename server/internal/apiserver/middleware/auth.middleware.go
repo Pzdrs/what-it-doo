@@ -56,18 +56,23 @@ func RequireAuthenticated(authService *service.AuthService, userService *service
 	}
 }
 
-func RequireUnauthenticated(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, err := r.Cookie(internal.SESSION_COOKIE_NAME)
-		if err == nil {
-			problem.WriteProblemDetails(w, problem.NewProblemDetails(
-				r, http.StatusBadRequest,
-				"Already authenticated",
-				"This resource is only available for unauthenticated users",
-				"auth/already-authenticated",
-			))
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
+func RequireUnauthenticated(authService *service.AuthService) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			cookie, err := r.Cookie(internal.SESSION_COOKIE_NAME)
+			if err == nil {
+				_, valid := authService.FindSession(cookie.Value)
+				if valid {
+					problem.WriteProblemDetails(w, problem.NewProblemDetails(
+						r, http.StatusBadRequest,
+						"Already authenticated",
+						"This resource is only available for unauthenticated users",
+						"auth/already-authenticated",
+					))
+					return
+				}
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
 }

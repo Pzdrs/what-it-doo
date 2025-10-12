@@ -4,6 +4,7 @@ import { redirect } from "@sveltejs/kit";
 import type { LayoutLoad } from "./$types";
 
 export const ssr = false;
+export const csr = true;
 
 export const load = (async ({fetch}) => {
     await init(fetch);

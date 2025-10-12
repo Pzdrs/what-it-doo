@@ -24,6 +24,13 @@ definitions:
     - email
     - password
     type: object
+  dto.LoginResponse:
+    properties:
+      user:
+        $ref: '#/definitions/dto.UserDetails'
+    required:
+    - user
+    type: object
   dto.LogoutResponse:
     properties:
       redirect_url:
@@ -35,19 +42,22 @@ definitions:
     properties:
       email:
         type: string
+      name:
+        type: string
       password:
         minLength: 8
         type: string
     required:
     - email
+    - name
     - password
     type: object
   dto.RegistrationResponse:
     properties:
-      success:
-        type: boolean
       user:
         $ref: '#/definitions/dto.UserDetails'
+    required:
+    - user
     type: object
   dto.UserDetails:
     properties:
@@ -100,7 +110,9 @@ paths:
           $ref: '#/definitions/dto.LoginRequest'
       responses:
         "200":
-          description: Login successful
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
         "400":
           description: Bad Request
           schema:
@@ -141,6 +153,10 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/dto.RegistrationRequest'
+      - description: Automatically log in the user after registration
+        in: query
+        name: autoLogin
+        type: boolean
       responses:
         "201":
           description: Created

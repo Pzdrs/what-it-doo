@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { login } from '$lib/api/client';
+	import { login, type DtoUserDetails } from '$lib/api/client';
 	import AuthPageLayout from '$lib/components/layout/AuthPageLayout.svelte';
 	import { t } from 'svelte-i18n';
 	import type { PageData } from './$types';
 	import { getTranslatedError } from '$lib/utils/handle-error';
 	import { setUser } from '$lib/stores/user.svelte';
+	import Alert from '$lib/components/ui/Alert.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 
 	interface Props {
 		data: PageData;
@@ -19,7 +21,7 @@
 	let remember_me = $state(false);
 	let loading = $state(false);
 
-	const onSuccess = async (user) => {
+	const onSuccess = async (user: DtoUserDetails) => {
 		setUser(user);
 		await goto(data.continueUrl, { invalidateAll: true });
 	};
@@ -28,7 +30,7 @@
 		try {
 			errorMessage = '';
 			loading = true;
-			const user = await login({ email, password, remember_me });
+			const { user } = await login({ email, password, remember_me });
 			await onSuccess(user);
 		} catch (error) {
 			errorMessage = getTranslatedError($t, error);
@@ -46,30 +48,14 @@
 
 <AuthPageLayout title={$t('sign_in_please')}>
 	<form {onsubmit} class="mt-6 space-y-4">
-		{#if errorMessage}
-			<div role="alert" class="mb-10 alert alert-error">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-6 w-6 shrink-0 stroke-current"
-					fill="none"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-					/>
-				</svg>
-				<span>{errorMessage}</span>
-			</div>
-		{/if}
+		<Alert type="error" message={errorMessage} />
 
 		<div>
-			<label class="label">
+			<label for="email" class="label">
 				<span class="label-text">{$t('email_address')}</span>
 			</label>
 			<input
+				name="email"
 				type="email"
 				placeholder={$t('email_placeholder')}
 				bind:value={email}
@@ -79,10 +65,11 @@
 		</div>
 
 		<div>
-			<label class="label">
+			<label for="password" class="label">
 				<span class="label-text">{$t('password')}</span>
 			</label>
 			<input
+				name="password"
 				type="password"
 				placeholder="••••••••"
 				bind:value={password}
@@ -99,7 +86,9 @@
 			<a href="#" class="link text-sm link-primary">{$t('forgot_password')}</a>
 		</div>
 
-		<button type="submit" class="btn w-full btn-primary">{$t('sign_in')}</button>
+		<Button {loading} loadingText={$t('sign_in_loading')} type="submit" class="w-full btn-primary">
+			{$t('sign_in')}
+		</Button>
 
 		<div class="divider">{$t('or_continue_with')}</div>
 

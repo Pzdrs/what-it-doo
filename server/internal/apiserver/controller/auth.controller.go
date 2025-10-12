@@ -27,19 +27,19 @@ func NewAuthController(authService *service.AuthService) *AuthController {
 //	@Description	Authenticate user with username and password
 //	@Accept			json
 //	@Tags			Authentication
-//	@Success		200		"Login successful"
+//	@Success		200		{object}	dto.LoginResponse
 //	@Failure		400		{object}	problem.ProblemDetails
 //	@Failure		401		{object}	problem.ProblemDetails
 //	@Param			request	body		dto.LoginRequest	true	"Login request"
 //	@Router			/auth/login [post]
 func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
-	t, ok := common.DecodeAndValidate[dto.LoginRequest](w, r)
+	req, ok := common.DecodeAndValidate[dto.LoginRequest](w, r)
 	if !ok {
 		return
 	}
 
-	user, err := c.authService.GetUserByEmail(t.Email)
-	if err != nil || !c.authService.AuthenticateUser(t.Email, t.Password) {
+	user, err := c.authService.GetUserByEmail(req.Email)
+	if err != nil || !c.authService.AuthenticateUser(req.Email, req.Password) {
 		problem.WriteProblemDetails(w, problem.NewProblemDetails(
 			r, http.StatusUnauthorized,
 			"Incorrect credentials",
@@ -55,7 +55,10 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	common.SetAuthCookies(w, &session, t.RememberMe)
+	common.SetAuthCookies(w, &session, req.RememberMe)
+	common.WriteJSON(w, http.StatusCreated, dto.LoginResponse{
+		User: dto.MapUserToUserDetails(user),
+	})
 }
 
 // HandleRegister
@@ -65,10 +68,11 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 //	@Description	Register a new user with credentials
 //	@Accept			json
 //	@Tags			Authentication
-//	@Success		201		{object}	dto.RegistrationResponse
-//	@Failure		400		{object}	problem.ProblemDetails
-//	@Failure		500		{object}	problem.ProblemDetails
-//	@Param			request	body		dto.RegistrationRequest	true	"Register request"
+//	@Success		201			{object}	dto.RegistrationResponse
+//	@Failure		400			{object}	problem.ProblemDetails
+//	@Failure		500			{object}	problem.ProblemDetails
+//	@Param			request		body		dto.RegistrationRequest	true	"Register request"
+//	@Param			autoLogin	query		bool					false	"Automatically log in the user after registration"
 //	@Router			/auth/register [post]
 func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) {
 	req, ok := common.DecodeAndValidate[dto.RegistrationRequest](w, r)
@@ -76,9 +80,10 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	u, err := c.authService.RegisterUser(
+	user, err := c.authService.RegisterUser(
 		model.User{
 			Email: req.Email,
+			Name:  req.Name,
 		}, req.Password,
 	)
 
@@ -88,7 +93,7 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 				r, http.StatusBadRequest,
 				"User already exists",
 				"A user with the given email already exists",
-				"auth/user-already-exists",
+				"auth/email-taken",
 			))
 			return
 		} else {
@@ -97,9 +102,17 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
+	if r.URL.Query().Get("autoLogin") == "true" {
+		session, err := c.authService.CreateSession(user.ID, "web", "unknown")
+		if err != nil {
+			problem.WriteProblemDetails(w, problem.NewInternalServerError(r, err))
+			return
+		}
+		common.SetAuthCookies(w, &session, true)
+	}
+
 	common.WriteJSON(w, http.StatusCreated, dto.RegistrationResponse{
-		Success: true,
-		User:    dto.MapUserToUserDetails(u),
+		User: dto.MapUserToUserDetails(user),
 	})
 }
 

@@ -18,6 +18,7 @@ func addRoutes(
 	userService *service.UserService,
 ) {
 	RequireAuthenticated := middleware.RequireAuthenticated(authService, userService)
+	RequireUnauthenticated := middleware.RequireUnauthenticated(authService)
 
 	authController := controller.NewAuthController(authService)
 	chatController := controller.NewChatController(chatService)
@@ -26,7 +27,7 @@ func addRoutes(
 	r.Route("/auth", func(r chi.Router) {
 		r.With().Post("/login", authController.HandleLogin)
 		r.With(RequireAuthenticated).Post("/logout", authController.HandleLogout)
-		r.With(middleware.RequireUnauthenticated).Post("/register", authController.HandleRegister)
+		r.With(RequireUnauthenticated).Post("/register", authController.HandleRegister)
 	})
 
 	r.Route("/users", func(r chi.Router) {

@@ -39,7 +39,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Login successful"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginResponse"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -100,6 +103,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.RegistrationRequest"
                         }
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Automatically log in the user after registration",
+                        "name": "autoLogin",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -185,6 +194,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.LoginResponse": {
+            "type": "object",
+            "required": [
+                "user"
+            ],
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/dto.UserDetails"
+                }
+            }
+        },
         "dto.LogoutResponse": {
             "type": "object",
             "properties": {
@@ -200,10 +220,14 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
+                "name",
                 "password"
             ],
             "properties": {
                 "email": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 },
                 "password": {
@@ -214,10 +238,10 @@ const docTemplate = `{
         },
         "dto.RegistrationResponse": {
             "type": "object",
+            "required": [
+                "user"
+            ],
             "properties": {
-                "success": {
-                    "type": "boolean"
-                },
                 "user": {
                     "$ref": "#/definitions/dto.UserDetails"
                 }

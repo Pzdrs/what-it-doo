@@ -1,0 +1,13 @@
+{
+    "email_address": "Emailová adresa",
+    "email_placeholder": "novak@domena.cz",
+    "password": "Heslo",
+    "remember_me": "Zapamatovat si mě",
+    "sign_in": "Přihlásit se",
+    "sign_in_please": "Přihlaste se ke svému účtu",
+    "sign_up_please": "Prosím, zaregistrujte se",
+    "sign_up": "Zaregistrovat se",
+    "forgot_password": "Zapomněli jste heslo?",
+    "no_account": "Nemáte účet?",
+    "or_continue_with": "Nebo pokračujte přes"
+}

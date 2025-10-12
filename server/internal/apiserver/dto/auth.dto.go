@@ -17,7 +17,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	User UserDetails `json:"user"`
+	User UserDetails `json:"user" validate:"required"`
 }
 
 type LogoutResponse struct {
@@ -27,10 +27,10 @@ type LogoutResponse struct {
 
 type RegistrationRequest struct {
 	Email    string `json:"email" validate:"required,email"`
+	Name     string `json:"name" validate:"required"`
 	Password string `json:"password" validate:"required,min=8"`
 }
 
 type RegistrationResponse struct {
-	Success bool        `json:"success"`
-	User    UserDetails `json:"user"`
+	User UserDetails `json:"user" validate:"required"`
 }

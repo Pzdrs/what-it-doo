@@ -48,3 +48,10 @@ export const authenticate = async (url: URL, options?: AuthOptions) => {
         redirect(302, `${AppRoute.AUTH_LOGIN}?continue=${encodeURIComponent(url.pathname + url.search)}`);
     }
 };
+
+export const requireNoAuth = async (url: URL) => {
+    const user = await loadUser();
+    if (user) {
+        redirect(302, AppRoute.HOME);
+    }
+};
