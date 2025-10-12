@@ -1,15 +1,17 @@
 SHELL := /bin/bash
+SWAG_INPUTS := $(shell find cmd/api/main.go internal/apiserver/controller -name "*.go")
+SWAG_OUTPUTS := api/docs.go
 
-build: clean
+build: 
 	go build -o bin/api ./cmd/api/
-
-run: swag build
-	./bin/api
 
 sqlc:
 	sqlc generate -f infra/db/sqlc.yaml
 
-swag:
+swag: $(SWAG_OUTPUTS)
+	@echo "api docs are up to date"
+
+$(SWAG_OUTPUTS): $(SWAG_INPUTS)
 	swag fmt
 	swag init -d ./cmd/api,./internal/apiserver -o ./api
 
