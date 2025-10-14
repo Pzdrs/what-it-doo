@@ -32,10 +32,9 @@ RUN go mod download
 COPY server/ .
 
 # Copy built frontend files into Go’s static directory
-COPY --from=frontend /app/build ./static
 
 # Build Go binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/server ./cmd/api
 
 # =========================
 # 3. Final minimal image
@@ -43,7 +42,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/api
 FROM gcr.io/distroless/base-debian12 AS production
 
 WORKDIR /app
-COPY --from=backend /app .
+COPY --from=backend /app/bin/server ./bin/server
+COPY --from=frontend /app/build ./static
 
 EXPOSE 8080
-ENTRYPOINT ["/app/server"]
+ENTRYPOINT ["/app/bin/server"]

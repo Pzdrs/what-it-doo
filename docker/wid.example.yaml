@@ -1,0 +1,9 @@
+# server:
+#   port: 8080
+
+# database:
+#   host: database
+#   port: 5432
+#   name: whatitdoo
+#   user: postgres
+#   password: example

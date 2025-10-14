@@ -1,0 +1,6 @@
+**/.vscode
+**/*.env
+
+server/bin/
+server/tmp/
+server/wid.yaml

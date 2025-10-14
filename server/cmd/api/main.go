@@ -46,41 +46,48 @@ func initDB(config *apiserver.Configuration) (*pgx.Conn, error) {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	log.Println("connected to database")
+	log.Println("Connected to database")
 	return conn, nil
 }
 
 func initConfig() (apiserver.Configuration, error) {
-	config := viper.New()
-	config.SetConfigName("wid")
-	config.SetEnvPrefix("WID")
+    config := viper.NewWithOptions(viper.ExperimentalBindStruct())
+    config.AutomaticEnv()
+    config.SetConfigName("wid")
+    config.SetEnvPrefix("WID")
 
-	config.AddConfigPath(".")
-	config.AddConfigPath("/etc/whatitdoo")
+    config.AddConfigPath(".")
+    config.AddConfigPath("/etc/whatitdoo")
 
-	config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	config.AutomaticEnv()
+    config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	config.SetDefault("server.port", 8080)
+    config.SetDefault("server.port", 8080)
 
-	if err := config.ReadInConfig(); err != nil {
-		return apiserver.Configuration{}, fmt.Errorf("failed to read config: %w", err)
+    if err := config.ReadInConfig(); err != nil {
+        if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+            return apiserver.Configuration{}, fmt.Errorf("failed to read config: %w", err)
+        }
+		log.Println("No configuration file found")
+    } else {
+		log.Println("Using configuration file:", config.ConfigFileUsed())
 	}
 
-	var cfg apiserver.Configuration
-	if err := config.Unmarshal(&cfg); err != nil {
-		return apiserver.Configuration{}, fmt.Errorf("failed to unmarshal config: %w", err)
-	}
+    var cfg apiserver.Configuration
+    if err := config.Unmarshal(&cfg); err != nil {
+        return apiserver.Configuration{}, fmt.Errorf("failed to unmarshal config: %w", err)
+    }
 
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	validate.RegisterStructValidation(validation.DbConfigStructLevelValidation, apiserver.DatabaseConfiguration{})
-	if err := validate.Struct(cfg); err != nil {
-		return apiserver.Configuration{}, fmt.Errorf("invalid config: %w", err)
-	}
+    validate := validator.New(validator.WithRequiredStructEnabled())
+    validate.RegisterStructValidation(
+        validation.DbConfigStructLevelValidation,
+        apiserver.DatabaseConfiguration{},
+    )
+    if err := validate.Struct(cfg); err != nil {
+        return apiserver.Configuration{}, fmt.Errorf("invalid config: %w", err)
+    }
 
-	return cfg, nil
+    return cfg, nil
 }
-
 // @title			What-it-doo API
 // @version		1.0
 // @description	API for the messanger of the future - What-it-doo.
@@ -104,8 +111,7 @@ func run(ctx context.Context, getenv func(string) string, w io.Writer, args []st
 		Handler: server.Handler,
 	}
 	go func() {
-		log.Printf("starting server with config: %+v\n", config)
-		log.Printf("listening on %s\n", httpServer.Addr)
+		log.Printf("Listening on %s\n", httpServer.Addr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Printf("error listening and serving: %s\n", err)
 		}
