@@ -1,4 +1,6 @@
 /bin
+.direnv/
+.vscode
 /tmp
 .env
 internal/database

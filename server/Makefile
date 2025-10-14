@@ -5,6 +5,9 @@ SWAG_OUTPUTS := api/docs.go
 build: 
 	go build -o bin/api ./cmd/api/
 
+run: 
+	go run ./cmd/api/
+
 sqlc:
 	sqlc generate -f infra/db/sqlc.yaml
 
