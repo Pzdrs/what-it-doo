@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "server:dev",
+      "type": "shell",
+      "command": "cd server && make run",
+      "group": "build"
+    },
+    {
+      "label": "web:dev",
+      "type": "shell",
+      "command": "cd web && pnpm run dev",
+      "group": "build"
+    },
+    {
+      "label": "dev:full",
+      "dependsOn": ["server:dev", "web:dev"],
+      "dependsOrder": "parallel",
+      "group": "build"
+    }
+  ]
+}

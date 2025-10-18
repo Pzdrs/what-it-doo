@@ -2,6 +2,8 @@ package apiserver
 
 import (
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,6 +18,22 @@ type Server struct {
 	authService *service.AuthService
 	chatService *service.ChatService
 	userService *service.UserService
+}
+
+func spaHandler(staticDir string) http.HandlerFunc {
+	fs := http.FileServer(http.Dir(staticDir))
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Does the path look like a file? (.js, .css, .png, etc.)
+		if strings.Contains(filepath.Base(r.URL.Path), ".") {
+			// Let FileServer try to serve it
+			fs.ServeHTTP(w, r)
+			return
+		}
+
+		// Otherwise, treat it as an SPA route → serve index.html
+		http.ServeFile(w, r, filepath.Join(staticDir, "index.html"))
+	}
 }
 
 func NewServer(q *database.Queries) *Server {
@@ -40,6 +58,9 @@ func NewServer(q *database.Queries) *Server {
 			server.userService,
 		)
 	})
+
+	// Static files (Svelte frontend)
+	r.Get("/*", spaHandler("./static"))
 
 	server.Handler = r
 

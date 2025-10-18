@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     goflake.url = "github:sagikazarmark/go-flake";
     goflake.inputs.nixpkgs.follows = "nixpkgs";
@@ -19,10 +19,10 @@
       let
         pkgs = import nixpkgs {
           inherit system;
-
           overlays = [ goflake.overlay ];
         };
-        buildDeps = with pkgs; [
+
+        backendDeps = with pkgs; [
           git
           go_1_25
           go-swag
@@ -30,12 +30,19 @@
           sqlc
           goose
         ];
-        devDeps = buildDeps ++ [ ];
+
+        frontendDeps = with pkgs; [
+          nodejs_24
+          pnpm_9
+        ];
+
       in
       {
-        devShell = pkgs.mkShell {
-          buildInputs = devDeps;
-          
+        devShells.default = pkgs.mkShell {
+          buildInputs = backendDeps ++ frontendDeps;
+          shellHook = ''
+            alias npm="echo 'Use pnpm instead!'"
+          '';
           GOOSE_DRIVER = "postgres";
           GOOSE_MIGRATION_DIR = "infra/db/migrations";
         };

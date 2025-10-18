@@ -51,43 +51,44 @@ func initDB(config *apiserver.Configuration) (*pgx.Conn, error) {
 }
 
 func initConfig() (apiserver.Configuration, error) {
-    config := viper.NewWithOptions(viper.ExperimentalBindStruct())
-    config.AutomaticEnv()
-    config.SetConfigName("wid")
-    config.SetEnvPrefix("WID")
+	config := viper.NewWithOptions(viper.ExperimentalBindStruct())
+	config.AutomaticEnv()
+	config.SetConfigName("wid")
+	config.SetEnvPrefix("WID")
 
-    config.AddConfigPath(".")
-    config.AddConfigPath("/etc/whatitdoo")
+	config.AddConfigPath(".")
+	config.AddConfigPath("/etc/whatitdoo")
 
-    config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-    config.SetDefault("server.port", 8080)
+	config.SetDefault("server.port", 8080)
 
-    if err := config.ReadInConfig(); err != nil {
-        if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-            return apiserver.Configuration{}, fmt.Errorf("failed to read config: %w", err)
-        }
+	if err := config.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return apiserver.Configuration{}, fmt.Errorf("failed to read config: %w", err)
+		}
 		log.Println("No configuration file found")
-    } else {
+	} else {
 		log.Println("Using configuration file:", config.ConfigFileUsed())
 	}
 
-    var cfg apiserver.Configuration
-    if err := config.Unmarshal(&cfg); err != nil {
-        return apiserver.Configuration{}, fmt.Errorf("failed to unmarshal config: %w", err)
-    }
+	var cfg apiserver.Configuration
+	if err := config.Unmarshal(&cfg); err != nil {
+		return apiserver.Configuration{}, fmt.Errorf("failed to unmarshal config: %w", err)
+	}
 
-    validate := validator.New(validator.WithRequiredStructEnabled())
-    validate.RegisterStructValidation(
-        validation.DbConfigStructLevelValidation,
-        apiserver.DatabaseConfiguration{},
-    )
-    if err := validate.Struct(cfg); err != nil {
-        return apiserver.Configuration{}, fmt.Errorf("invalid config: %w", err)
-    }
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	validate.RegisterStructValidation(
+		validation.DbConfigStructLevelValidation,
+		apiserver.DatabaseConfiguration{},
+	)
+	if err := validate.Struct(cfg); err != nil {
+		return apiserver.Configuration{}, fmt.Errorf("invalid config: %w", err)
+	}
 
-    return cfg, nil
+	return cfg, nil
 }
+
 // @title			What-it-doo API
 // @version		1.0
 // @description	API for the messanger of the future - What-it-doo.

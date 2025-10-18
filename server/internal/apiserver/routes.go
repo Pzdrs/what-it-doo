@@ -1,8 +1,6 @@
 package apiserver
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "pycrs.cz/what-it-do/api" // Swagger docs
@@ -40,6 +38,4 @@ func addRoutes(
 
 	// Swagger UI
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
-
-	r.Handle("/", http.NotFoundHandler())
 }

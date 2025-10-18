@@ -1,7 +1,5 @@
 /bin
-.direnv/
-.vscode
 /tmp
-.env
+/static
 internal/database
 wid.yaml

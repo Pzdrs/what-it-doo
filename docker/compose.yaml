@@ -2,6 +2,7 @@
 volumes:
   pgdata:
 
+name: whatitdoo
 services:
   server:
     container_name: wid-server
@@ -18,6 +19,17 @@ services:
       - WID_DATABASE_PORT=5432
     volumes:
       - ./wid.example.yaml:/etc/whatitdoo/wid.yaml:ro
+    depends_on:
+      - migrate
+  migrate:
+    build: ../server/infra/db
+    container_name: wid-migrate
+    environment:
+      - DBHOST=database
+      - DBUSER=postgres
+      - DBPASSWORD=example
+      - DBNAME=whatitdoo
+      - DBSSL=false
     depends_on:
       - database
   database:

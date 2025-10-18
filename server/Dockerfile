@@ -31,19 +31,18 @@ RUN go mod download
 # Copy backend source code
 COPY server/ .
 
-# Copy built frontend files into Go’s static directory
-
 # Build Go binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/server ./cmd/api
 
 # =========================
 # 3. Final minimal image
 # =========================
-FROM gcr.io/distroless/base-debian12 AS production
+FROM alpine:latest AS production
 
 WORKDIR /app
 COPY --from=backend /app/bin/server ./bin/server
+COPY --from=backend /app/entrypoint.sh ./bin/entrypoint.sh 
 COPY --from=frontend /app/build ./static
 
 EXPOSE 8080
-ENTRYPOINT ["/app/bin/server"]
+ENTRYPOINT ["/app/bin/entrypoint.sh"]
