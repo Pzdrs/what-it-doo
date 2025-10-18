@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "lokalise.i18n-ally",
+        "esbenp.prettier-vscode",
+        "svelte.svelte-vscode",
+        "dbaeumer.vscode-eslint",
+        "bradlc.vscode-tailwindcss",
+        "golang.go",
+    ]
+}

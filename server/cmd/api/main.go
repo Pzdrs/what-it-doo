@@ -62,6 +62,7 @@ func initConfig() (apiserver.Configuration, error) {
 	config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	config.SetDefault("server.port", 8080)
+	config.SetDefault("database.port", 5432)
 
 	if err := config.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {

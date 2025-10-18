@@ -36,15 +36,21 @@
           pnpm_9
         ];
 
+        dbUrl = "postgres://postgres:postgres@localhost:5432/whatitdoo?sslmode=disable";
       in
       {
         devShells.default = pkgs.mkShell {
           buildInputs = backendDeps ++ frontendDeps;
+
           shellHook = ''
             alias npm="echo 'Use pnpm instead!'"
           '';
+
+          WID_DATABASE_URL = dbUrl;
+
+          GOOSE_DBSTRING = dbUrl;
           GOOSE_DRIVER = "postgres";
-          GOOSE_MIGRATION_DIR = "infra/db/migrations";
+          GOOSE_MIGRATION_DIR = "server/infra/db/migrations";
         };
       }
     );

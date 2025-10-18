@@ -11,8 +11,8 @@ type ServerConfiguration struct {
 
 type DatabaseConfiguration struct {
 	URL      string
-	Host     string `validate:"hostname|ip"`
-	Port     int    `validate:"min=1,max=65535"`
+	Host     string
+	Port     int `validate:"min=1,max=65535"`
 	User     string
 	Password string
 	Name     string
