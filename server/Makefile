@@ -11,6 +11,9 @@ run:
 sqlc:
 	sqlc generate -f infra/db/sqlc.yaml
 
+migrate:
+	goose up
+
 swag: $(SWAG_OUTPUTS)
 	@echo "api docs are up to date"
 

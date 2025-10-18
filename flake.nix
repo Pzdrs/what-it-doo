@@ -50,7 +50,7 @@
 
           GOOSE_DBSTRING = dbUrl;
           GOOSE_DRIVER = "postgres";
-          GOOSE_MIGRATION_DIR = "server/infra/db/migrations";
+          GOOSE_MIGRATION_DIR = "infra/db/migrations";
         };
       }
     );
