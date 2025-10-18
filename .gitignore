@@ -1,2 +1,6 @@
 *.env
 .direnv/
+
+# OS
+.DS_Store
+Thumbs.db
