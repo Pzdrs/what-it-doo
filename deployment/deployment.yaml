@@ -23,8 +23,16 @@ spec:
       containers:
       - name: server
         image: registry.gitlab.pycrs.cz/tul/what-it-doo/server
+        volumeMounts:
+          - mountPath: /etc/whatitdoo/wid.yaml
+            name: config-volume
+            subPath: wid.yaml
         envFrom:
           - secretRef:
               name: wid-secrets
         ports:
         - containerPort: 8080
+      volumes:
+        - name: config-volume
+          configMap:
+            name: wid-config
