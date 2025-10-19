@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wid-config
+  namespace: what-it-doo
+data:
+  wid.yaml: |-

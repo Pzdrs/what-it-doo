@@ -39,9 +39,12 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/server ./cmd/api
 # =========================
 FROM alpine:latest AS production
 
+RUN apk add --no-cache tzdata
+ENV TZ="UTC"
+
 WORKDIR /app
 COPY --from=backend /app/bin/server ./bin/server
-COPY --from=backend /app/entrypoint.sh ./bin/entrypoint.sh 
+COPY docker-entrypoint.sh ./bin/entrypoint.sh 
 COPY --from=frontend /app/build ./static
 
 EXPOSE 8080

@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: what-it-doo
+spec:
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      # initContainers:
+      #   - name: wait-for-migrations
+      #     image: ghcr.io/groundnuty/k8s-wait-for:1.6
+      #     args:
+      #       - "job"
+      #       - "database-migrations"
+
+      containers:
+      - name: server
+        image: registry.gitlab.pycrs.cz/tul/what-it-doo/server
+        envFrom:
+          - secretRef:
+              name: wid-secrets
+        ports:
+        - containerPort: 8080

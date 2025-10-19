@@ -8,36 +8,26 @@ services:
     container_name: wid-server
     build:
       context: ..
-      dockerfile: ./server/Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       - WID_DATABASE_HOST=database
       - WID_DATABASE_USER=postgres
-      - WID_DATABASE_PASSWORD=example
+      - WID_DATABASE_PASSWORD=postgres
       - WID_DATABASE_NAME=whatitdoo
-      - WID_DATABASE_PORT=5432
     volumes:
       - ./wid.example.yaml:/etc/whatitdoo/wid.yaml:ro
     depends_on:
-      - migrate
-  migrate:
-    build: ../server/infra/db
-    container_name: wid-migrate
-    environment:
-      - DBHOST=database
-      - DBUSER=postgres
-      - DBPASSWORD=example
-      - DBNAME=whatitdoo
-      - DBSSL=false
-    depends_on:
       - database
+
   database:
     container_name: wid-database
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: example
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: whatitdoo
+    ports:
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data

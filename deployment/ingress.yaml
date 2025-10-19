@@ -1,0 +1,16 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: wid-ingress 
+  namespace: what-it-doo 
+spec:
+  entryPoints: [https]
+  routes:
+  - kind: Rule
+    match: Host(`wid.pycrs.cz`) 
+    services:
+    - kind: Service
+      name: wid-service
+      port: http 
+  tls: {}

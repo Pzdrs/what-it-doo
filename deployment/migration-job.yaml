@@ -1,0 +1,22 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: database-migrations
+  namespace: what-it-doo
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+      - name: goose
+        image: ghcr.io/kukymbr/goose-docker:3.26.0
+        env:
+          - name: GOOSE_DRIVER
+            value: "postgres"
+          - name: GOOSE_DBSTRING
+            valueFrom:
+              secretKeyRef:
+                name: wid-database-credentials
+                key: database-url
+      restartPolicy: Never

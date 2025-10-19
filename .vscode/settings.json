@@ -1,5 +1,10 @@
 {
     "i18n-ally.localesPaths": [
         "src/i18n"
-    ]
+    ],
+    "yaml.schemas": {
+        "kubernetes://schema/apps/v1@deployment": [
+            "file:///Users/pycrs/school/pwa/what-it-doo/deployment/deployment.yaml",
+        ]
+    }
 }
