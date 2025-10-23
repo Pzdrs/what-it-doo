@@ -4,6 +4,7 @@
 	import ChatList from '$lib/components/ChatList.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import UserPageLayout from '$lib/components/layout/UserPageLayout.svelte';
+	import ServerStatus from '$lib/components/ServerStatus.svelte';
 	import NewChatModal from '$lib/modals/NewChatModal.svelte';
 	import { getChat } from '$lib/stores/chats.svelte';
 	import type { Chat } from '$lib/types';
@@ -14,11 +15,11 @@
 
 <UserPageLayout>
 	<div
-		class="flex h-full w-full flex-col gap-x-0 gap-y-4 bg-base-100 px-4 pt-4 pb-6 md:h-[calc(100vh-80px)] md:flex-row md:gap-x-4 md:gap-y-0"
+		class="bg-base-100 flex h-full w-full flex-col gap-x-0 gap-y-4 px-4 pb-6 pt-4 md:h-[calc(100vh-80px)] md:flex-row md:gap-x-4 md:gap-y-0"
 	>
-		<section class="flex h-full w-full flex-col rounded-box bg-base-300 p-4 md:w-1/3">
+		<section class="rounded-box bg-base-300 flex h-full w-full flex-col p-4 md:w-1/3">
 			<div class="flex justify-between">
-				<p class="p-2 text-4xl font-bold text-primary">Chats</p>
+				<p class="text-primary p-2 text-4xl font-bold">Chats</p>
 				<span class="my-auto text-white">
 					<a
 						href="#new-chat"
@@ -51,8 +52,11 @@
 				</label>
 			</div>
 			<ChatList {currentChat} />
+
+			<div class="divider my-4"></div>
+			<ServerStatus />
 		</section>
-		<section class="flex h-full w-full flex-3 flex-col rounded-box bg-base-300 p-4 md:w-2/3">
+		<section class="flex-3 rounded-box bg-base-300 flex h-full w-full flex-col p-4 md:w-2/3">
 			<ChatFeed chat={currentChat} />
 		</section>
 	</div>

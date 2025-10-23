@@ -4,10 +4,10 @@ import (
 	"context"
 	"net/http"
 
-	"pycrs.cz/what-it-do/internal"
-	"pycrs.cz/what-it-do/internal/apiserver/model"
-	"pycrs.cz/what-it-do/internal/apiserver/problem"
-	"pycrs.cz/what-it-do/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal"
+	"pycrs.cz/what-it-doo/internal/apiserver/model"
+	"pycrs.cz/what-it-doo/internal/apiserver/problem"
+	"pycrs.cz/what-it-doo/internal/apiserver/service"
 )
 
 type contextKey string

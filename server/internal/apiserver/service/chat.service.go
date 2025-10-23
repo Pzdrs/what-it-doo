@@ -1,9 +1,9 @@
 package service
 
 import (
-	"pycrs.cz/what-it-do/internal/apiserver/model"
-	"pycrs.cz/what-it-do/internal/apiserver/repository"
-	"pycrs.cz/what-it-do/internal/database"
+	"pycrs.cz/what-it-doo/internal/apiserver/model"
+	"pycrs.cz/what-it-doo/internal/apiserver/repository"
+	"pycrs.cz/what-it-doo/internal/database"
 )
 
 type ChatService struct {

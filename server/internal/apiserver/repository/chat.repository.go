@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"pycrs.cz/what-it-do/internal/database"
+	"pycrs.cz/what-it-doo/internal/database"
 )
 
 type ChatRepository struct {

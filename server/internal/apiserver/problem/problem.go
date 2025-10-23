@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"pycrs.cz/what-it-do/internal"
+	"pycrs.cz/what-it-doo/internal"
 )
 
 type ProblemDetails struct {

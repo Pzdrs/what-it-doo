@@ -4,7 +4,7 @@
     {
       "label": "server:dev",
       "type": "shell",
-      "command": "cd server && make run",
+      "command": "cd server && air",
       "group": "build"
     },
     {

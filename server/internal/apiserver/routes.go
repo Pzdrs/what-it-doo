@@ -3,10 +3,10 @@ package apiserver
 import (
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
-	_ "pycrs.cz/what-it-do/api" // Swagger docs
-	"pycrs.cz/what-it-do/internal/apiserver/controller"
-	"pycrs.cz/what-it-do/internal/apiserver/middleware"
-	"pycrs.cz/what-it-do/internal/apiserver/service"
+	_ "pycrs.cz/what-it-doo/api" // Swagger docs
+	"pycrs.cz/what-it-doo/internal/apiserver/controller"
+	"pycrs.cz/what-it-doo/internal/apiserver/middleware"
+	"pycrs.cz/what-it-doo/internal/apiserver/service"
 )
 
 func addRoutes(
@@ -21,6 +21,12 @@ func addRoutes(
 	authController := controller.NewAuthController(authService)
 	chatController := controller.NewChatController(chatService)
 	userController := controller.NewUserController(userService)
+	serverController := controller.NewServerController()
+
+	r.Route("/server", func(r chi.Router) {
+		r.Get("/about", serverController.HandleAbout)
+		r.Get("/config", serverController.HandleConfig)
+	})
 
 	r.Route("/auth", func(r chi.Router) {
 		r.With().Post("/login", authController.HandleLogin)

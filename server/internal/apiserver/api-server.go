@@ -7,9 +7,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"pycrs.cz/what-it-do/internal/apiserver/repository"
-	"pycrs.cz/what-it-do/internal/apiserver/service"
-	"pycrs.cz/what-it-do/internal/database"
+	"pycrs.cz/what-it-doo/internal/apiserver/repository"
+	"pycrs.cz/what-it-doo/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/database"
 )
 
 type Server struct {

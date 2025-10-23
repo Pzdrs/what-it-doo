@@ -22,7 +22,8 @@ spec:
 
       containers:
       - name: server
-        image: registry.gitlab.pycrs.cz/tul/what-it-doo/server
+        image: registry.gitlab.pycrs.cz/tul/what-it-doo/server:0.1.0
+        imagePullPolicy: Always
         volumeMounts:
           - mountPath: /etc/whatitdoo/wid.yaml
             name: config-volume

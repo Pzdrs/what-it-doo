@@ -1,6 +1,6 @@
 package dto
 
-import "pycrs.cz/what-it-do/internal/apiserver/model"
+import "pycrs.cz/what-it-doo/internal/apiserver/model"
 
 func MapUserToUserDetails(u model.User) UserDetails {
 	return UserDetails{

@@ -8,9 +8,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"golang.org/x/crypto/bcrypt"
-	"pycrs.cz/what-it-do/internal/apiserver/model"
-	"pycrs.cz/what-it-do/internal/apiserver/repository"
-	"pycrs.cz/what-it-do/internal/database"
+	"pycrs.cz/what-it-doo/internal/apiserver/model"
+	"pycrs.cz/what-it-doo/internal/apiserver/repository"
+	"pycrs.cz/what-it-doo/internal/database"
 )
 
 var (

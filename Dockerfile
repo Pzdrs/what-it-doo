@@ -32,15 +32,18 @@ RUN go mod download
 COPY server/ .
 
 # Build Go binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/server ./cmd/api
+ARG TARGETOS
+ARG TARGETARCH
+ARG VERSION
+
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    go build -ldflags="-s -w -X pycrs.cz/what-it-doo/pkg/version.Version=${VERSION}" \
+    -o /app/bin/server ./cmd/api
 
 # =========================
 # 3. Final minimal image
 # =========================
 FROM alpine:latest AS production
-
-RUN apk add --no-cache tzdata
-ENV TZ="UTC"
 
 WORKDIR /app
 COPY --from=backend /app/bin/server ./bin/server

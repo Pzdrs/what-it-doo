@@ -10,17 +10,16 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 
-	"pycrs.cz/what-it-do/internal/apiserver"
-	"pycrs.cz/what-it-do/internal/database"
-	"pycrs.cz/what-it-do/internal/validation"
+	"pycrs.cz/what-it-doo/internal/apiserver"
+	"pycrs.cz/what-it-doo/internal/database"
+	"pycrs.cz/what-it-doo/internal/validation"
+	"pycrs.cz/what-it-doo/pkg/version"
 )
 
 func initDB(config *apiserver.Configuration) (*pgx.Conn, error) {
@@ -93,7 +92,10 @@ func initConfig() (apiserver.Configuration, error) {
 // @title			What-it-doo API
 // @version		1.0
 // @description	API for the messanger of the future - What-it-doo.
+// @BasePath		/api/v1
 func run(ctx context.Context, getenv func(string) string, w io.Writer, args []string) error {
+	log.Printf("Starting what-it-doo server version %s\n", version.Version)
+
 	config, err := initConfig()
 	if err != nil {
 		return fmt.Errorf("failed to initialize config: %w", err)
@@ -112,25 +114,11 @@ func run(ctx context.Context, getenv func(string) string, w io.Writer, args []st
 		Addr:    net.JoinHostPort("0.0.0.0", strconv.Itoa(config.Server.Port)),
 		Handler: server.Handler,
 	}
-	go func() {
-		log.Printf("Listening on %s\n", httpServer.Addr)
-		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Printf("error listening and serving: %s\n", err)
-		}
-	}()
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		<-ctx.Done()
-		shutdownCtx := context.Background()
-		shutdownCtx, cancel := context.WithTimeout(shutdownCtx, 10*time.Second)
-		defer cancel()
-		if err := httpServer.Shutdown(shutdownCtx); err != nil {
-			fmt.Fprintf(os.Stderr, "error shutting down http server: %s\n", err)
-		}
-	}()
-	wg.Wait()
+
+	log.Printf("Listening on %s\n", httpServer.Addr)
+	if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Printf("error listening and serving: %s\n", err)
+	}
 	return nil
 }
 

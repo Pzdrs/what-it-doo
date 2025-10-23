@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"pycrs.cz/what-it-do/internal/apiserver/middleware"
-	"pycrs.cz/what-it-do/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/apiserver/middleware"
+	"pycrs.cz/what-it-doo/internal/apiserver/service"
 )
 
 type UserController struct {

@@ -8,10 +8,12 @@ import * as Oazapfts from "@oazapfts/runtime";
 import * as QS from "@oazapfts/runtime/query";
 export const defaults: Oazapfts.Defaults<Oazapfts.CustomHeaders> = {
     headers: {},
-    baseUrl: "/",
+    baseUrl: "/api/v1",
 };
 const oazapfts = Oazapfts.runtime(defaults);
-export const servers = {};
+export const servers = {
+    server1: "/api/v1"
+};
 export type DtoLoginRequest = {
     email: string;
     password: string;
@@ -46,6 +48,10 @@ export type DtoRegistrationRequest = {
 export type DtoRegistrationResponse = {
     user: DtoUserDetails;
 };
+export type DtoServerInfo = {
+    version?: string;
+};
+export type DtoServerConfig = object;
 export type ModelUser = {
     avatar_url?: string;
     bio?: string;
@@ -111,6 +117,28 @@ export function register(dtoRegistrationRequest: DtoRegistrationRequest, { autoL
         method: "POST",
         body: dtoRegistrationRequest
     })));
+}
+/**
+ * Get server information
+ */
+export function getServerInfo(opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 200;
+        data: DtoServerInfo;
+    }>("/server/about", {
+        ...opts
+    }));
+}
+/**
+ * Get server configuration
+ */
+export function getServerConfig(opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 200;
+        data: DtoServerConfig;
+    }>("/server/config", {
+        ...opts
+    }));
 }
 /**
  * Get current user

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"pycrs.cz/what-it-do/internal/database"
+	"pycrs.cz/what-it-doo/internal/database"
 )
 
 type UserRepository struct {

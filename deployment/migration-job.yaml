@@ -10,13 +10,13 @@ spec:
     spec:
       containers:
       - name: goose
-        image: ghcr.io/kukymbr/goose-docker:3.26.0
+        image: registry.gitlab.pycrs.cz/tul/what-it-doo/migrate
         env:
           - name: GOOSE_DRIVER
             value: "postgres"
           - name: GOOSE_DBSTRING
             valueFrom:
               secretKeyRef:
-                name: wid-database-credentials
-                key: database-url
+                name: wid-secrets
+                key: WID_DATABASE_URL
       restartPolicy: Never

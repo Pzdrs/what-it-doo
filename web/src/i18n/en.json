@@ -21,6 +21,8 @@
     "confirm_password_placeholder": "Re-enter your password",
     "password_min_length_hint": "Password must be at least {count} characters long",
     "passwords_must_match": "Passwords must match",
+    "server_status_online": "Server Online",
+    "server_status_offline": "Server Offline",
     "errors": {
         "unknown_error": "An unknown error occurred. Please try again.",
         "auth": {

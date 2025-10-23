@@ -1,3 +1,4 @@
+basePath: /api/v1
 definitions:
   ProblemDetails:
     properties:
@@ -58,6 +59,13 @@ definitions:
         $ref: '#/definitions/dto.UserDetails'
     required:
     - user
+    type: object
+  dto.ServerConfig:
+    type: object
+  dto.ServerInfo:
+    properties:
+      version:
+        type: string
     type: object
   dto.UserDetails:
     properties:
@@ -173,6 +181,34 @@ paths:
       summary: Register user
       tags:
       - Authentication
+  /server/about:
+    get:
+      description: Get information about the server
+      operationId: getServerInfo
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ServerInfo'
+      summary: Get server information
+      tags:
+      - Server
+  /server/config:
+    get:
+      description: Get server configuration
+      operationId: getServerConfig
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ServerConfig'
+      summary: Get server configuration
+      tags:
+      - Server
   /users/me:
     get:
       description: Get details of the currently authenticated user

@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { logout } from '$lib/api/client';
 	import { AppRoute } from '$lib/constants';
-	import ServerHealth from './ServerHealth.svelte';
 	import ThemeSwitch from './ThemeSwitch.svelte';
 	let menuOpen = false;
 
@@ -20,7 +19,6 @@
 
 	<!-- PRAVÁ STRANA – DESKTOP -->
 	<div class="navbar-end hidden gap-2 lg:flex">
-		<ServerHealth />
 		<ThemeSwitch />
 
 		<div class="divider divider-horizontal"></div>

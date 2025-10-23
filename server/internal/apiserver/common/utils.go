@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator/v10"
-	"pycrs.cz/what-it-do/internal/apiserver/problem"
+	"pycrs.cz/what-it-doo/internal/apiserver/problem"
 )
 
 func validationErrorsToMap(ve validator.ValidationErrors) map[string]problem.FieldValidationError {

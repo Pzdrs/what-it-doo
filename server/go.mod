@@ -1,4 +1,4 @@
-module pycrs.cz/what-it-do
+module pycrs.cz/what-it-doo
 
 go 1.25.0
 

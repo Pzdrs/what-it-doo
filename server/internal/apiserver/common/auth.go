@@ -3,8 +3,8 @@ package common
 import (
 	"net/http"
 
-	"pycrs.cz/what-it-do/internal"
-	"pycrs.cz/what-it-do/internal/apiserver/model"
+	"pycrs.cz/what-it-doo/internal"
+	"pycrs.cz/what-it-doo/internal/apiserver/model"
 )
 
 func SetAuthCookies(w http.ResponseWriter, session *model.UserSession, rememberMe bool) {

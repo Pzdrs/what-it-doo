@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { t } from 'svelte-i18n';
-
+	
 	interface Props {
 		title?: string;
 		children?: Snippet;
@@ -10,7 +9,7 @@
 	let { children, title }: Props = $props();
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-base-200">
+<div class="flex min-h-screen flex-col items-center justify-center bg-base-200 relative">
 	<div class="w-full max-w-xl">
 		<div class="card bg-base-100 shadow-xl">
 			<div class="card-body p-10">
@@ -23,4 +22,6 @@
 			</div>
 		</div>
 	</div>
+
+	<p class="absolute bottom-4 w-full text-center opacity-25">v1.0.0</p>
 </div>

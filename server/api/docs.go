@@ -133,6 +133,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/server/about": {
+            "get": {
+                "description": "Get information about the server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Server"
+                ],
+                "summary": "Get server information",
+                "operationId": "getServerInfo",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ServerInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/server/config": {
+            "get": {
+                "description": "Get server configuration",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Server"
+                ],
+                "summary": "Get server configuration",
+                "operationId": "getServerConfig",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ServerConfig"
+                        }
+                    }
+                }
+            }
+        },
         "/users/me": {
             "get": {
                 "description": "Get details of the currently authenticated user",
@@ -247,6 +289,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ServerConfig": {
+            "type": "object"
+        },
+        "dto.ServerInfo": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UserDetails": {
             "type": "object",
             "properties": {
@@ -300,7 +353,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "What-it-doo API",
 	Description:      "API for the messanger of the future - What-it-doo.",

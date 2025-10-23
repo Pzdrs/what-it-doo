@@ -4,12 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	"pycrs.cz/what-it-do/internal/apiserver/common"
-	"pycrs.cz/what-it-do/internal/apiserver/dto"
-	"pycrs.cz/what-it-do/internal/apiserver/middleware"
-	"pycrs.cz/what-it-do/internal/apiserver/model"
-	"pycrs.cz/what-it-do/internal/apiserver/problem"
-	"pycrs.cz/what-it-do/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/apiserver/common"
+	"pycrs.cz/what-it-doo/internal/apiserver/dto"
+	"pycrs.cz/what-it-doo/internal/apiserver/middleware"
+	"pycrs.cz/what-it-doo/internal/apiserver/model"
+	"pycrs.cz/what-it-doo/internal/apiserver/problem"
+	"pycrs.cz/what-it-doo/internal/apiserver/service"
 )
 
 type AuthController struct {
