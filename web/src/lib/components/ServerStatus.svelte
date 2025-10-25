@@ -1,26 +1,23 @@
 <script lang="ts">
 	import { getServerInfo, type DtoServerInfo } from '$lib/api/client';
+	import { websocketStore } from '$lib/stores/websocket.svelte';
 	import { t } from 'svelte-i18n';
 
-	let serverOnline: boolean = $state(false);
-
-	let info: DtoServerInfo = $state({})
+	let info: DtoServerInfo = $state({});
 
 	$effect(() => {
 		getServerInfo()
 			.then((res) => {
 				info = res;
-				serverOnline = true;
 			})
-			.catch((err) => {
-				serverOnline = false;
-			});
+			.catch((err) => {});
+
 	});
 </script>
 
 <div class="flex justify-between px-2">
 	<div class="flex items-center space-x-2">
-		{#if serverOnline}
+		{#if websocketStore.connected}
 			<div class="inline-grid *:[grid-area:1/1]">
 				<div class="status status-success animate-ping"></div>
 				<div class="status status-success"></div>

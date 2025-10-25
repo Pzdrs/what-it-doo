@@ -1,7 +1,11 @@
 package apiserver
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/websocket"
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "pycrs.cz/what-it-doo/api" // Swagger docs
 	"pycrs.cz/what-it-doo/internal/apiserver/controller"
@@ -23,6 +27,15 @@ func addRoutes(
 	userController := controller.NewUserController(userService)
 	serverController := controller.NewServerController()
 
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			// Allow requests from your frontend dev server
+			return r.Header.Get("Origin") == "http://localhost:5173"
+		},
+	}
+
 	r.Route("/server", func(r chi.Router) {
 		r.Get("/about", serverController.HandleAbout)
 		r.Get("/config", serverController.HandleConfig)
@@ -40,6 +53,26 @@ func addRoutes(
 
 	r.Route("/chats", func(r chi.Router) {
 		r.Get("/", chatController.HandleAllChats)
+	})
+
+	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			http.Error(w, "Failed to upgrade to WebSocket", http.StatusInternalServerError)
+			return
+		}
+
+		go func() {
+			defer conn.Close()
+			for {
+				_, msg, err := conn.ReadMessage()
+				if err != nil {
+					break
+				}
+				// Handle incoming WebSocket messages
+				fmt.Println("Received WebSocket message:", string(msg))
+			}
+		}()
 	})
 
 	// Swagger UI
