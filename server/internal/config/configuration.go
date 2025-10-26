@@ -5,10 +5,12 @@ type Configuration struct {
 	Database DBConfig       `mapstructure:"database"`
 	Redis    RedisConfig    `mapstructure:"redis"`
 	Gravatar GravatarConfig `mapstructure:"gravatar"`
+
+	ExternalUrl string `mapstructure:"external_url" validate:"required,url"`
 }
 
 type ServerConfig struct {
-	Port int `validate:"min=1,max=65535"`
+	Port        int    `validate:"min=1,max=65535"`
 }
 
 type DBConfig struct {

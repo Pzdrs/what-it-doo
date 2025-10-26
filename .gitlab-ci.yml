@@ -1,0 +1,13 @@
+stages:
+  - build
+
+build-server:
+  stage: build
+  image: golang:1.20
+  script:
+    - cd server
+    - go mod download
+    - go build -o what-it-doo ./cmd/server/main.go
+  artifacts:
+    paths:
+      - server/what-it-doo

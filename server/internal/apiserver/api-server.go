@@ -58,6 +58,7 @@ func NewServer(q *queries.Queries, config config.Configuration, redisClient *red
 			server.authService,
 			server.chatService,
 			server.userService,
+			config,
 		)
 	})
 

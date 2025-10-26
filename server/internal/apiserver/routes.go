@@ -11,6 +11,7 @@ import (
 	"pycrs.cz/what-it-doo/internal/apiserver/controller"
 	"pycrs.cz/what-it-doo/internal/apiserver/middleware"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/config"
 )
 
 func addRoutes(
@@ -18,6 +19,7 @@ func addRoutes(
 	authService *service.AuthService,
 	chatService *service.ChatService,
 	userService *service.UserService,
+	config config.Configuration,
 ) {
 	RequireAuthenticated := middleware.RequireAuthenticated(authService, userService)
 	RequireUnauthenticated := middleware.RequireUnauthenticated(authService)
@@ -31,8 +33,7 @@ func addRoutes(
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 		CheckOrigin: func(r *http.Request) bool {
-			// Allow requests from your frontend dev server
-			return r.Header.Get("Origin") == "http://localhost:5173"
+			return r.Header.Get("Origin") == config.ExternalUrl
 		},
 	}
 

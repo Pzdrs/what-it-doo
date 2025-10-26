@@ -2,10 +2,10 @@ SHELL := /bin/bash
 SWAG_INPUTS := $(shell find cmd/api/main.go internal/apiserver/controller -name "*.go")
 SWAG_OUTPUTS := api/docs.go
 
-TAG_NAME = $(shell git describe --abbrev=0 --tags --exact-match)
-SHA = $(shell git rev-parse HEAD)
-VERSION_GIT = $(if $(TAG_NAME),$(TAG_NAME),$(SHA))
-VERSION = $(if $(VERSION),$(VERSION),$(VERSION_GIT))
+TAG_NAME := $(shell git describe --abbrev=0 --tags)
+SHA := $(shell git rev-parse HEAD)
+VERSION_GIT := $(if $(TAG_NAME),$(TAG_NAME),$(SHA))
+VERSION := $(if $(VERSION),$(VERSION),$(VERSION_GIT))
 
 BIN_NAME := server
 DOCKER_BUILD_PLATFORMS ?= linux/amd64,linux/arm64

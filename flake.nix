@@ -48,6 +48,7 @@
 
           WID_DATABASE_URL = dbUrl;
           WID_REDIS_HOST = "localhost";
+          WID_EXTERNAL_URL = "http://localhost:8080";
 
           GOOSE_DBSTRING = dbUrl;
           GOOSE_DRIVER = "postgres";

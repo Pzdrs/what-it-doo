@@ -101,7 +101,6 @@
 {#if menuOpen}
 	<div class="border-base-200 bg-base-100 border-t shadow-md lg:hidden">
 		<div class="flex flex-col items-center gap-3 p-4">
-			<ServerHealth />
 			<ThemeSwitch />
 			<a href="#notifications" class="btn btn-ghost justify-start">Notifications</a>
 			<a href="#profile" class="btn btn-ghost justify-start">Profile</a>
