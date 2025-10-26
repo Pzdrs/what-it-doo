@@ -14,5 +14,5 @@ Access the demo at [wid.pycrs.cz](https://wid.pycrs.cz).
 - [ ] Delivered, read, and typing indicators
 - [ ] Group chats
 - [ ] Configurable 3rd party IdP
-- [ ] Gravatar support
+- [x] Gravatar support
 
