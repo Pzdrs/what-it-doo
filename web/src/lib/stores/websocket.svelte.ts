@@ -18,12 +18,10 @@ export const openWebSocketConnection = () => {
 		websocket = new WebSocket('/api/v1/ws');
 
 		websocket.onopen = () => {
-			console.log('WebSocket connected');
 			websocketStore.connected = true;
 		};
 
 		websocket.onclose = () => {
-			console.log('WebSocket disconnected');
 			websocketStore.connected = false;
 
             setTimeout(openWebSocketConnection, reconnectTimeout);
