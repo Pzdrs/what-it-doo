@@ -5,8 +5,8 @@
 	import Alert from '$lib/components/ui/Alert.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { AppRoute } from '$lib/constants';
-	import { setUser } from '$lib/stores/user.svelte';
 	import { getTranslatedError, isProblemType, toProblemDetails } from '$lib/utils/handle-error';
+	import { userStore } from '$stores/user.svelte';
 	import { t } from 'svelte-i18n';
 
 	const passwordMinLength = 8;
@@ -19,7 +19,7 @@
 	let loading = $state(false);
 
 	const onSuccess = async (user: DtoUserDetails) => {
-		setUser(user);
+		userStore.user = user;	
 		await goto(AppRoute.HOME, { invalidateAll: true });
 	};
 

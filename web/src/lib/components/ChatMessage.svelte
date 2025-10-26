@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ChatMessage, User } from '$lib/types';
 	import { formatDateOrTime } from '$lib/utils';
-	import { getUser } from '$lib/stores/user.svelte';
+	import { userStore } from '$stores/user.svelte';
 
 	type ChatMessageOrigin = 'us' | 'them';
 
@@ -11,9 +11,9 @@
 
 	let { message }: Props = $props();
 
-	const user = getUser();
+	const user = userStore.user
 
-	const origin = user.id === message.sender.id ? 'us' : 'them';
+	const origin = user?.id === message.sender.id ? 'us' : 'them';
 </script>
 
 <div class="chat" class:chat-start={origin === 'them'} class:chat-end={origin === 'us'}>
@@ -38,7 +38,7 @@
 		{message.content}
 	</div>
 
-	{#if message.sender.id === user.id}
+	{#if message.sender.id === user?.id}
 		<div class="chat-footer opacity-50">
 			{#if message.readAt}
 				<span class="text-xs">Seen at {formatDateOrTime(message.readAt)}</span>

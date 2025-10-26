@@ -1,7 +1,7 @@
 import { browser } from "$app/environment";
 import { getMyself } from "$lib/api/client";
 import { AppRoute, SESSION_COOKIE_NAME } from "$lib/constants";
-import { getUser, setUser } from "$lib/stores/user.svelte";
+import { userStore } from "$lib/stores/user.svelte";
 import { redirect } from "@sveltejs/kit";
 
 export interface AuthOptions {
@@ -10,10 +10,10 @@ export interface AuthOptions {
 
 export const loadUser = async () => {
     try {
-        const user = getUser();
+        const user = userStore.user;
         if (!user && hasAuthCookie()) {
-            let [_user] = await Promise.all([getMyself()]);
-            return setUser(_user);
+            const [_user] = await Promise.all([getMyself()]);
+            return userStore.user = _user; 
         }
         return user;
     } catch {
@@ -49,7 +49,7 @@ export const authenticate = async (url: URL, options?: AuthOptions) => {
     }
 };
 
-export const requireNoAuth = async (url: URL) => {
+export const requireNoAuth = async () => {
     const user = await loadUser();
     if (user) {
         redirect(302, AppRoute.HOME);

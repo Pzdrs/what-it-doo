@@ -2,7 +2,9 @@
 	import { goto } from '$app/navigation';
 	import { logout } from '$lib/api/client';
 	import { AppRoute } from '$lib/constants';
+	import { userStore } from '$stores/user.svelte';
 	import ThemeSwitch from './ThemeSwitch.svelte';
+	import user from '$lib/assets/user.png?enhanced';
 	let menuOpen = false;
 
 	const _logout = async () => {
@@ -11,10 +13,10 @@
 	};
 </script>
 
-<div class="my-1 navbar h-20 bg-base-100 shadow-sm">
+<div class="navbar bg-base-100 my-1 h-20 shadow-sm">
 	<!-- LEVÁ STRANA -->
 	<div class="navbar-start">
-		<a href="/" class="btn text-xl text-primary btn-ghost">what it doo</a>
+		<a href="/" class="btn text-primary btn-ghost text-xl">what it doo</a>
 	</div>
 
 	<!-- PRAVÁ STRANA – DESKTOP -->
@@ -44,30 +46,33 @@
 					<span class="indicator-item badge badge-xs badge-primary"></span>
 				</div>
 			</button>
-			<ul class="dropdown-content menu z-10 w-52 rounded-box bg-base-100 p-2 shadow-sm">
+			<ul class="dropdown-content menu rounded-box bg-base-100 z-10 w-52 p-2 shadow-sm">
 				<li><a>Item 1</a></li>
 				<li><a>Item 2</a></li>
 			</ul>
 		</div>
 
 		<!-- Avatar -->
-		<div class="dropdown dropdown-end">
-			<div tabindex="0" role="button" class="btn avatar btn-circle btn-ghost">
-				<div class="w-10 rounded-full">
-					<img
-						alt="user avatar"
-						src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-					/>
+		{#if userStore.user}
+			<div class="dropdown dropdown-end">
+				<div tabindex="0" role="button" class="btn avatar btn-circle btn-ghost">
+					<div class="w-10 rounded-full">
+						{#if userStore.user.avatar_url}
+							<img alt="user avatar" src={userStore.user.avatar_url} />
+						{:else}
+							<enhanced:img alt="default user avatar" src={user} />
+						{/if}
+					</div>
 				</div>
+				<ul class="dropdown-content menu menu-sm rounded-box bg-base-100 z-10 mt-3 w-52 p-2 shadow">
+					<li>
+						<a href="#profile" class="justify-between">Profile <span class="badge">New</span></a>
+					</li>
+					<li><a href="#settings">Settings</a></li>
+					<li><button onclick={_logout}>Logout</button></li>
+				</ul>
 			</div>
-			<ul class="dropdown-content menu z-10 mt-3 w-52 menu-sm rounded-box bg-base-100 p-2 shadow">
-				<li>
-					<a href="#profile" class="justify-between">Profile <span class="badge">New</span></a>
-				</li>
-				<li><a href="#settings">Settings</a></li>
-				<li><button onclick={_logout}>Logout</button></li>
-			</ul>
-		</div>
+		{/if}
 	</div>
 
 	<!-- MOBILE BURGER -->
@@ -94,14 +99,14 @@
 
 <!-- MOBILE MENU -->
 {#if menuOpen}
-	<div class="border-t border-base-200 bg-base-100 shadow-md lg:hidden">
+	<div class="border-base-200 bg-base-100 border-t shadow-md lg:hidden">
 		<div class="flex flex-col items-center gap-3 p-4">
 			<ServerHealth />
 			<ThemeSwitch />
-			<a href="#notifications" class="btn justify-start btn-ghost">Notifications</a>
-			<a href="#profile" class="btn justify-start btn-ghost">Profile</a>
-			<a href="#settings" class="btn justify-start btn-ghost">Settings</a>
-			<a href="#logout" class="btn justify-start btn-ghost">Logout</a>
+			<a href="#notifications" class="btn btn-ghost justify-start">Notifications</a>
+			<a href="#profile" class="btn btn-ghost justify-start">Profile</a>
+			<a href="#settings" class="btn btn-ghost justify-start">Settings</a>
+			<a href="#logout" class="btn btn-ghost justify-start">Logout</a>
 		</div>
 	</div>
 {/if}

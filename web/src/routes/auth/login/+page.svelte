@@ -2,12 +2,12 @@
 	import { goto } from '$app/navigation';
 	import { login, type DtoUserDetails } from '$lib/api/client';
 	import AuthPageLayout from '$lib/components/layout/AuthPageLayout.svelte';
-	import { t } from 'svelte-i18n';
-	import type { PageData } from './$types';
-	import { getTranslatedError } from '$lib/utils/handle-error';
-	import { setUser } from '$lib/stores/user.svelte';
 	import Alert from '$lib/components/ui/Alert.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import { userStore } from '$lib/stores/user.svelte';
+	import { getTranslatedError } from '$lib/utils/handle-error';
+	import { t } from 'svelte-i18n';
+	import type { PageData } from './$types';
 
 	interface Props {
 		data: PageData;
@@ -22,7 +22,7 @@
 	let loading = $state(false);
 
 	const onSuccess = async (user: DtoUserDetails) => {
-		setUser(user);
+		userStore.user = user;	
 		await goto(data.continueUrl, { invalidateAll: true });
 	};
 
