@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
-	"pycrs.cz/what-it-doo/internal/database"
+	"pycrs.cz/what-it-doo/internal/queries"
 )
 
 type Server struct {
@@ -36,7 +36,7 @@ func spaHandler(staticDir string) http.HandlerFunc {
 	}
 }
 
-func NewServer(q *database.Queries) *Server {
+func NewServer(q *queries.Queries) *Server {
 	userRepository := repository.NewUserRepository(q)
 	sessionRepository := repository.NewSessionRepository(q)
 	chatRepository := repository.NewChatRepository(q)

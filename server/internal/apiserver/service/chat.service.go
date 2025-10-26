@@ -3,7 +3,7 @@ package service
 import (
 	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
-	"pycrs.cz/what-it-doo/internal/database"
+	"pycrs.cz/what-it-doo/internal/queries"
 )
 
 type ChatService struct {
@@ -16,7 +16,7 @@ func NewChatService(repo *repository.ChatRepository) *ChatService {
 	}
 }
 
-func mapChatToModel(chat database.Chat) model.Chat {
+func mapChatToModel(chat queries.Chat) model.Chat {
 	return model.Chat{
 		ID:        chat.ID,
 		Title:     chat.Title.String,

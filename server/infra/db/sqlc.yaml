@@ -5,8 +5,8 @@ sql:
     queries: "queries"
     gen:
       go:
-        out: "../../internal/database"
-        package: "database"
+        out: "../../internal/queries"
+        package: "queries"
         sql_package: "pgx/v5"
         overrides:
           - db_type: "uuid"

@@ -4,22 +4,22 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"pycrs.cz/what-it-doo/internal/database"
+	"pycrs.cz/what-it-doo/internal/queries"
 )
 
 type SessionRepository struct {
-	q *database.Queries
+	q *queries.Queries
 }
 
-func NewSessionRepository(q *database.Queries) *SessionRepository {
+func NewSessionRepository(q *queries.Queries) *SessionRepository {
 	return &SessionRepository{q: q}
 }
 
-func (r *SessionRepository) GetSessionByToken(token string) (database.Session, error) {
+func (r *SessionRepository) GetSessionByToken(token string) (queries.Session, error) {
 	return r.q.GetSessionByToken(context.Background(), token)
 }
 
-func (r *SessionRepository) CreateSession(params database.CreateSessionParams) (database.Session, error) {
+func (r *SessionRepository) CreateSession(params queries.CreateSessionParams) (queries.Session, error) {
 	return r.q.CreateSession(context.Background(), params)
 }
 

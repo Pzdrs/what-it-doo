@@ -14,7 +14,7 @@ import (
 
 	"pycrs.cz/what-it-doo/internal/apiserver"
 	"pycrs.cz/what-it-doo/internal/bootstrap"
-	"pycrs.cz/what-it-doo/internal/database"
+	"pycrs.cz/what-it-doo/internal/queries"
 	"pycrs.cz/what-it-doo/pkg/version"
 )
 
@@ -36,7 +36,7 @@ func run(ctx context.Context, getenv func(string) string, w io.Writer, args []st
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
 
-	q := database.New(conn)
+	q := queries.New(conn)
 
 	server := apiserver.NewServer(q)
 	httpServer := &http.Server{

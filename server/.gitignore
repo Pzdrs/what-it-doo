@@ -1,5 +1,5 @@
 /bin
 /tmp
 /static
-internal/database
+internal/queries
 wid.yaml

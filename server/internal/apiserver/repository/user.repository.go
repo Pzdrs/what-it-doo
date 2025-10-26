@@ -5,14 +5,14 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"pycrs.cz/what-it-doo/internal/database"
+	"pycrs.cz/what-it-doo/internal/queries"
 )
 
 type UserRepository struct {
-	q *database.Queries
+	q *queries.Queries
 }
 
-func NewUserRepository(q *database.Queries) *UserRepository {
+func NewUserRepository(q *queries.Queries) *UserRepository {
 	return &UserRepository{q: q}
 }
 
@@ -21,12 +21,12 @@ func (r *UserRepository) UserExists(username string) bool {
 	return err == nil
 }
 
-func (r UserRepository) SaveUser(user database.User) (database.User, error) {
+func (r UserRepository) SaveUser(user queries.User) (queries.User, error) {
 	if user.Email == "" {
-		return database.User{}, fmt.Errorf("email is required")
+		return queries.User{}, fmt.Errorf("email is required")
 	}
 
-	user, err := r.q.CreateUser(context.Background(), database.CreateUserParams{
+	user, err := r.q.CreateUser(context.Background(), queries.CreateUserParams{
 		Name:           user.Name,
 		Email:          user.Email,
 		HashedPassword: user.HashedPassword,
@@ -36,11 +36,11 @@ func (r UserRepository) SaveUser(user database.User) (database.User, error) {
 	return user, err
 }
 
-func (r *UserRepository) GetUserByEmail(email string) (database.User, error) {
+func (r *UserRepository) GetUserByEmail(email string) (queries.User, error) {
 	return r.q.GetUserByEmail(context.Background(), email)
 }
 
-func (r *UserRepository) GetUserByID(userID uuid.UUID) (*database.User, error) {
+func (r *UserRepository) GetUserByID(userID uuid.UUID) (*queries.User, error) {
 	user, err := r.q.GetUserByID(context.Background(), userID)
 	if err != nil {
 		return nil, err

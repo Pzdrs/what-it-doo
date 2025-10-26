@@ -4,14 +4,14 @@ import (
 	"github.com/google/uuid"
 	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
-	"pycrs.cz/what-it-doo/internal/database"
+	"pycrs.cz/what-it-doo/internal/queries"
 )
 
 type UserService struct {
 	repository *repository.UserRepository
 }
 
-func mapUserToModel(user database.User) model.User {
+func mapUserToModel(user queries.User) model.User {
 	return model.User{
 		ID:        user.ID,
 		Name:      user.Name.String,

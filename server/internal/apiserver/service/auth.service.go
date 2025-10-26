@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
-	"pycrs.cz/what-it-doo/internal/database"
+	"pycrs.cz/what-it-doo/internal/queries"
 )
 
 var (
@@ -29,7 +29,7 @@ func NewAuthService(repo *repository.UserRepository, sessionRepo *repository.Ses
 	}
 }
 
-func mapSessionToModel(session database.Session) model.UserSession {
+func mapSessionToModel(session queries.Session) model.UserSession {
 	return model.UserSession{
 		ID:         session.ID,
 		UserID:     session.UserID,
@@ -52,7 +52,7 @@ func (s *AuthService) RegisterUser(user model.User, password string) (model.User
 		return model.User{}, fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	u, err := s.repository.SaveUser(database.User{
+	u, err := s.repository.SaveUser(queries.User{
 		Name:           pgtype.Text{String: user.Name, Valid: true},
 		Email:          user.Email,
 		HashedPassword: pgtype.Text{String: string(hashedPassword), Valid: true},
@@ -86,7 +86,7 @@ func (s *AuthService) AuthenticateUser(email, password string) bool {
 
 func (s *AuthService) CreateSession(userID uuid.UUID, deviceType, deviceOs string) (model.UserSession, error) {
 	return func() (model.UserSession, error) {
-		session, err := s.sessionRepository.CreateSession(database.CreateSessionParams{
+		session, err := s.sessionRepository.CreateSession(queries.CreateSessionParams{
 			UserID: userID,
 			// TODO: Use a more secure token generation method
 			Token:      uuid.NewString(),
