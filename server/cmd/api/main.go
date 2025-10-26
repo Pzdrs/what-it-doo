@@ -10,8 +10,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/joho/godotenv"
-
 	"pycrs.cz/what-it-doo/internal/apiserver"
 	"pycrs.cz/what-it-doo/internal/bootstrap"
 	"pycrs.cz/what-it-doo/internal/queries"
@@ -30,7 +28,6 @@ func run(ctx context.Context, getenv func(string) string, w io.Writer, args []st
 		return fmt.Errorf("failed to initialize config: %w", err)
 	}
 
-	godotenv.Load()
 	conn, err := bootstrap.InitDB(&config)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
