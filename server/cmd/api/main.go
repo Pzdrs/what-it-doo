@@ -33,9 +33,13 @@ func run(ctx context.Context, getenv func(string) string, w io.Writer, args []st
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
 
+	redisClient, err := bootstrap.InitRedis(&config)
+	if err != nil {
+		return fmt.Errorf("failed to initialize redis: %w", err)
+	}
 	q := queries.New(conn)
 
-	server := apiserver.NewServer(q)
+	server := apiserver.NewServer(q, redisClient)
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort("0.0.0.0", strconv.Itoa(config.Server.Port)),
 		Handler: server.Handler,

@@ -47,6 +47,7 @@
           '';
 
           WID_DATABASE_URL = dbUrl;
+          WID_REDIS_HOST = "localhost";
 
           GOOSE_DBSTRING = dbUrl;
           GOOSE_DRIVER = "postgres";

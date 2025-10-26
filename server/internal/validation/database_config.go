@@ -7,7 +7,7 @@ import (
 )
 
 func DbConfigStructLevelValidation(sl validator.StructLevel) {
-	cfg := sl.Current().Interface().(apiserver.DatabaseConfiguration)
+	cfg := sl.Current().Interface().(apiserver.DBConfig)
 
 	if cfg.URL == "" {
 		if cfg.Host == "" {

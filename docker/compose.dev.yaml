@@ -24,7 +24,7 @@ services:
     container_name: wid-redis
     image: redis:8
     ports:
-      - "6380:6379"
+      - "6379:6379"
 
   database:
     container_name: wid-database
@@ -34,6 +34,6 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data

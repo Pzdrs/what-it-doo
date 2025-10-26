@@ -1,19 +1,26 @@
 package apiserver
 
 type Configuration struct {
-	Server   ServerConfiguration   `mapstructure:"server"`
-	Database DatabaseConfiguration `mapstructure:"database"`
+	Server   ServerConfig `mapstructure:"server"`
+	Database DBConfig     `mapstructure:"database"`
+	Redis    RedisConfig  `mapstructure:"redis"`
 }
 
-type ServerConfiguration struct {
+type ServerConfig struct {
 	Port int `validate:"min=1,max=65535"`
 }
 
-type DatabaseConfiguration struct {
+type DBConfig struct {
 	URL      string
 	Host     string
 	Port     int `validate:"min=1,max=65535"`
 	User     string
 	Password string
 	Name     string
+}
+
+type RedisConfig struct {
+	Host     string
+	Port     int `validate:"min=1,max=65535"`
+	Password string
 }

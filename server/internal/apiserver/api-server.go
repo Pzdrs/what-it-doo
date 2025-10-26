@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/redis/go-redis/v9"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
 	"pycrs.cz/what-it-doo/internal/queries"
@@ -36,7 +37,7 @@ func spaHandler(staticDir string) http.HandlerFunc {
 	}
 }
 
-func NewServer(q *queries.Queries) *Server {
+func NewServer(q *queries.Queries, redisClient *redis.Client) *Server {
 	userRepository := repository.NewUserRepository(q)
 	sessionRepository := repository.NewSessionRepository(q)
 	chatRepository := repository.NewChatRepository(q)

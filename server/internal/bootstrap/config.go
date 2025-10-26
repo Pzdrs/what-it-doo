@@ -33,7 +33,7 @@ func InitConfig() (apiserver.Configuration, error) {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	validate.RegisterStructValidation(
 		validation.DbConfigStructLevelValidation,
-		apiserver.DatabaseConfiguration{},
+		apiserver.DBConfig{},
 	)
 	if err := validate.Struct(cfg); err != nil {
 		return apiserver.Configuration{}, fmt.Errorf("invalid config: %w", err)
@@ -60,4 +60,5 @@ func newViper() *viper.Viper {
 func setDefaults(config *viper.Viper) {
 	config.SetDefault("server.port", 8080)
 	config.SetDefault("database.port", 5432)
+	config.SetDefault("redis.port", 6379)
 }
