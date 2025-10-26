@@ -1,13 +1,12 @@
-package validation
+package config
 
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
-	"pycrs.cz/what-it-doo/internal/apiserver"
 )
 
 func DbConfigStructLevelValidation(sl validator.StructLevel) {
-	cfg := sl.Current().Interface().(apiserver.DBConfig)
+	cfg := sl.Current().Interface().(DBConfig)
 
 	if cfg.URL == "" {
 		if cfg.Host == "" {

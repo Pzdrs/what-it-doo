@@ -10,6 +10,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/config"
 	"pycrs.cz/what-it-doo/internal/queries"
 )
 
@@ -37,15 +38,15 @@ func spaHandler(staticDir string) http.HandlerFunc {
 	}
 }
 
-func NewServer(q *queries.Queries, redisClient *redis.Client) *Server {
+func NewServer(q *queries.Queries, config config.Configuration, redisClient *redis.Client) *Server {
 	userRepository := repository.NewUserRepository(q)
 	sessionRepository := repository.NewSessionRepository(q)
 	chatRepository := repository.NewChatRepository(q)
 
 	server := &Server{
-		authService: service.NewAuthService(userRepository, sessionRepository),
+		authService: service.NewAuthService(userRepository, sessionRepository, config),
 		chatService: service.NewChatService(chatRepository),
-		userService: service.NewUserService(userRepository),
+		userService: service.NewUserService(userRepository, config),
 	}
 
 	r := chi.NewRouter()

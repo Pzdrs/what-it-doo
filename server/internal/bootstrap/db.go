@@ -6,10 +6,10 @@ import (
 	"log"
 
 	"github.com/jackc/pgx/v5"
-	"pycrs.cz/what-it-doo/internal/apiserver"
+	"pycrs.cz/what-it-doo/internal/config"
 )
 
-func InitDB(config *apiserver.Configuration) (*pgx.Conn, error) {
+func InitDB(config config.Configuration) (*pgx.Conn, error) {
 	var dsn string
 
 	if config.Database.URL != "" {

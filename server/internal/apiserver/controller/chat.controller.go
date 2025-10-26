@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 
+	"pycrs.cz/what-it-doo/internal/apiserver/common"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
 )
 
@@ -21,5 +21,5 @@ func (c *ChatController) HandleAllChats(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(chats)
+	common.WriteJSON(w, 200, chats)
 }

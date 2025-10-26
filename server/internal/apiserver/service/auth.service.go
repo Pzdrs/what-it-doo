@@ -10,6 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
+	"pycrs.cz/what-it-doo/internal/config"
 	"pycrs.cz/what-it-doo/internal/queries"
 )
 
@@ -20,12 +21,14 @@ var (
 type AuthService struct {
 	repository        *repository.UserRepository
 	sessionRepository *repository.SessionRepository
+	config            config.Configuration
 }
 
-func NewAuthService(repo *repository.UserRepository, sessionRepo *repository.SessionRepository) *AuthService {
+func NewAuthService(repo *repository.UserRepository, sessionRepo *repository.SessionRepository, config config.Configuration) *AuthService {
 	return &AuthService{
 		repository:        repo,
 		sessionRepository: sessionRepo,
+		config:            config,
 	}
 }
 
@@ -62,7 +65,7 @@ func (s *AuthService) RegisterUser(user model.User, password string) (model.User
 	if err != nil {
 		return model.User{}, err
 	}
-	return mapUserToModel(u), nil
+	return mapUserToModel(u, s.config), nil
 }
 
 func (s *AuthService) GetUserByEmail(email string) (model.User, error) {
@@ -71,7 +74,7 @@ func (s *AuthService) GetUserByEmail(email string) (model.User, error) {
 		if err != nil {
 			return model.User{}, err
 		}
-		return mapUserToModel(user), nil
+		return mapUserToModel(user, s.config), nil
 	}()
 }
 

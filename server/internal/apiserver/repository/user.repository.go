@@ -40,10 +40,10 @@ func (r *UserRepository) GetUserByEmail(email string) (queries.User, error) {
 	return r.q.GetUserByEmail(context.Background(), email)
 }
 
-func (r *UserRepository) GetUserByID(userID uuid.UUID) (*queries.User, error) {
+func (r *UserRepository) GetUserByID(userID uuid.UUID) (queries.User, error) {
 	user, err := r.q.GetUserByID(context.Background(), userID)
 	if err != nil {
-		return nil, err
+		return queries.User{}, err
 	}
-	return &user, nil
+	return user, nil
 }
