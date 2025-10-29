@@ -22,12 +22,15 @@ spec:
 
       containers:
       - name: server
-        image: registry.gitlab.pycrs.cz/tul/what-it-doo/server:0.2.0
+        image: registry.gitlab.pycrs.cz/tul/what-it-doo/server:0.2.1
         imagePullPolicy: Always
         volumeMounts:
           - mountPath: /etc/whatitdoo/wid.yaml
             name: config-volume
-            subPath: wid.yaml
+            subPath: wid.yamldocker 
+        env:
+          - name: WID_EXTERNAL_URL
+            value: "https://wid.pycrs.cz"
         envFrom:
           - secretRef:
               name: wid-secrets

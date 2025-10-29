@@ -1,65 +1,82 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import ChatFeed from '$lib/components/ChatFeed.svelte';
-	import ChatList from '$lib/components/ChatList.svelte';
+	import type { ModelChat } from '$lib/api/client';
+	import ChatMessage from '$lib/components/ChatMessage.svelte';
 	import Icon from '$lib/components/Icon.svelte';
-	import UserPageLayout from '$lib/components/layout/UserPageLayout.svelte';
-	import ServerStatus from '$lib/components/ServerStatus.svelte';
-	import NewChatModal from '$lib/modals/NewChatModal.svelte';
-	import { getChat } from '$lib/stores/chats.svelte';
-	import type { Chat } from '$lib/types';
-	import { mdiSquareEditOutline } from '@mdi/js';
+	import { messagingStore } from '$stores/chats.svelte';
+	import { mdiHandWaveOutline, mdiSendOutline } from '@mdi/js';
 
-	const currentChat: Chat | undefined = $derived(getChat(parseInt(page.params.chat_id || '0')));
+	const chat = $derived(messagingStore.currentChat);
+
+	$effect(() => {
+		// TODO: send typing indicator to server
+		console.log('Actively typing changed:', activelyTyping());
+	});
+
+	$effect(() => {
+		console.log('Loaded chat ID:', chat?.id);
+	});
+
+	let message = $state('');
+	let focus = $state(false);
+	let typing = $derived(message.length > 0);
+	let activelyTyping = $derived(() => typing && focus);
+
+	function sendMessage() {
+		console.log('Sending message:', message);
+		message = '';
+	}
+	function dapUp() {
+		console.log('Dapping up!');
+	}
 </script>
 
-<UserPageLayout>
-	<div
-		class="bg-base-100 flex h-full w-full flex-col gap-x-0 gap-y-4 px-4 pb-6 pt-4 md:h-[calc(100vh-80px)] md:flex-row md:gap-x-4 md:gap-y-0"
-	>
-		<section class="rounded-box bg-base-300 flex h-full w-full flex-col p-4 md:w-1/3">
-			<div class="flex justify-between">
-				<p class="text-primary p-2 text-4xl font-bold">Chats</p>
-				<span class="my-auto text-white">
-					<a
-						href="#new-chat"
-						class="tooltip btn"
-						data-tip="Start a new chat"
-						aria-label="New Chat"
-						onclick={() =>
-							(document.getElementById('new-chat-dialog') as HTMLDialogElement).showModal()}
-					>
-						<Icon icon={mdiSquareEditOutline} class="size-[1.2em]" />
-						Compose
-					</a>
-				</span>
+<div class="flex">
+	<div class="flex items-center rounded-lg p-2 transition-colors duration-200">
+		<div class="avatar avatar-online">
+			<div class="w-9 rounded-full">
+				<img src={'avatar_url'} alt="Chat Avatar" />
 			</div>
-			<div class="my-4">
-				<label class="input w-full">
-					<svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-						<g
-							stroke-linejoin="round"
-							stroke-linecap="round"
-							stroke-width="2.5"
-							fill="none"
-							stroke="currentColor"
-						>
-							<circle cx="11" cy="11" r="8"></circle>
-							<path d="m21 21-4.3-4.3"></path>
-						</g>
-					</svg>
-					<input type="search" required placeholder="Search conversations" />
-				</label>
-			</div>
-			<ChatList {currentChat} />
-
-			<div class="divider my-4"></div>
-			<ServerStatus />
-		</section>
-		<section class="flex-3 rounded-box bg-base-300 flex h-full w-full flex-col p-4 md:w-2/3">
-			<ChatFeed chat={currentChat} />
-		</section>
+		</div>
+		<div class="ml-4">
+			<h3 class="font-bold">
+				{chat?.title}
+			</h3>
+			<p class="text-base-content/75 text-sm">Active now</p>
+		</div>
 	</div>
+	<div></div>
+</div>
+<div class="flex-grow overflow-auto">
+	{#if messagingStore.currentMessages.length > 0}
+		{#each messagingStore.currentMessages as msg (msg.id)}
+			<ChatMessage message={msg} />
+		{/each}
+	{:else}
+		<p class="text-base-content/50 mt-20 text-center">No messages yet. Start the conversation!</p>
+	{/if}
 
-	<NewChatModal />
-</UserPageLayout>
+	<!-- {#each chat.getTypingUsers() as user (user.id)}
+        <TypingIndicator {user}/>
+    {/each} -->
+</div>
+<div class="mt-2 flex justify-between gap-2">
+	<input
+		type="text"
+		placeholder="Aa"
+		bind:value={message}
+		onfocus={() => (focus = true)}
+		onblur={() => (focus = false)}
+		class="input w-full"
+	/>
+	<span>
+		<div class="tooltip" data-tip={typing ? 'Send message' : 'Dap a homie up'}>
+			<button
+				class="btn btn-ghost"
+				onclick={typing ? sendMessage : dapUp}
+				aria-label={typing ? 'Send Message' : 'Dap Up'}
+			>
+				<Icon icon={typing ? mdiSendOutline : mdiHandWaveOutline} size="30" />
+			</button>
+		</div>
+	</span>
+</div>

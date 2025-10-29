@@ -10,7 +10,7 @@ type Configuration struct {
 }
 
 type ServerConfig struct {
-	Port        int    `validate:"min=1,max=65535"`
+	Port int `validate:"min=1,max=65535"`
 }
 
 type DBConfig struct {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { serverStore } from '$stores/server.svelte';
 	import type { Snippet } from 'svelte';
 	
 	interface Props {
@@ -23,5 +24,5 @@
 		</div>
 	</div>
 
-	<p class="absolute bottom-4 w-full text-center opacity-25">v1.0.0</p>
+	<p class="absolute bottom-4 w-full text-center opacity-25">{serverStore.version}</p>
 </div>

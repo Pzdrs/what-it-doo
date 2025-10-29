@@ -3,3 +3,7 @@ dev:
 
 dev-down:
 	docker compose -f ./docker/compose.dev.yaml down --remove-orphans
+
+api:
+	(cd server && make swag)
+	(cd web && npm run gen:api)

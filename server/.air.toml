@@ -1,4 +1,4 @@
 [build]
   bin = "bin/api"
-  cmd = "make swag && make build"
-  exclude_dir = ["api", "bin", "tmp"]
+  cmd = "make build"
+  exclude_dir = ["api", "bin", "tmp", "static"]

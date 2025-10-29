@@ -1,25 +1,26 @@
 <script lang="ts">
+	import type { DtoChatMessage } from '$lib/api/client';
 	import type { ChatMessage, User } from '$lib/types';
 	import { formatDateOrTime } from '$lib/utils';
+	import { messagingStore } from '$stores/chats.svelte';
 	import { userStore } from '$stores/user.svelte';
 
-	type ChatMessageOrigin = 'us' | 'them';
-
 	interface Props {
-		message: ChatMessage;
+		message: DtoChatMessage;
 	}
 
 	let { message }: Props = $props();
 
-	const user = userStore.user
-
-	const origin = user?.id === message.sender.id ? 'us' : 'them';
+	const origin = $derived(userStore.user?.id === message.sender_id? 'us' : 'them');
+	const sender = $derived.by(() => {
+		return messagingStore.allParticipants.find((p) => p.id === message.sender_id);
+	});
 </script>
 
 <div class="chat" class:chat-start={origin === 'them'} class:chat-end={origin === 'us'}>
 	<div class="chat-image avatar">
 		<div class="w-10 rounded-full">
-			<img alt="{message.sender.name} Avatar" src={message.sender.avatarUrl} />
+			<img alt="{sender?.name} Avatar" src={sender?.avatarUrl} />
 		</div>
 	</div>
 	<div class="chat-header">

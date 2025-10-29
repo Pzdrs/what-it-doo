@@ -1,84 +1,61 @@
-import { Chat, type ChatMessage } from "$lib/types";
-import { userStore } from "./user.svelte";
+import {
+	getChatById,
+	type DtoChat,
+	type DtoChatMessage,
+	type DtoUserDetails
+} from '$lib/api/client';
+import type { UUID } from 'crypto';
 
-const user = userStore.user;
+class MessagingStore {
+	chats = $state<DtoChat[]>([]);
+	messages = $state<Record<number, DtoChatMessage[]>>({}); // key = chatId, value = messages array
 
-let chats = $state<Chat[]>([
-    new Chat(1, [
-        {
-            id: 'c175258b-88fe-4035-8c0b-c78c49ffee67',
-            name: 'Alice',
-            avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg'
-        }, user
-    ], {
-        title: 'Chat 1', lastMessage: {
-            id: crypto.randomUUID(),
-            chatId: 1,
-            sender: user,
-            content: 'Hello, how are you?',
-            timestamp: new Date(Date.now() - 300 * 1000), // 5 minutes ago
-            readAt: new Date(Date.now() - 200 * 1000) // 3 minutes ago
-        },
-        typingUsers: []
-    }),
-    new Chat(2, [], {
-        title: 'Chat 2',
-        lastMessage: {
-            id: crypto.randomUUID(),
-            chatId: 2,
-            sender: user,
-            content: "What's up?",
-            timestamp: new Date(Date.now() - 3600 * 1000), // 1 hour ago
-            readAt: new Date(Date.now()),
-        },
-    }),
-    new Chat(3, [], {
-        lastMessage: {
-            id: crypto.randomUUID(),
-            chatId: 3,
-            sender: user,
-            content: "Let's catch up!",
-            timestamp: new Date('2025-01-15T15:30:00Z')
-        },
-    })
-]);
-let messages = $state<ChatMessage[]>([
-    {
-        id: crypto.randomUUID(),
-        chatId: 1,
-        sender: {
-            id: crypto.randomUUID(),
-            name: 'Bob',
-            avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg'
-        },
-        content: 'Hello, how are you? lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-        timestamp: new Date(Date.now() - 600 * 1000) // 10 minutes ago
-    },
-    {
-        id: crypto.randomUUID(),
-        chatId: 1,
-        sender: {
-            id: 'c175238b-88fe-4035-8c0b-c78c49ffee67',
-            name: 'Alice',
-            avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg'
-        },
-        content: 'Hi Bob! I am good, thanks!',
-        //timestamp: new Date(Date.now() - 300 * 1000) // 5 minutes ago
-    }
-]);
+	_currentChatId = $state<number | null>(null);
 
-export const getChats = () => {
-    return chats;
+	currentChat = $derived.by(() => {
+		if (this._currentChatId === null) return null;
+		return this.chats.find((chat) => chat.id === this._currentChatId) || null;
+	});
+
+	currentMessages = $derived.by(() => {
+		if (this._currentChatId === null) return [];
+		return this.messages[this._currentChatId] || [];
+	});
+
+	// List of all unique participants across all chats
+	allParticipants = $derived.by(() => {
+		const participantIds = new Set<UUID>();
+		return this.chats
+			.flatMap((chat) => chat.participants)
+			.filter((p) => {
+				if (participantIds.has(p.id)) return false;
+				participantIds.add(p.id);
+				return true;
+			});
+	});
+
+	getChat(chatId: number): DtoChat | null {
+		return this.chats.find((chat) => chat.id === chatId) || null;
+	}
+
+	getParticipant(user_id: UUID): DtoUserDetails | null {
+		for (const chat of this.chats) {
+			const participant = chat.participants.find((p) => p.id === user_id);
+			if (participant) {
+				return participant;
+			}
+		}
+		return null;
+	}
+
+	async setCurrentChat(chatId: number) {
+		this._currentChatId = chatId;
+		if (this.chats.length === 0) {
+			await getChatById(chatId).then((chat) => {
+				this.chats.push(chat);
+			});
+		}
+	}
 }
 
-export const getChat = (chatId: number): Chat | undefined => {
-    return chats.find(chat => chat.id === chatId);
-}
-
-export const sendMessage = (message: ChatMessage) => {
-    messages.push(message);
-}
-
-export const getMessages = (chatId: number) => {
-    return messages.filter(message => message.chatId === chatId);
-}
+export const messagingStore = new MessagingStore();

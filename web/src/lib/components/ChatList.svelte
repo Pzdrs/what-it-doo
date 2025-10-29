@@ -1,41 +1,44 @@
 <script lang="ts">
-	import { getChats } from '$lib/stores/chats.svelte';
-	import type { Chat } from '$lib/types';
+	import { getMyChats, type ModelChat } from '$lib/api/client';
+	import { messagingStore } from '$lib/stores/chats.svelte';
 	import { format } from 'timeago.js';
 
-	interface Props {
-		currentChat: Chat;
+	interface Props {}
+
+	let {}: Props = $props();
+
+	function loadChats() {
+		return getMyChats().then((fetchedChats) => {
+			messagingStore.chats = fetchedChats;
+			return fetchedChats;
+		});
 	}
-
-	let { currentChat }: Props = $props();
-
-	let chatsPromis: Promise<Chat[]> = Promise.resolve(getChats());
 </script>
 
 <ul class="menu flex w-full flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden">
-	{#await chatsPromis}
+	{#await loadChats()}
 		<div class="mt-10 text-center">
 			<span class="loading loading-spinner loading-xl"></span>
 		</div>
 	{:then chats}
 		{#each chats as chat}
 			<li>
-				<a href="/chat/{chat.id}" class:menu-active={currentChat.id === chat.id}>
+				<a
+					data-sveltekit-preload-data="tap"
+					href="/chat/{chat.id}"
+					class:menu-active={messagingStore.currentChat === chat.id}
+				>
 					<div class="rounded-box flex items-center p-2 transition-colors duration-200">
-						<div
-							class="avatar"
-							class:avatar-online={chat.getStatus()}
-							class:avatar-offline={!chat.getStatus()}
-						>
+						<div class="avatar" class:avatar-online={false} class:avatar-offline={true}>
 							<div class="w-12 rounded-full">
-								<img src={chat.getAvatarUrl()} alt="Chat Avatar" />
+								<img src={''} alt="Chat Avatar" />
 							</div>
 						</div>
 						<div class="ml-4">
-							<h3 class="font-bold">{chat.getTitle()}</h3>
+							<h3 class="font-bold">{chat.title}</h3>
 							<p class="text-sm">
-								<span>{chat.lastMessage.content}</span> &middot;
-								<span>{format(chat.lastMessage.timestamp)}</span>
+								<span>{'Last message'}</span> &middot;
+								<span>{format(Date.now())}</span>
 							</p>
 						</div>
 					</div>

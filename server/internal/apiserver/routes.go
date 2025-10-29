@@ -17,7 +17,7 @@ import (
 func addRoutes(
 	r chi.Router,
 	authService *service.AuthService,
-	chatService *service.ChatService,
+	chatService service.ChatService,
 	userService *service.UserService,
 	config config.Configuration,
 ) {
@@ -32,9 +32,6 @@ func addRoutes(
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
-		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get("Origin") == config.ExternalUrl
-		},
 	}
 
 	r.Route("/server", func(r chi.Router) {
@@ -52,8 +49,12 @@ func addRoutes(
 		r.With(RequireAuthenticated).Get("/me", userController.HandleGetMyself)
 	})
 
-	r.Route("/chats", func(r chi.Router) {
-		r.Get("/", chatController.HandleAllChats)
+	r.With(RequireAuthenticated).Route("/chats", func(r chi.Router) {
+		r.Get("/", chatController.HandleMyChats)
+		r.Route("/{chat_id}", func(r chi.Router) {
+			r.Get("/", chatController.HandleGetChat)
+			r.Get("/messages", chatController.HandleGetChatMessages)
+		})
 	})
 
 	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {

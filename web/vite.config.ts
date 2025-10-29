@@ -5,7 +5,6 @@ import { defineConfig } from 'vite';
 
 const upstream = {
 	target: process.env.WID_SERVER_URL || 'http://localhost:8080',
-	changeOrigin: true,
 	secure: true,
 	ws: true
 };

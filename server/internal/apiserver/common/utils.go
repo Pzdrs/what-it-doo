@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"pycrs.cz/what-it-doo/internal/apiserver/problem"
@@ -65,4 +67,32 @@ func WriteJSON(w http.ResponseWriter, status int, data any) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	return json.NewEncoder(w).Encode(data)
+}
+
+func ParseQueryInt[T int | int8 | int16 | int32 | int64](r *http.Request, name string, defaultValue T) (T, error) {
+	val := r.URL.Query().Get(name)
+	if val == "" {
+		return defaultValue, nil
+	}
+
+	// Parse as int64 first
+	i, err := strconv.ParseInt(val, 10, 64)
+	if err != nil {
+		var zero T
+		return zero, err
+	}
+
+	return T(i), nil
+}
+
+func ParseQueryTime(r *http.Request, name string, defaultValue time.Time) (time.Time, error) {
+	val := r.URL.Query().Get(name)
+	if val == "" {
+		return defaultValue, nil // return default if missing
+	}
+	parsedTime, err := time.Parse(time.RFC3339, val)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return parsedTime, nil
 }

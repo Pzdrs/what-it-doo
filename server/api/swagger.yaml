@@ -13,6 +13,47 @@ definitions:
       type:
         type: string
     type: object
+  dto.Chat:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      last_message:
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/dto.UserDetails'
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.ChatMessage:
+    properties:
+      content:
+        type: string
+      delivered_at:
+        type: string
+      id:
+        type: string
+      read_at:
+        type: string
+      sender_id:
+        type: string
+      sent_at:
+        type: string
+    type: object
+  dto.ChatMessages:
+    properties:
+      has_more:
+        type: boolean
+      messages:
+        items:
+          $ref: '#/definitions/dto.ChatMessage'
+        type: array
+    type: object
   dto.LoginRequest:
     properties:
       email:
@@ -181,6 +222,77 @@ paths:
       summary: Register user
       tags:
       - Authentication
+  /chats/:
+    get:
+      description: Retrieves all chats the authenticated user is a participant of
+      operationId: GetMyChats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.Chat'
+            type: array
+      security:
+      - SessionAuth: []
+      summary: Get my chats
+      tags:
+      - Chats
+  /chats/{chat_id}:
+    get:
+      description: Retrieves a chat by its ID
+      operationId: GetChatByID
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chat_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Chat'
+        "404":
+          description: Not Found
+      summary: Get chat by ID
+      tags:
+      - Chats
+  /chats/{chat_id}/messages:
+    get:
+      description: Retrieves messages for a specific chat
+      operationId: GetChatMessages
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chat_id
+        required: true
+        type: integer
+      - default: 50
+        description: Maximum number of messages to retrieve
+        in: query
+        name: limit
+        type: integer
+      - description: Retrieve messages sent before this timestamp
+        example: "2023-01-01T00:00:00Z"
+        format: date-time
+        in: query
+        name: before
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ChatMessages'
+      summary: Get chat messages
+      tags:
+      - Chats
   /server/about:
     get:
       description: Get information about the server

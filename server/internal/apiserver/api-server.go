@@ -18,7 +18,7 @@ type Server struct {
 	Handler http.Handler
 
 	authService *service.AuthService
-	chatService *service.ChatService
+	chatService service.ChatService
 	userService *service.UserService
 }
 
