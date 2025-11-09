@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"sync"
+	"time"
 
 	"pycrs.cz/what-it-doo/internal/apiserver"
 	"pycrs.cz/what-it-doo/internal/bootstrap"
@@ -20,7 +22,10 @@ import (
 // @version		1.0
 // @description	API for the messanger of the future - What-it-doo.
 // @BasePath		/api/v1
-func run(ctx context.Context, getenv func(string) string, w io.Writer, args []string) error {
+func run(ctx context.Context) error {
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
+	defer stop()
+
 	log.Printf("Starting what-it-doo server version %s\n", version.Version)
 
 	config, err := bootstrap.InitConfig()
@@ -32,29 +37,50 @@ func run(ctx context.Context, getenv func(string) string, w io.Writer, args []st
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
+	defer connPool.Close()
 
 	redisClient, err := bootstrap.InitRedis(ctx, config)
 	if err != nil {
 		return fmt.Errorf("failed to initialize redis: %w", err)
 	}
-	q := queries.New(connPool)
+	defer redisClient.Close()
 
+	q := queries.New(connPool)
 	server := apiserver.NewServer(q, config, redisClient)
+
 	httpServer := &http.Server{
-		Addr:    net.JoinHostPort("0.0.0.0", strconv.Itoa(config.Server.Port)),
+		Addr:    net.JoinHostPort(config.Server.Host, strconv.Itoa(config.Server.Port)),
 		Handler: server.Handler,
 	}
 
-	log.Printf("Listening on %s\n", httpServer.Addr)
-	if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Printf("error listening and serving: %s\n", err)
-	}
+	// we run the server in a separate goroutine
+	go func() {
+		log.Printf("Listening on %s\n", httpServer.Addr)
+		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			fmt.Fprintf(os.Stderr, "error listening and serving: %s\n", err)
+		}
+	}()
+
+	// graceful shutdown logic running in a separate goroutine waiting for context cancellation
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		<-ctx.Done()
+		log.Print("Shutting down HTTP server...")
+
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if err := httpServer.Shutdown(shutdownCtx); err != nil {
+			fmt.Fprintf(os.Stderr, "error shutting down http server: %s\n", err)
+		}
+	})
+	wg.Wait()
+	
 	return nil
 }
 
 func main() {
 	ctx := context.Background()
-	if err := run(ctx, os.Getenv, os.Stdout, os.Args); err != nil {
+	if err := run(ctx); err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(1)
 	}

@@ -10,6 +10,7 @@ type Configuration struct {
 }
 
 type ServerConfig struct {
+	Host string
 	Port int `validate:"min=1,max=65535"`
 }
 

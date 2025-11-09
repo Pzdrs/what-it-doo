@@ -59,6 +59,7 @@ func newViper() *viper.Viper {
 }
 
 func setDefaults(v *viper.Viper) {
+	v.SetDefault("server.host", "0.0.0.0")
 	v.SetDefault("server.port", 8080)
 	v.SetDefault("database.port", 5432)
 	v.SetDefault("redis.port", 6379)
