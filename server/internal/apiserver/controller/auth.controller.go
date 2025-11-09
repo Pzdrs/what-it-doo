@@ -13,11 +13,13 @@ import (
 )
 
 type AuthController struct {
-	authService *service.AuthService
+	authService    service.AuthService
+	userService    service.UserService
+	sessionService service.SessionService
 }
 
-func NewAuthController(authService *service.AuthService) *AuthController {
-	return &AuthController{authService: authService}
+func NewAuthController(authService service.AuthService, userService service.UserService, sessionService service.SessionService) *AuthController {
+	return &AuthController{authService: authService, userService: userService, sessionService: sessionService}
 }
 
 // HandleLogin
@@ -38,8 +40,8 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := c.authService.GetUserByEmail(req.Email)
-	if err != nil || !c.authService.AuthenticateUser(req.Email, req.Password) {
+	user, err := c.userService.GetByEmail(r.Context(), req.Email)
+	if err != nil || !c.authService.AuthenticateUser(r.Context(), req.Email, req.Password) {
 		problem.WriteProblemDetails(w, problem.NewProblemDetails(
 			r, http.StatusUnauthorized,
 			"Incorrect credentials",
@@ -49,7 +51,7 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, err := c.authService.CreateSession(user.ID, "web", "unknown")
+	session, err := c.sessionService.Create(r.Context(), user.ID, "web", "unknown")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -81,6 +83,7 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 	}
 
 	user, err := c.authService.RegisterUser(
+		r.Context(),
 		model.User{
 			Email: req.Email,
 			Name:  req.Name,
@@ -103,7 +106,7 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if r.URL.Query().Get("autoLogin") == "true" {
-		session, err := c.authService.CreateSession(user.ID, "web", "unknown")
+		session, err := c.sessionService.Create(r.Context(), user.ID, "web", "unknown")
 		if err != nil {
 			problem.WriteProblemDetails(w, problem.NewInternalServerError(r, err))
 			return
@@ -132,7 +135,7 @@ func (c *AuthController) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := c.authService.Logout(session)
+	err := c.authService.LogoutUser(r.Context(), session)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

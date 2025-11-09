@@ -35,7 +35,7 @@ func NewChatController(chatService service.ChatService) *ChatController {
 func (c *ChatController) HandleMyChats(w http.ResponseWriter, r *http.Request) {
 	session, _ := middleware.SessionFromContext(r.Context())
 
-	chats, err := c.chatService.GetChatsForUser(session.UserID)
+	chats, err := c.chatService.GetChatsForUser(r.Context(), session.UserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -61,7 +61,7 @@ func (c *ChatController) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	chat, err := c.chatService.GetChatByID(chat_id)
+	chat, err := c.chatService.GetChatByID(r.Context(), chat_id)
 	if errors.Is(err, sql.ErrNoRows) {
 		common.WriteJSON(w, 404, struct{}{})
 		return
@@ -70,6 +70,21 @@ func (c *ChatController) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	common.WriteJSON(w, 200, chat)
+}
+
+// HandleCreateChat godoc
+func (c *ChatController) HandleCreateChat(w http.ResponseWriter, r *http.Request) {
+	req, ok := common.DecodeAndValidate[dto.CreateChatRequest](w, r)
+	if !ok {
+		return
+	}
+
+	chat, err := c.chatService.CreateChat(r.Context(), req.Participants)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	common.WriteJSON(w, 201, chat)
 }
 
 // HandleGetChatMessages
@@ -103,7 +118,7 @@ func (c *ChatController) HandleGetChatMessages(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	messages, more, err := c.chatService.GetMessagesForChat(chat_id, limit, before)
+	messages, more, err := c.chatService.GetMessagesForChat(r.Context(), chat_id, limit, before)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

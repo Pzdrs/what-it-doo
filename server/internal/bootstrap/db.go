@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"pycrs.cz/what-it-doo/internal/config"
 )
 
-func InitDB(config config.Configuration) (*pgx.Conn, error) {
+func InitDB(ctx context.Context, config config.Configuration) (*pgxpool.Pool, error) {
 	var dsn string
 
 	if config.Database.URL != "" {
@@ -24,11 +24,11 @@ func InitDB(config config.Configuration) (*pgx.Conn, error) {
 		)
 	}
 
-	conn, err := pgx.Connect(context.Background(), dsn)
+	conn, err := pgxpool.New(ctx, dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
-	if err := conn.Ping(context.Background()); err != nil {
+	if err := conn.Ping(ctx); err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 

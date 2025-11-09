@@ -30,6 +30,10 @@ type ChatMessages struct {
 	HasMore  bool          `json:"has_more"`
 }
 
+type CreateChatRequest struct {
+	Participants []uuid.UUID `json:"participants" validate:"required,min=1"`
+}
+
 func MapChatToDTO(chat model.Chat) Chat {
 	return Chat{
 		ID:        chat.ID,

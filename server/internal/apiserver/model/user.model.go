@@ -7,13 +7,14 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	AvatarUrl string    `json:"avatar_url"`
-	Bio       string    `json:"bio"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID             uuid.UUID `json:"id"`
+	Name           string    `json:"name"`
+	Email          string    `json:"email"`
+	HashedPassword string    `json:"hashed_password"`
+	AvatarUrl      string    `json:"avatar_url"`
+	Bio            string    `json:"bio"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 type UserSession struct {
@@ -24,5 +25,5 @@ type UserSession struct {
 	DeviceOs   string    `json:"device_os"`
 	CreatedAt  time.Time `json:"created_at"`
 	ExpiresAt  time.Time `json:"expires_at"`
-	RevokedAt  time.Time `json:"revoked_at"`
+	RevokedAt  *time.Time `json:"revoked_at"`
 }

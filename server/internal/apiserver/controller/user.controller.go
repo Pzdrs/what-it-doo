@@ -9,10 +9,10 @@ import (
 )
 
 type UserController struct {
-	userService *service.UserService
+	userService service.UserService
 }
 
-func NewUserController(userService *service.UserService) *UserController {
+func NewUserController(userService service.UserService) *UserController {
 	return &UserController{userService: userService}
 }
 
@@ -32,7 +32,7 @@ func (c *UserController) HandleGetMyself(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	user, err := c.userService.GetUserByID(session.UserID)
+	user, err := c.userService.GetByID(r.Context(),session.UserID)
 	if err != nil {
 		http.Error(w, "user not found", http.StatusNotFound)
 		return

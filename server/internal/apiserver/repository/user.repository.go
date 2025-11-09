@@ -2,48 +2,84 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
+	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/queries"
 )
 
-type UserRepository struct {
+type UserRepository interface {
+	UserExists(ctx context.Context, email string) bool
+	Create(ctx context.Context, user *model.User) error
+	GetByEmail(ctx context.Context, email string) (*model.User, error)
+	GetByID(ctx context.Context, userID uuid.UUID) (*model.User, error)
+}
+
+type postgresUserRepository struct {
 	q *queries.Queries
 }
 
-func NewUserRepository(q *queries.Queries) *UserRepository {
-	return &UserRepository{q: q}
+func NewUserRepository(q *queries.Queries) UserRepository {
+	return &postgresUserRepository{q: q}
 }
 
-func (r *UserRepository) UserExists(username string) bool {
-	_, err := r.q.GetUserByEmail(context.Background(), username)
+func (r *postgresUserRepository) UserExists(ctx context.Context, email string) bool {
+	_, err := r.q.GetUserByEmail(ctx, email)
 	return err == nil
 }
 
-func (r UserRepository) SaveUser(user queries.User) (queries.User, error) {
-	if user.Email == "" {
-		return queries.User{}, fmt.Errorf("email is required")
-	}
-
-	user, err := r.q.CreateUser(context.Background(), queries.CreateUserParams{
-		Name:           user.Name,
+func (r *postgresUserRepository) Create(ctx context.Context, user *model.User) error {
+	createdUser, err := r.q.CreateUser(ctx, queries.CreateUserParams{
+		Name:           pgtype.Text{String: user.Name, Valid: true},
 		Email:          user.Email,
-		HashedPassword: user.HashedPassword,
-		AvatarUrl:      user.AvatarUrl,
-		Bio:            user.Bio,
+		HashedPassword: pgtype.Text{String: user.HashedPassword, Valid: true},
+		AvatarUrl:      pgtype.Text{String: user.AvatarUrl, Valid: true},
+		Bio:            pgtype.Text{String: user.Bio, Valid: true},
 	})
-	return user, err
-}
 
-func (r *UserRepository) GetUserByEmail(email string) (queries.User, error) {
-	return r.q.GetUserByEmail(context.Background(), email)
-}
-
-func (r *UserRepository) GetUserByID(userID uuid.UUID) (queries.User, error) {
-	user, err := r.q.GetUserByID(context.Background(), userID)
 	if err != nil {
-		return queries.User{}, err
+		return err
 	}
-	return user, nil
+
+	user.ID = createdUser.ID
+	user.CreatedAt = createdUser.CreatedAt.Time
+	user.UpdatedAt = createdUser.UpdatedAt.Time
+
+	return nil
 }
+
+func (r *postgresUserRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	user, err := r.q.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	return &model.User{
+		ID:             user.ID,
+		Name:           user.Name.String,
+		Email:          user.Email,
+		HashedPassword: user.HashedPassword.String,
+		Bio:            user.Bio.String,
+		CreatedAt:      user.CreatedAt.Time,
+		UpdatedAt:      user.UpdatedAt.Time,
+	}, nil
+}
+
+func (r *postgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID) (*model.User, error) {
+	user, err := r.q.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return &model.User{
+		ID:             user.ID,
+		Name:           user.Name.String,
+		Email:          user.Email,
+		HashedPassword: user.HashedPassword.String,
+		Bio:            user.Bio.String,
+		CreatedAt:      user.CreatedAt.Time,
+		UpdatedAt:      user.UpdatedAt.Time,
+	}, nil
+}
+
+// Compile-time check
+var _ UserRepository = (*postgresUserRepository)(nil)

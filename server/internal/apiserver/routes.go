@@ -1,9 +1,6 @@
 package apiserver
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -11,28 +8,32 @@ import (
 	"pycrs.cz/what-it-doo/internal/apiserver/controller"
 	"pycrs.cz/what-it-doo/internal/apiserver/middleware"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/apiserver/ws"
 	"pycrs.cz/what-it-doo/internal/config"
 )
 
 func addRoutes(
 	r chi.Router,
-	authService *service.AuthService,
+	authService service.AuthService,
 	chatService service.ChatService,
-	userService *service.UserService,
+	userService service.UserService,
+	sessionService service.SessionService,
 	config config.Configuration,
 ) {
-	RequireAuthenticated := middleware.RequireAuthenticated(authService, userService)
-	RequireUnauthenticated := middleware.RequireUnauthenticated(authService)
-
-	authController := controller.NewAuthController(authService)
-	chatController := controller.NewChatController(chatService)
-	userController := controller.NewUserController(userService)
-	serverController := controller.NewServerController()
-
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
+	connectionManager := ws.NewConnectionManager()
+
+	RequireAuthenticated := middleware.RequireAuthenticated(sessionService)
+	RequireUnauthenticated := middleware.RequireUnauthenticated(sessionService)
+
+	authController := controller.NewAuthController(authService, userService, sessionService)
+	chatController := controller.NewChatController(chatService)
+	userController := controller.NewUserController(userService)
+	serverController := controller.NewServerController()
+	socketController := controller.NewSocketController(upgrader, connectionManager)
 
 	r.Route("/server", func(r chi.Router) {
 		r.Get("/about", serverController.HandleAbout)
@@ -51,31 +52,14 @@ func addRoutes(
 
 	r.With(RequireAuthenticated).Route("/chats", func(r chi.Router) {
 		r.Get("/", chatController.HandleMyChats)
+		r.Post("/", chatController.HandleCreateChat)
 		r.Route("/{chat_id}", func(r chi.Router) {
 			r.Get("/", chatController.HandleGetChat)
 			r.Get("/messages", chatController.HandleGetChatMessages)
 		})
 	})
 
-	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		conn, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			http.Error(w, "Failed to upgrade to WebSocket", http.StatusInternalServerError)
-			return
-		}
-
-		go func() {
-			defer conn.Close()
-			for {
-				_, msg, err := conn.ReadMessage()
-				if err != nil {
-					break
-				}
-				// Handle incoming WebSocket messages
-				fmt.Println("Received WebSocket message:", string(msg))
-			}
-		}()
-	})
+	r.With(RequireAuthenticated).Get("/ws", socketController.HandleWebSocket)
 
 	// Swagger UI
 	r.Get("/swagger/*", httpSwagger.WrapHandler)

@@ -6,41 +6,152 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/queries"
 )
 
-type ChatRepository struct {
+type ChatRepository interface {
+	GetAll(ctx context.Context) ([]model.Chat, error)
+	GetForUser(ctx context.Context, userID uuid.UUID) ([]model.Chat, error)
+	GetByID(ctx context.Context, chatID int64) (*model.Chat, error)
+	GetMessagesForChat(ctx context.Context, chatID int64, limit int32, beforeTime time.Time) ([]model.Message, error)
+}
+
+type pgxChatRepository struct {
 	q *queries.Queries
 }
 
-func NewChatRepository(q *queries.Queries) *ChatRepository {
-	return &ChatRepository{q: q}
+func NewChatRepository(q *queries.Queries) ChatRepository {
+	return &pgxChatRepository{q: q}
 }
 
-func (r *ChatRepository) GetAllChats() ([]queries.Chat, error) {
-	return r.q.ListChats(context.Background())
-}
-
-func (r *ChatRepository) GetChatsForUser(userID uuid.UUID) ([]queries.Chat, error) {
-	return r.q.GetChatsForUser(context.Background(), userID)
-}
-
-func (r *ChatRepository) GetChatsForUserWithParticipants(userID uuid.UUID) ([]queries.GetChatsForUserWithParticipantsRow, error) {
-	return r.q.GetChatsForUserWithParticipants(context.Background(), userID)
-}
-
-func (r *ChatRepository) GetChatByID(chatID int64) (*queries.GetChatByIdWithParticipantsRow, error) {
-	chat, err := r.q.GetChatByIdWithParticipants(context.Background(), chatID)
+func (r *pgxChatRepository) GetAll(ctx context.Context) ([]model.Chat, error) {
+	c, err := r.q.ListChats(ctx)
 	if err != nil {
 		return nil, err
 	}
+	result := make([]model.Chat, len(c))
+	for i := range c {
+		result[i] = dbChatToModel(c[i])
+	}
+	return result, nil
+}
+
+func (r *pgxChatRepository) GetForUser(ctx context.Context, userID uuid.UUID) ([]model.Chat, error) {
+	c, err := r.q.GetChatsForUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]model.Chat, len(c))
+	for i := range c {
+		u, err := r.q.GetChatParticipants(ctx, c[i].ID)
+		if err != nil {
+			return nil, err
+		}
+
+		chat := dbChatToModel(c[i])
+		chat.Participants = dbUsersToModels(u)
+		result[i] = chat
+	}
+	return result, nil
+}
+
+func (r *pgxChatRepository) GetByID(ctx context.Context, chatID int64) (*model.Chat, error) {
+	c, err := r.q.GetChatById(ctx, chatID)
+	if err != nil {
+		return nil, err
+	}
+
+	u, err := r.q.GetChatParticipants(ctx, c.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	chat := dbChatToModel(c)
+	chat.Participants = dbUsersToModels(u)
+
 	return &chat, nil
 }
 
-func (r *ChatRepository) GetMessagesForChat(chatID int64, limit int32, beforeTime time.Time) ([]queries.Message, error) {
-	return r.q.GetMessagesForChat(context.Background(), queries.GetMessagesForChatParams{
+func (r *pgxChatRepository) GetMessagesForChat(ctx context.Context, chatID int64, limit int32, beforeTime time.Time) ([]model.Message, error) {
+	m, err := r.q.GetMessagesForChat(ctx, queries.GetMessagesForChatParams{
 		ChatID:    pgtype.Int8{Int64: chatID, Valid: true},
 		Limit:     limit,
 		CreatedAt: pgtype.Timestamptz{Time: beforeTime, Valid: true},
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return dbMessagesToModels(m), nil
 }
+
+func dbChatToModel(c queries.Chat) model.Chat {
+	return model.Chat{
+		ID:        c.ID,
+		Title:     c.Title.String,
+		CreatedAt: c.CreatedAt.Time,
+		UpdatedAt: c.UpdatedAt.Time,
+	}
+}
+
+func dbUserToModel(u queries.User) model.User {
+	return model.User{
+		ID:             u.ID,
+		Name:           u.Name.String,
+		Email:          u.Email,
+		HashedPassword: u.HashedPassword.String,
+		AvatarUrl:      u.AvatarUrl.String,
+		Bio:            u.Bio.String,
+		CreatedAt:      u.CreatedAt.Time,
+		UpdatedAt:      u.UpdatedAt.Time,
+	}
+}
+
+func dbUsersToModels(users []queries.User) []model.User {
+	out := make([]model.User, len(users))
+	for i := range users {
+		out[i] = dbUserToModel(users[i])
+	}
+	return out
+}
+
+func dbMessagesToModels(msgs []queries.Message) []model.Message {
+	out := make([]model.Message, len(msgs))
+	for i := range msgs {
+		senderID := func() *uuid.UUID {
+			if !msgs[i].SenderID.Valid {
+				return nil
+			}
+			uid, err := uuid.FromBytes(msgs[i].SenderID.Bytes[:])
+			if err != nil {
+				return nil
+			}
+			return &uid
+		}()
+
+		out[i] = model.Message{
+			ID:       msgs[i].ID,
+			ChatID:   msgs[i].ChatID.Int64,
+			SenderID: senderID,
+			Content:  msgs[i].Content.String,
+			SentAt:   msgs[i].CreatedAt.Time,
+			DeliveredAt: func() *time.Time {
+				if msgs[i].DeliveredAt.Valid {
+					return &msgs[i].DeliveredAt.Time
+				}
+				return nil
+			}(),
+			ReadAt: func() *time.Time {
+				if msgs[i].ReadAt.Valid {
+					return &msgs[i].ReadAt.Time
+				}
+				return nil
+			}(),
+		}
+	}
+	return out
+}
+
+var _ ChatRepository = (*pgxChatRepository)(nil)

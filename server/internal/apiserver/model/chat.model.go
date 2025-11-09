@@ -7,14 +7,17 @@ import (
 )
 
 type Chat struct {
-	ID        int64     `json:"id"`
-	Title     string    `json:"title"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID           int64     `json:"id"`
+	Title        string    `json:"title"`
+	Participants []User    `json:"participants"`
+	LastMessage  string    `json:"last_message,omitempty"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 type Message struct {
 	ID          uuid.UUID  `json:"id"`
+	ChatID      int64      `json:"chat_id"`
 	SenderID    *uuid.UUID `json:"sender_id"`
 	Content     string     `json:"content"`
 	SentAt      time.Time  `json:"sent_at"`
@@ -23,5 +26,5 @@ type Message struct {
 }
 
 func (c *Chat) IsGroupChat() bool {
-	return false
+	return len(c.Participants) > 2
 }

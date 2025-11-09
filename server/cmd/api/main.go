@@ -28,16 +28,16 @@ func run(ctx context.Context, getenv func(string) string, w io.Writer, args []st
 		return fmt.Errorf("failed to initialize config: %w", err)
 	}
 
-	conn, err := bootstrap.InitDB(config)
+	connPool, err := bootstrap.InitDB(ctx, config)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
 
-	redisClient, err := bootstrap.InitRedis(config)
+	redisClient, err := bootstrap.InitRedis(ctx, config)
 	if err != nil {
 		return fmt.Errorf("failed to initialize redis: %w", err)
 	}
-	q := queries.New(conn)
+	q := queries.New(connPool)
 
 	server := apiserver.NewServer(q, config, redisClient)
 	httpServer := &http.Server{

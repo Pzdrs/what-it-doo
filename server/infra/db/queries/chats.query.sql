@@ -29,6 +29,16 @@ WHERE
 GROUP BY
     c.id;
 
+-- name: GetChatParticipants :many
+SELECT
+    u.*
+FROM
+    users u
+JOIN
+    chat_participants cp ON u.id = cp.user_id
+WHERE
+    cp.chat_id = $1;
+
 -- name: GetChatById :one
 SELECT
     *

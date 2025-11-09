@@ -17,9 +17,10 @@ import (
 type Server struct {
 	Handler http.Handler
 
-	authService *service.AuthService
+	authService service.AuthService
 	chatService service.ChatService
-	userService *service.UserService
+	userService service.UserService
+	sessionService service.SessionService
 }
 
 func spaHandler(staticDir string) http.HandlerFunc {
@@ -47,6 +48,7 @@ func NewServer(q *queries.Queries, config config.Configuration, redisClient *red
 		authService: service.NewAuthService(userRepository, sessionRepository, config),
 		chatService: service.NewChatService(chatRepository),
 		userService: service.NewUserService(userRepository, config),
+		sessionService: service.NewSessionService(userRepository, sessionRepository, config),
 	}
 
 	r := chi.NewRouter()
@@ -58,6 +60,7 @@ func NewServer(q *queries.Queries, config config.Configuration, redisClient *red
 			server.authService,
 			server.chatService,
 			server.userService,
+			server.sessionService,
 			config,
 		)
 	})

@@ -25,7 +25,7 @@ func SessionFromContext(ctx context.Context) (model.UserSession, bool) {
 	return session, ok
 }
 
-func RequireAuthenticated(authService *service.AuthService, userService *service.UserService) func(http.Handler) http.Handler {
+func RequireAuthenticated(sessionService service.SessionService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie(internal.SESSION_COOKIE_NAME)
@@ -39,7 +39,7 @@ func RequireAuthenticated(authService *service.AuthService, userService *service
 				return
 			}
 
-			session, valid := authService.FindSession(cookie.Value)
+			session, valid := sessionService.GetByToken(r.Context(),cookie.Value)
 			if !valid {
 				problem.WriteProblemDetails(w, problem.NewProblemDetails(
 					r, http.StatusUnauthorized,
@@ -56,12 +56,12 @@ func RequireAuthenticated(authService *service.AuthService, userService *service
 	}
 }
 
-func RequireUnauthenticated(authService *service.AuthService) func(http.Handler) http.Handler {
+func RequireUnauthenticated(sessionService service.SessionService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie(internal.SESSION_COOKIE_NAME)
 			if err == nil {
-				_, valid := authService.FindSession(cookie.Value)
+				_, valid := sessionService.GetByToken(r.Context(), cookie.Value)
 				if valid {
 					problem.WriteProblemDetails(w, problem.NewProblemDetails(
 						r, http.StatusBadRequest,
