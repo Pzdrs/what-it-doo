@@ -2,6 +2,7 @@ import { browser } from "$app/environment";
 import { getMyself } from "$lib/api/client";
 import { AppRoute, SESSION_COOKIE_NAME } from "$lib/constants";
 import { userStore } from "$lib/stores/user.svelte";
+import { openWebSocketConnection } from "$stores/websocket.svelte";
 import { redirect } from "@sveltejs/kit";
 
 export interface AuthOptions {
@@ -46,7 +47,10 @@ export const authenticate = async (url: URL, options?: AuthOptions) => {
     
     if (!user) {
         redirect(302, `${AppRoute.AUTH_LOGIN}?continue=${encodeURIComponent(url.pathname + url.search)}`);
+        return;
     }
+
+    openWebSocketConnection();
 };
 
 export const requireNoAuth = async () => {

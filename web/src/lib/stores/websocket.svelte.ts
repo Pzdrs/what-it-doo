@@ -14,6 +14,10 @@ const onMessage = (event: MessageEvent) => {
 };
 
 export const openWebSocketConnection = () => {
+	if (websocket && websocket.readyState === WebSocket.OPEN) {
+		return;
+	}
+
 	try {
 		websocket = new WebSocket('/api/v1/ws');
 
