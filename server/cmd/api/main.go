@@ -74,7 +74,7 @@ func run(ctx context.Context) error {
 		}
 	})
 	wg.Wait()
-	
+
 	return nil
 }
 

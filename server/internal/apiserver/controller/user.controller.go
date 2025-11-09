@@ -32,7 +32,7 @@ func (c *UserController) HandleGetMyself(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	user, err := c.userService.GetByID(r.Context(),session.UserID)
+	user, err := c.userService.GetByID(r.Context(), session.UserID)
 	if err != nil {
 		http.Error(w, "user not found", http.StatusNotFound)
 		return

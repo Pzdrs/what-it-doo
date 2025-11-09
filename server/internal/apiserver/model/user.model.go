@@ -18,12 +18,12 @@ type User struct {
 }
 
 type UserSession struct {
-	ID         uuid.UUID `json:"id"`
-	UserID     uuid.UUID `json:"user_id"`
-	Token      string    `json:"token"`
-	DeviceType string    `json:"device_type"`
-	DeviceOs   string    `json:"device_os"`
-	CreatedAt  time.Time `json:"created_at"`
-	ExpiresAt  time.Time `json:"expires_at"`
+	ID         uuid.UUID  `json:"id"`
+	UserID     uuid.UUID  `json:"user_id"`
+	Token      string     `json:"token"`
+	DeviceType string     `json:"device_type"`
+	DeviceOs   string     `json:"device_os"`
+	CreatedAt  time.Time  `json:"created_at"`
+	ExpiresAt  time.Time  `json:"expires_at"`
 	RevokedAt  *time.Time `json:"revoked_at"`
 }

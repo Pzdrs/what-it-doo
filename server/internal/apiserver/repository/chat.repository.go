@@ -15,6 +15,9 @@ type ChatRepository interface {
 	GetForUser(ctx context.Context, userID uuid.UUID) ([]model.Chat, error)
 	GetByID(ctx context.Context, chatID int64) (*model.Chat, error)
 	GetMessagesForChat(ctx context.Context, chatID int64, limit int32, beforeTime time.Time) ([]model.Message, error)
+	Create(ctx context.Context) (model.Chat, error)
+	AddParticipant(ctx context.Context, chatID int64, userID uuid.UUID) error
+	GetParticipants(ctx context.Context, chatID int64) ([]model.User, error)
 }
 
 type pgxChatRepository struct {
@@ -85,6 +88,30 @@ func (r *pgxChatRepository) GetMessagesForChat(ctx context.Context, chatID int64
 	}
 
 	return dbMessagesToModels(m), nil
+}
+
+func (r *pgxChatRepository) Create(ctx context.Context) (model.Chat, error) {
+	chat, err := r.q.CreateChat(ctx)
+	if err != nil {
+		return model.Chat{}, err
+	}
+
+	return dbChatToModel(chat), nil
+}
+
+func (r *pgxChatRepository) AddParticipant(ctx context.Context, chatID int64, userID uuid.UUID) error {
+	return r.q.AddChatParticipant(ctx, queries.AddChatParticipantParams{
+		ChatID: chatID,
+		UserID: userID,
+	})
+}
+
+func (r *pgxChatRepository) GetParticipants(ctx context.Context, chatID int64) ([]model.User, error) {
+	u, err := r.q.GetChatParticipants(ctx, chatID)
+	if err != nil {
+		return nil, err
+	}
+	return dbUsersToModels(u), nil
 }
 
 func dbChatToModel(c queries.Chat) model.Chat {

@@ -41,7 +41,7 @@ func (p ProblemDetails) GetDetail() string   { return p.Detail }
 func (p ProblemDetails) GetType() string     { return p.Type }
 func (p ProblemDetails) GetInstance() string { return p.Instance }
 
-func NewProblemDetails(r *http.Request, status int, title, detail, problemType string) ProblemDetails {
+func New(r *http.Request, status int, title, detail, problemType string) ProblemDetails {
 	return ProblemDetails{
 		Status:   status,
 		Title:    title,
@@ -52,7 +52,7 @@ func NewProblemDetails(r *http.Request, status int, title, detail, problemType s
 }
 
 func NewInternalServerError(r *http.Request, err error) ProblemDetails {
-	return NewProblemDetails(
+	return New(
 		r, http.StatusInternalServerError,
 		"Internal Server Error",
 		internal.FirstUpper(strings.TrimSpace(err.Error())),
@@ -60,7 +60,7 @@ func NewInternalServerError(r *http.Request, err error) ProblemDetails {
 	)
 }
 
-func WriteProblemDetails(w http.ResponseWriter, p Problem) error {
+func Write(w http.ResponseWriter, p Problem) error {
 
 	w.Header().Set("Content-Type", "application/problem+json")
 	w.WriteHeader(p.GetStatus())

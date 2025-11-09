@@ -48,7 +48,7 @@ FROM alpine:latest AS production
 WORKDIR /app
 COPY --from=backend /app/bin/server ./bin/server
 COPY docker-entrypoint.sh ./bin/entrypoint.sh 
-COPY --from=frontend /app/build ./static
+COPY --from=frontend /app/build ./web
 
 EXPOSE 8080
 ENTRYPOINT ["/app/bin/entrypoint.sh"]

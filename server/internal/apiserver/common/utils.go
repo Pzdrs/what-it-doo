@@ -31,7 +31,7 @@ func DecodeAndValidate[T any](w http.ResponseWriter, r *http.Request) (*T, bool)
 	// Decode JSON
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&req); err != nil {
-		problem.WriteProblemDetails(w, problem.NewProblemDetails(
+		problem.Write(w, problem.New(
 			r, http.StatusBadRequest,
 			"Invalid JSON",
 			"Request body contains invalid JSON",
@@ -47,8 +47,8 @@ func DecodeAndValidate[T any](w http.ResponseWriter, r *http.Request) (*T, bool)
 		if errors.As(err, &ve) {
 			errMap := validationErrorsToMap(ve)
 
-			problem.WriteProblemDetails(w, problem.ValidationProblemDetails{
-				ProblemDetails: problem.NewProblemDetails(
+			problem.Write(w, problem.ValidationProblemDetails{
+				ProblemDetails: problem.New(
 					r, http.StatusBadRequest,
 					"Validation Error",
 					"One or more fields are invalid",

@@ -160,6 +160,39 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Creates a new chat with the specified participants",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chats"
+                ],
+                "summary": "Create a new chat",
+                "operationId": "CreateChat",
+                "parameters": [
+                    {
+                        "description": "Chat creation request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Chat"
+                        }
+                    }
+                }
             }
         },
         "/chats/{chat_id}": {
@@ -388,6 +421,21 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreateChatRequest": {
+            "type": "object",
+            "required": [
+                "participants"
+            ],
+            "properties": {
+                "participants": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "dto.LoginRequest": {
             "type": "object",
             "required": [
@@ -503,6 +551,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "email": {
+                    "type": "string"
+                },
+                "hashed_password": {
                     "type": "string"
                 },
                 "id": {

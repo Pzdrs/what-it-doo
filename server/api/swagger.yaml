@@ -54,6 +54,16 @@ definitions:
           $ref: '#/definitions/dto.ChatMessage'
         type: array
     type: object
+  dto.CreateChatRequest:
+    properties:
+      participants:
+        items:
+          type: string
+        minItems: 1
+        type: array
+    required:
+    - participants
+    type: object
   dto.LoginRequest:
     properties:
       email:
@@ -130,6 +140,8 @@ definitions:
       created_at:
         type: string
       email:
+        type: string
+      hashed_password:
         type: string
       id:
         type: string
@@ -238,6 +250,28 @@ paths:
       security:
       - SessionAuth: []
       summary: Get my chats
+      tags:
+      - Chats
+    post:
+      consumes:
+      - application/json
+      description: Creates a new chat with the specified participants
+      operationId: CreateChat
+      parameters:
+      - description: Chat creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateChatRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.Chat'
+      summary: Create a new chat
       tags:
       - Chats
   /chats/{chat_id}:

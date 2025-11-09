@@ -30,7 +30,7 @@ func RequireAuthenticated(sessionService service.SessionService) func(http.Handl
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie(internal.SESSION_COOKIE_NAME)
 			if err != nil {
-				problem.WriteProblemDetails(w, problem.NewProblemDetails(
+				problem.Write(w, problem.New(
 					r, http.StatusUnauthorized,
 					"Unauthenticated",
 					"Authentication is required to access this resource",
@@ -39,9 +39,9 @@ func RequireAuthenticated(sessionService service.SessionService) func(http.Handl
 				return
 			}
 
-			session, valid := sessionService.GetByToken(r.Context(),cookie.Value)
+			session, valid := sessionService.GetByToken(r.Context(), cookie.Value)
 			if !valid {
-				problem.WriteProblemDetails(w, problem.NewProblemDetails(
+				problem.Write(w, problem.New(
 					r, http.StatusUnauthorized,
 					"Invalid session",
 					"The provided session either does not exist, is expired or has been revoked",
@@ -63,7 +63,7 @@ func RequireUnauthenticated(sessionService service.SessionService) func(http.Han
 			if err == nil {
 				_, valid := sessionService.GetByToken(r.Context(), cookie.Value)
 				if valid {
-					problem.WriteProblemDetails(w, problem.NewProblemDetails(
+					problem.Write(w, problem.New(
 						r, http.StatusBadRequest,
 						"Already authenticated",
 						"This resource is only available for unauthenticated users",

@@ -11,6 +11,7 @@ import (
 	"pycrs.cz/what-it-doo/internal/apiserver/common"
 	"pycrs.cz/what-it-doo/internal/apiserver/dto"
 	"pycrs.cz/what-it-doo/internal/apiserver/middleware"
+	"pycrs.cz/what-it-doo/internal/apiserver/problem"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
 )
 
@@ -37,7 +38,7 @@ func (c *ChatController) HandleMyChats(w http.ResponseWriter, r *http.Request) {
 
 	chats, err := c.chatService.GetChatsForUser(r.Context(), session.UserID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		problem.Write(w, problem.NewInternalServerError(r, err))
 		return
 	}
 	common.WriteJSON(w, 200, chats)
@@ -57,22 +58,42 @@ func (c *ChatController) HandleMyChats(w http.ResponseWriter, r *http.Request) {
 func (c *ChatController) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 	chat_id, err := strconv.ParseInt(chi.URLParam(r, "chat_id"), 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid chat ID", http.StatusBadRequest)
+		problem.Write(w, problem.New(
+			r, http.StatusBadRequest,
+			"Invalid chat ID",
+			"The provided chat ID is not a valid integer",
+			"chats/invalid-chat-id",
+		))
 		return
 	}
 
 	chat, err := c.chatService.GetChatByID(r.Context(), chat_id)
 	if errors.Is(err, sql.ErrNoRows) {
-		common.WriteJSON(w, 404, struct{}{})
+		problem.Write(w, problem.New(
+			r, http.StatusNotFound,
+			"Chat not found",
+			"No chat found with the specified ID",
+			"chats/chat-not-found",
+		))
 		return
 	} else if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		problem.Write(w, problem.NewInternalServerError(r, err))
 		return
 	}
 	common.WriteJSON(w, 200, chat)
 }
 
 // HandleCreateChat godoc
+//
+//	@Summary		Create a new chat
+//	@Id				CreateChat
+//	@Description	Creates a new chat with the specified participants
+//	@Tags			Chats
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dto.CreateChatRequest	true	"Chat creation request"
+//	@Success		201		{object}	dto.Chat
+//	@Router			/chats/ [post]
 func (c *ChatController) HandleCreateChat(w http.ResponseWriter, r *http.Request) {
 	req, ok := common.DecodeAndValidate[dto.CreateChatRequest](w, r)
 	if !ok {
@@ -81,7 +102,16 @@ func (c *ChatController) HandleCreateChat(w http.ResponseWriter, r *http.Request
 
 	chat, err := c.chatService.CreateChat(r.Context(), req.Participants)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if errors.Is(err, sql.ErrNoRows) {
+			problem.Write(w, problem.New(
+				r, http.StatusBadRequest,
+				"Invalid participant",
+				"One or more specified participants do not exist",
+				"chats/invalid-participant",
+			))
+		} else {
+			problem.Write(w, problem.NewInternalServerError(r, err))
+		}
 		return
 	}
 	common.WriteJSON(w, 201, chat)
@@ -102,25 +132,40 @@ func (c *ChatController) HandleCreateChat(w http.ResponseWriter, r *http.Request
 func (c *ChatController) HandleGetChatMessages(w http.ResponseWriter, r *http.Request) {
 	chat_id, err := strconv.ParseInt(chi.URLParam(r, "chat_id"), 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid chat ID", http.StatusBadRequest)
+		problem.Write(w, problem.New(
+			r, http.StatusBadRequest,
+			"Invalid chat ID",
+			"The provided chat ID is not a valid integer",
+			"chats/invalid-chat-id",
+		))
 		return
 	}
 
 	limit, err := common.ParseQueryInt[int32](r, "limit", 50)
 	if err != nil {
-		http.Error(w, "Invalid limit", http.StatusBadRequest)
+		problem.Write(w, problem.New(
+			r, http.StatusBadRequest,
+			"Invalid limit",
+			"The provided limit is not a valid integer",
+			"chats/invalid-limit",
+		))
 		return
 	}
 
 	before, err := common.ParseQueryTime(r, "before", time.Now())
 	if err != nil {
-		http.Error(w, "Invalid before", http.StatusBadRequest)
+		problem.Write(w, problem.New(
+			r, http.StatusBadRequest,
+			"Invalid before",
+			"The provided before timestamp is not valid",
+			"chats/invalid-before",
+		))
 		return
 	}
 
 	messages, more, err := c.chatService.GetMessagesForChat(r.Context(), chat_id, limit, before)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		problem.Write(w, problem.NewInternalServerError(r, err))
 		return
 	}
 	common.WriteJSON(w, 200, dto.ChatMessages{

@@ -31,7 +31,7 @@ type ChatMessages struct {
 }
 
 type CreateChatRequest struct {
-	Participants []uuid.UUID `json:"participants" validate:"required,min=1"`
+	Participants []string `json:"participants" validate:"required,min=1"`
 }
 
 func MapChatToDTO(chat model.Chat) Chat {

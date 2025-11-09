@@ -74,3 +74,12 @@ ORDER BY
     created_at DESC
 LIMIT
     $2;
+
+-- name: CreateChat :one
+INSERT INTO chats DEFAULT VALUES
+RETURNING
+    *;
+
+-- name: AddChatParticipant :exec
+INSERT INTO chat_participants (chat_id, user_id)
+VALUES ($1, $2);

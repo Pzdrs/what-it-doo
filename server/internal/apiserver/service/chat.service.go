@@ -20,21 +20,44 @@ type ChatService interface {
 	// It returns a slice of ChatMessage, a boolean indicating if there are more messages, and an error if any
 	GetMessagesForChat(ctx context.Context, chatID int64, limit int32, before time.Time) ([]model.Message, bool, error)
 	// CreateChat creates a new chat with the given participants.
-	CreateChat(ctx context.Context, participants []uuid.UUID) (*model.Chat, error)
+	CreateChat(ctx context.Context, participants []string) (*model.Chat, error)
 }
 
 type chatService struct {
-	repository repository.ChatRepository
+	repository     repository.ChatRepository
+	userRepository repository.UserRepository
 }
 
-func NewChatService(repo repository.ChatRepository) ChatService {
+func NewChatService(repo repository.ChatRepository, userRepo repository.UserRepository) ChatService {
 	return &chatService{
-		repository: repo,
+		repository:     repo,
+		userRepository: userRepo,
 	}
 }
 
-func (c *chatService) CreateChat(ctx context.Context, participants []uuid.UUID) (*model.Chat, error) {
-	panic("unimplemented")
+func (c *chatService) CreateChat(ctx context.Context, participants []string) (*model.Chat, error) {
+	chat, err := c.repository.Create(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, participantEmail := range participants {
+		u, err := c.userRepository.GetByEmail(ctx, participantEmail)
+		if err != nil {
+			return nil, err
+		}
+		if err = c.repository.AddParticipant(ctx, chat.ID, u.ID); err != nil {
+			return nil, err
+		}
+	}
+
+	chatParticipants, err := c.repository.GetParticipants(ctx, chat.ID)
+	if err != nil {
+		return nil, err
+	}
+	chat.Participants = chatParticipants
+
+	return &chat, nil
 }
 
 func (s *chatService) GetAllChats(ctx context.Context) ([]model.Chat, error) {

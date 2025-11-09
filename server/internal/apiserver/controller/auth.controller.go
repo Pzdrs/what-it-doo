@@ -42,7 +42,7 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, err := c.userService.GetByEmail(r.Context(), req.Email)
 	if err != nil || !c.authService.AuthenticateUser(r.Context(), req.Email, req.Password) {
-		problem.WriteProblemDetails(w, problem.NewProblemDetails(
+		problem.Write(w, problem.New(
 			r, http.StatusUnauthorized,
 			"Incorrect credentials",
 			"Incorrect email or password",
@@ -92,7 +92,7 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 
 	if err != nil {
 		if errors.Is(err, service.ErrUserAlreadyExists) {
-			problem.WriteProblemDetails(w, problem.NewProblemDetails(
+			problem.Write(w, problem.New(
 				r, http.StatusBadRequest,
 				"User already exists",
 				"A user with the given email already exists",
@@ -100,7 +100,7 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 			))
 			return
 		} else {
-			problem.WriteProblemDetails(w, problem.NewInternalServerError(r, err))
+			problem.Write(w, problem.NewInternalServerError(r, err))
 			return
 		}
 	}
@@ -108,7 +108,7 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 	if r.URL.Query().Get("autoLogin") == "true" {
 		session, err := c.sessionService.Create(r.Context(), user.ID, "web", "unknown")
 		if err != nil {
-			problem.WriteProblemDetails(w, problem.NewInternalServerError(r, err))
+			problem.Write(w, problem.NewInternalServerError(r, err))
 			return
 		}
 		common.SetAuthCookies(w, &session, true)

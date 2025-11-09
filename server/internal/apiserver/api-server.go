@@ -17,9 +17,9 @@ import (
 type Server struct {
 	Handler http.Handler
 
-	authService service.AuthService
-	chatService service.ChatService
-	userService service.UserService
+	authService    service.AuthService
+	chatService    service.ChatService
+	userService    service.UserService
 	sessionService service.SessionService
 }
 
@@ -45,9 +45,9 @@ func NewServer(q *queries.Queries, config config.Configuration, redisClient *red
 	chatRepository := repository.NewChatRepository(q)
 
 	server := &Server{
-		authService: service.NewAuthService(userRepository, sessionRepository, config),
-		chatService: service.NewChatService(chatRepository),
-		userService: service.NewUserService(userRepository, config),
+		authService:    service.NewAuthService(userRepository, sessionRepository, config),
+		chatService:    service.NewChatService(chatRepository, userRepository),
+		userService:    service.NewUserService(userRepository, config),
 		sessionService: service.NewSessionService(userRepository, sessionRepository, config),
 	}
 
@@ -66,7 +66,7 @@ func NewServer(q *queries.Queries, config config.Configuration, redisClient *red
 	})
 
 	// Static files (Svelte frontend)
-	r.Get("/*", spaHandler("./static"))
+	r.Get("/*", spaHandler("./web"))
 
 	server.Handler = r
 
