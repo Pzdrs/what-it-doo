@@ -34,7 +34,6 @@ func (r *postgresUserRepository) Create(ctx context.Context, user *model.User) e
 		Name:           pgtype.Text{String: user.Name, Valid: true},
 		Email:          user.Email,
 		HashedPassword: pgtype.Text{String: user.HashedPassword, Valid: true},
-		AvatarUrl:      pgtype.Text{String: user.AvatarUrl, Valid: true},
 		Bio:            pgtype.Text{String: user.Bio, Valid: true},
 	})
 

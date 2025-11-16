@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	"pycrs.cz/what-it-doo/internal/apiserver/common"
 	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
 	"pycrs.cz/what-it-doo/internal/config"
@@ -61,7 +62,7 @@ func (s *authService) RegisterUser(ctx context.Context, user model.User, passwor
 		return model.User{}, err
 	}
 
-	u.AvatarUrl = getAvatarUrl(u, s.config.Gravatar)
+	u.AvatarUrl = common.GetAvatarUrl(u, s.config.Gravatar)
 
 	return u, nil
 }

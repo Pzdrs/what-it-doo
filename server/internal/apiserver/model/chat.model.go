@@ -16,7 +16,7 @@ type Chat struct {
 }
 
 type Message struct {
-	ID          uuid.UUID  `json:"id"`
+	ID          int64      `json:"id"`
 	ChatID      int64      `json:"chat_id"`
 	SenderID    *uuid.UUID `json:"sender_id"`
 	Content     string     `json:"content"`

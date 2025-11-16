@@ -1,8 +1,11 @@
 package apiserver
 
 import (
+	"context"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
+	"github.com/redis/go-redis/v9"
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "pycrs.cz/what-it-doo/api" // Swagger docs
 	"pycrs.cz/what-it-doo/internal/apiserver/controller"
@@ -13,12 +16,14 @@ import (
 )
 
 func addRoutes(
+	ctx context.Context,
 	r chi.Router,
 	authService service.AuthService,
 	chatService service.ChatService,
 	userService service.UserService,
 	sessionService service.SessionService,
 	config config.Configuration,
+	redisClient *redis.Client,
 ) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -30,10 +35,10 @@ func addRoutes(
 	RequireUnauthenticated := middleware.RequireUnauthenticated(sessionService)
 
 	authController := controller.NewAuthController(authService, userService, sessionService)
-	chatController := controller.NewChatController(chatService)
+	chatController := controller.NewChatController(chatService, config)
 	userController := controller.NewUserController(userService)
 	serverController := controller.NewServerController()
-	socketController := controller.NewSocketController(upgrader, connectionManager)
+	socketController := controller.NewSocketController(ctx, upgrader, connectionManager, redisClient, userService)
 
 	r.Route("/server", func(r chi.Router) {
 		r.Get("/about", serverController.HandleAbout)

@@ -387,7 +387,7 @@
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "read_at": {
                     "type": "string"
@@ -514,9 +514,6 @@
         "dto.UserDetails": {
             "type": "object",
             "properties": {
-                "avatar_url": {
-                    "type": "string"
-                },
                 "bio": {
                     "type": "string"
                 },

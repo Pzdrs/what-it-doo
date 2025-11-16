@@ -20,3 +20,6 @@ export const langs: Lang[] = [
 	{ name: 'English', code: 'en', loader: () => import('$i18n/en.json') },
 	{ name: 'Czech', code: 'cs', loader: () => import('$i18n/cs.json') }
 ];
+
+export const INIT_LOAD_MESSAGES_COUNT = 20;
+export const LOAD_OLDER_MESSAGES_COUNT = 5;

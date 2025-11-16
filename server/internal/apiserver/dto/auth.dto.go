@@ -3,11 +3,10 @@ package dto
 import "github.com/google/uuid"
 
 type UserDetails struct {
-	ID        uuid.UUID `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	AvatarUrl string    `json:"avatar_url"`
-	Bio       string    `json:"bio"`
+	ID    uuid.UUID `json:"id"`
+	Name  string    `json:"name"`
+	Email string    `json:"email"`
+	Bio   string    `json:"bio"`
 }
 
 type LoginRequest struct {

@@ -18,15 +18,15 @@ CREATE TABLE
 
 CREATE TABLE
     messages (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        id BIGSERIAL PRIMARY KEY,
         chat_id BIGINT REFERENCES chats (id) ON DELETE CASCADE,
         sender_id UUID REFERENCES users (id) ON DELETE SET NULL,
-        replying_to UUID REFERENCES messages (id) ON DELETE SET NULL,
+        replying_to BIGINT REFERENCES messages (id) ON DELETE SET NULL,
         content TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         delivered_at TIMESTAMPTZ,
         read_at TIMESTAMPTZ,
-        updated_at TIMESTAMPTZ DEFAULT NOW ()
+        updated_at TIMESTAMPTZ
     );
 
 CREATE TRIGGER update_chats_updated_at BEFORE

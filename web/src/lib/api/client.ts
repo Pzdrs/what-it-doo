@@ -20,7 +20,6 @@ export type DtoLoginRequest = {
     remember_me?: boolean;
 };
 export type DtoUserDetails = {
-    avatar_url?: string;
     bio?: string;
     email?: string;
     id?: string;
@@ -56,10 +55,13 @@ export type DtoChat = {
     title?: string;
     updated_at?: string;
 };
+export type DtoCreateChatRequest = {
+    participants: string[];
+};
 export type DtoChatMessage = {
     content?: string;
     delivered_at?: string;
-    id?: string;
+    id?: number;
     read_at?: string;
     sender_id?: string;
     sent_at?: string;
@@ -77,6 +79,7 @@ export type ModelUser = {
     bio?: string;
     created_at?: string;
     email?: string;
+    hashed_password?: string;
     id?: string;
     name?: string;
     updated_at?: string;
@@ -148,6 +151,19 @@ export function getMyChats(opts?: Oazapfts.RequestOpts) {
     }>("/chats/", {
         ...opts
     }));
+}
+/**
+ * Create a new chat
+ */
+export function createChat(dtoCreateChatRequest: DtoCreateChatRequest, opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 201;
+        data: DtoChat;
+    }>("/chats/", oazapfts.json({
+        ...opts,
+        method: "POST",
+        body: dtoCreateChatRequest
+    })));
 }
 /**
  * Get chat by ID

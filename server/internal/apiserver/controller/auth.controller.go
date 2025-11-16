@@ -140,6 +140,10 @@ func (c *AuthController) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	common.WriteJSON(w, 200, dto.LogoutResponse{
+		Success:     true,
+		RedirectUrl: "/auth/login",
+	})
 
 	common.ClearAuthCookies(w)
 }

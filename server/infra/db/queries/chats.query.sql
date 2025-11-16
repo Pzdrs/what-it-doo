@@ -83,3 +83,9 @@ RETURNING
 -- name: AddChatParticipant :exec
 INSERT INTO chat_participants (chat_id, user_id)
 VALUES ($1, $2);
+
+-- name: CreateMessage :one
+INSERT INTO messages (chat_id, sender_id, content)
+VALUES ($1, $2, $3)
+RETURNING
+    *;

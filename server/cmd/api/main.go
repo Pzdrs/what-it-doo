@@ -46,7 +46,7 @@ func run(ctx context.Context) error {
 	defer redisClient.Close()
 
 	q := queries.New(connPool)
-	server := apiserver.NewServer(q, config, redisClient)
+	server := apiserver.NewServer(ctx, q, config, redisClient)
 
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Server.Host, strconv.Itoa(config.Server.Port)),

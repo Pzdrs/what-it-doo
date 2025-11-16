@@ -14,10 +14,12 @@ type ChatRepository interface {
 	GetAll(ctx context.Context) ([]model.Chat, error)
 	GetForUser(ctx context.Context, userID uuid.UUID) ([]model.Chat, error)
 	GetByID(ctx context.Context, chatID int64) (*model.Chat, error)
-	GetMessagesForChat(ctx context.Context, chatID int64, limit int32, beforeTime time.Time) ([]model.Message, error)
 	Create(ctx context.Context) (model.Chat, error)
 	AddParticipant(ctx context.Context, chatID int64, userID uuid.UUID) error
 	GetParticipants(ctx context.Context, chatID int64) ([]model.User, error)
+
+	GetMessagesForChat(ctx context.Context, chatID int64, limit int32, beforeTime time.Time) ([]model.Message, error)
+	CreateMessage(ctx context.Context, chatID int64, senderID uuid.UUID, content string) (model.Message, error)
 }
 
 type pgxChatRepository struct {
@@ -114,6 +116,19 @@ func (r *pgxChatRepository) GetParticipants(ctx context.Context, chatID int64) (
 	return dbUsersToModels(u), nil
 }
 
+func (r *pgxChatRepository) CreateMessage(ctx context.Context, chatID int64, senderID uuid.UUID, content string) (model.Message, error) {
+	message, err := r.q.CreateMessage(ctx, queries.CreateMessageParams{
+		ChatID:   pgtype.Int8{Int64: chatID, Valid: true},
+		SenderID: pgtype.UUID{Bytes: senderID, Valid: true},
+		Content:  pgtype.Text{String: content, Valid: true},
+	})
+	if err != nil {
+		return model.Message{}, err
+	}
+
+	return dbMessageToModel(message), nil
+}
+
 func dbChatToModel(c queries.Chat) model.Chat {
 	return model.Chat{
 		ID:        c.ID,
@@ -129,7 +144,6 @@ func dbUserToModel(u queries.User) model.User {
 		Name:           u.Name.String,
 		Email:          u.Email,
 		HashedPassword: u.HashedPassword.String,
-		AvatarUrl:      u.AvatarUrl.String,
 		Bio:            u.Bio.String,
 		CreatedAt:      u.CreatedAt.Time,
 		UpdatedAt:      u.UpdatedAt.Time,
@@ -144,39 +158,39 @@ func dbUsersToModels(users []queries.User) []model.User {
 	return out
 }
 
+func dbMessageToModel(msg queries.Message) model.Message {
+	var senderID *uuid.UUID
+	if msg.SenderID.Valid {
+		if uid, err := uuid.FromBytes(msg.SenderID.Bytes[:]); err == nil {
+			senderID = &uid
+		}
+	}
+
+	var deliveredAt *time.Time
+	if msg.DeliveredAt.Valid {
+		deliveredAt = &msg.DeliveredAt.Time
+	}
+
+	var readAt *time.Time
+	if msg.ReadAt.Valid {
+		readAt = &msg.ReadAt.Time
+	}
+
+	return model.Message{
+		ID:          msg.ID,
+		ChatID:      msg.ChatID.Int64,
+		SenderID:    senderID,
+		Content:     msg.Content.String,
+		SentAt:      msg.CreatedAt.Time,
+		DeliveredAt: deliveredAt,
+		ReadAt:      readAt,
+	}
+}
+
 func dbMessagesToModels(msgs []queries.Message) []model.Message {
 	out := make([]model.Message, len(msgs))
 	for i := range msgs {
-		senderID := func() *uuid.UUID {
-			if !msgs[i].SenderID.Valid {
-				return nil
-			}
-			uid, err := uuid.FromBytes(msgs[i].SenderID.Bytes[:])
-			if err != nil {
-				return nil
-			}
-			return &uid
-		}()
-
-		out[i] = model.Message{
-			ID:       msgs[i].ID,
-			ChatID:   msgs[i].ChatID.Int64,
-			SenderID: senderID,
-			Content:  msgs[i].Content.String,
-			SentAt:   msgs[i].CreatedAt.Time,
-			DeliveredAt: func() *time.Time {
-				if msgs[i].DeliveredAt.Valid {
-					return &msgs[i].DeliveredAt.Time
-				}
-				return nil
-			}(),
-			ReadAt: func() *time.Time {
-				if msgs[i].ReadAt.Valid {
-					return &msgs[i].ReadAt.Time
-				}
-				return nil
-			}(),
-		}
+		out[i] = dbMessageToModel(msgs[i])
 	}
 	return out
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getMyChats, type ModelChat } from '$lib/api/client';
 	import { messagingStore } from '$lib/stores/chats.svelte';
+	import { userStore } from '$stores/user.svelte';
 	import { format } from 'timeago.js';
 
 	interface Props {}
@@ -35,7 +36,15 @@
 							</div>
 						</div>
 						<div class="ml-4">
-							<h3 class="font-bold">{chat.title}</h3>
+							<h3 class="font-bold">
+								{#if chat.title}
+									{chat.title}
+								{:else if chat.participants?.length == 2}
+									{chat.participants?.find((p) => p.id !== userStore.user?.id)?.name || 'Unknown User'}
+								{:else}
+									group chat
+								{/if}
+							</h3>
 							<p class="text-sm">
 								<span>{'Last message'}</span> &middot;
 								<span>{format(Date.now())}</span>

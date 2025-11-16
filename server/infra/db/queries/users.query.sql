@@ -10,11 +10,10 @@ INSERT INTO
         name,
         email,
         hashed_password,
-        avatar_url,
         bio
     )
 VALUES
-    ($1, $2, $3, $4, $5)
+    ($1, $2, $3, $4)
 RETURNING
     *;
 

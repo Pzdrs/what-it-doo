@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"pycrs.cz/what-it-doo/internal/apiserver/common"
 	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
+	"pycrs.cz/what-it-doo/internal/config"
 )
 
 type ChatService interface {
-	// GetAllChats retrieves all chats.
-	GetAllChats(ctx context.Context) ([]model.Chat, error)
 	// GetChatsForUser retrieves all chats for a specific user.
 	GetChatsForUser(ctx context.Context, userID uuid.UUID) ([]model.Chat, error)
 	// GetChatByID retrieves a chat by its ID.
@@ -21,17 +21,21 @@ type ChatService interface {
 	GetMessagesForChat(ctx context.Context, chatID int64, limit int32, before time.Time) ([]model.Message, bool, error)
 	// CreateChat creates a new chat with the given participants.
 	CreateChat(ctx context.Context, participants []string) (*model.Chat, error)
+	// SendMessage sends a message in a chat.
+	SendMessage(ctx context.Context, chatID int64, senderID uuid.UUID, content string) (model.Message, error)
 }
 
 type chatService struct {
 	repository     repository.ChatRepository
 	userRepository repository.UserRepository
+	config         config.Configuration
 }
 
-func NewChatService(repo repository.ChatRepository, userRepo repository.UserRepository) ChatService {
+func NewChatService(repo repository.ChatRepository, userRepo repository.UserRepository, config config.Configuration) ChatService {
 	return &chatService{
 		repository:     repo,
 		userRepository: userRepo,
+		config:         config,
 	}
 }
 
@@ -60,16 +64,31 @@ func (c *chatService) CreateChat(ctx context.Context, participants []string) (*m
 	return &chat, nil
 }
 
-func (s *chatService) GetAllChats(ctx context.Context) ([]model.Chat, error) {
-	return s.repository.GetAll(ctx)
-}
-
 func (s *chatService) GetChatsForUser(ctx context.Context, userID uuid.UUID) ([]model.Chat, error) {
-	return s.repository.GetForUser(ctx, userID)
+	chats, err := s.repository.GetForUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range chats {
+		for j := range chats[i].Participants {
+			chats[i].Participants[j].AvatarUrl = common.GetAvatarUrl(chats[i].Participants[j], s.config.Gravatar)
+		}
+	}
+	return chats, nil
 }
 
 func (s *chatService) GetChatByID(ctx context.Context, chatID int64) (*model.Chat, error) {
-	return s.repository.GetByID(ctx, chatID)
+	chat, err := s.repository.GetByID(ctx, chatID)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range chat.Participants {
+		chat.Participants[i].AvatarUrl = common.GetAvatarUrl(chat.Participants[i], s.config.Gravatar)
+	}
+
+	return chat, nil
 }
 
 func (s *chatService) GetMessagesForChat(ctx context.Context, chatID int64, limit int32, before time.Time) ([]model.Message, bool, error) {
@@ -77,7 +96,18 @@ func (s *chatService) GetMessagesForChat(ctx context.Context, chatID int64, limi
 	if err != nil {
 		return nil, false, err
 	}
-	return messages, len(messages) > int(limit), nil
+
+	hasMore := len(messages) > int(limit)
+
+	if hasMore {
+		messages = messages[:limit]
+	}
+
+	return messages, hasMore, nil
+}
+
+func (s *chatService) SendMessage(ctx context.Context, chatID int64, senderID uuid.UUID, content string) (model.Message, error) {
+	return s.repository.CreateMessage(ctx, chatID, senderID, content)
 }
 
 var _ ChatService = (*chatService)(nil)

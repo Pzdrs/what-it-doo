@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { createChat } from "$lib/api/client";
+	import { userStore } from "$stores/user.svelte";
 	import { t } from "svelte-i18n";
 
 	let emails = $state(['']);
@@ -15,9 +17,11 @@
 		emails[index] = value;
 	}
 
-	function startChat() {
-		const validEmails = emails.filter((e) => e.trim() !== '');
-		console.log(validEmails);
+	async function startChat() {
+		let validEmails = emails.filter((e) => e.trim() !== '');
+		validEmails.push(userStore.user?.email);
+		await createChat({ participants: validEmails });
+		
 		(document.getElementById('new-chat-dialog') as HTMLDialogElement)?.close();
 	}
 </script>

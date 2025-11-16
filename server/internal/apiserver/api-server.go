@@ -1,6 +1,7 @@
 package apiserver
 
 import (
+	"context"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -15,6 +16,7 @@ import (
 )
 
 type Server struct {
+	ctx     context.Context
 	Handler http.Handler
 
 	authService    service.AuthService
@@ -39,14 +41,15 @@ func spaHandler(staticDir string) http.HandlerFunc {
 	}
 }
 
-func NewServer(q *queries.Queries, config config.Configuration, redisClient *redis.Client) *Server {
+func NewServer(ctx context.Context, q *queries.Queries, config config.Configuration, redisClient *redis.Client) *Server {
 	userRepository := repository.NewUserRepository(q)
 	sessionRepository := repository.NewSessionRepository(q)
 	chatRepository := repository.NewChatRepository(q)
 
 	server := &Server{
+		ctx:            ctx,
 		authService:    service.NewAuthService(userRepository, sessionRepository, config),
-		chatService:    service.NewChatService(chatRepository, userRepository),
+		chatService:    service.NewChatService(chatRepository, userRepository, config),
 		userService:    service.NewUserService(userRepository, config),
 		sessionService: service.NewSessionService(userRepository, sessionRepository, config),
 	}
@@ -56,12 +59,14 @@ func NewServer(q *queries.Queries, config config.Configuration, redisClient *red
 
 	r.Route("/api/v1", func(api chi.Router) {
 		addRoutes(
+			ctx,
 			api,
 			server.authService,
 			server.chatService,
 			server.userService,
 			server.sessionService,
 			config,
+			redisClient,
 		)
 	})
 

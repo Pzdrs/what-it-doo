@@ -17,7 +17,7 @@ type Chat struct {
 }
 
 type ChatMessage struct {
-	ID          uuid.UUID  `json:"id"`
+	ID          int64      `json:"id"`
 	SenderID    *uuid.UUID `json:"sender_id"`
 	Content     string     `json:"content"`
 	SentAt      time.Time  `json:"sent_at"`
@@ -32,15 +32,6 @@ type ChatMessages struct {
 
 type CreateChatRequest struct {
 	Participants []string `json:"participants" validate:"required,min=1"`
-}
-
-func MapChatToDTO(chat model.Chat) Chat {
-	return Chat{
-		ID:        chat.ID,
-		Title:     chat.Title,
-		CreatedAt: chat.CreatedAt,
-		UpdatedAt: chat.UpdatedAt,
-	}
 }
 
 func MapMessageToDTO(message model.Message) ChatMessage {

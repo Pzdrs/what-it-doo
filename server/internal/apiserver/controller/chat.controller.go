@@ -13,14 +13,16 @@ import (
 	"pycrs.cz/what-it-doo/internal/apiserver/middleware"
 	"pycrs.cz/what-it-doo/internal/apiserver/problem"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/config"
 )
 
 type ChatController struct {
 	chatService service.ChatService
+	config      config.Configuration
 }
 
-func NewChatController(chatService service.ChatService) *ChatController {
-	return &ChatController{chatService: chatService}
+func NewChatController(chatService service.ChatService, config config.Configuration) *ChatController {
+	return &ChatController{chatService: chatService, config: config}
 }
 
 // HandleMyChats

@@ -37,7 +37,7 @@ definitions:
       delivered_at:
         type: string
       id:
-        type: string
+        type: integer
       read_at:
         type: string
       sender_id:
@@ -120,8 +120,6 @@ definitions:
     type: object
   dto.UserDetails:
     properties:
-      avatar_url:
-        type: string
       bio:
         type: string
       email:

@@ -1,3 +1,5 @@
+import { messagingStore } from './chats.svelte';
+
 class WebsocketStore {
 	// Used for things like showing online/offline server status
 	connected = $state(false);
@@ -9,8 +11,17 @@ let websocket: WebSocket | null = null;
 let reconnectTimeout = 1000;
 
 const onMessage = (event: MessageEvent) => {
-    console.log('Received:', event.data);
-    // Handle incoming messages
+	const message = JSON.parse(event.data);
+	switch (message.type) {
+		case 'message_ack': {
+			const { temp_id, sent_at } = message.data as { temp_id: number; sent_at: string };
+			messagingStore.acknowledgeMessage(temp_id, new Date(sent_at));
+			break;
+		}
+
+		default:
+			console.warn('Unknown message type:', message.type);
+	}
 };
 
 export const openWebSocketConnection = () => {
@@ -28,8 +39,8 @@ export const openWebSocketConnection = () => {
 		websocket.onclose = () => {
 			websocketStore.connected = false;
 
-            setTimeout(openWebSocketConnection, reconnectTimeout);
-            reconnectTimeout *= 2; // Exponential backoff
+			setTimeout(openWebSocketConnection, reconnectTimeout);
+			reconnectTimeout *= 2; // Exponential backoff
 		};
 
 		websocket.onerror = (err) => {
@@ -50,3 +61,11 @@ export const closeWebSocketConnection = () => {
 	}
 };
 
+export const sendWebSocketMessage = (type: string, data: unknown) => {
+	websocket?.send(
+		JSON.stringify({
+			type,
+			data
+		})
+	);
+};

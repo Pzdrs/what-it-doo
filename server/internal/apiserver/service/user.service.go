@@ -2,12 +2,9 @@ package service
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
-	"strconv"
-	"strings"
 
 	"github.com/google/uuid"
+	"pycrs.cz/what-it-doo/internal/apiserver/common"
 	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
 	"pycrs.cz/what-it-doo/internal/config"
@@ -25,22 +22,6 @@ type userService struct {
 	config     config.Configuration
 }
 
-func getAvatarUrl(user model.User, config config.GravatarConfig) string {
-	if user.AvatarUrl != "" {
-		return user.AvatarUrl
-	}
-
-	if config.Enabled {
-		hash := md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email))))
-		return strings.NewReplacer(
-			"{{hash}}", hex.EncodeToString(hash[:]),
-			"{{size}}", strconv.Itoa(80),
-		).Replace(config.Url)
-	}
-
-	return ""
-}
-
 func NewUserService(userRepo repository.UserRepository, config config.Configuration) UserService {
 	return &userService{repository: userRepo, config: config}
 }
@@ -50,7 +31,7 @@ func (s *userService) GetByID(ctx context.Context, userID uuid.UUID) (*model.Use
 	if err != nil {
 		return nil, err
 	}
-	user.AvatarUrl = getAvatarUrl(*user, s.config.Gravatar)
+	user.AvatarUrl = common.GetAvatarUrl(*user, s.config.Gravatar)
 	return user, nil
 }
 

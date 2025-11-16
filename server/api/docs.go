@@ -394,7 +394,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "read_at": {
                     "type": "string"
@@ -521,9 +521,6 @@ const docTemplate = `{
         "dto.UserDetails": {
             "type": "object",
             "properties": {
-                "avatar_url": {
-                    "type": "string"
-                },
                 "bio": {
                     "type": "string"
                 },

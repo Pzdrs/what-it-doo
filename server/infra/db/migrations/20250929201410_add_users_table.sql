@@ -7,7 +7,6 @@ CREATE TABLE users (
     name VARCHAR(255),
     email VARCHAR(255) UNIQUE NOT NULL,
     hashed_password VARCHAR(255),
-    avatar_url TEXT,
     bio TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()

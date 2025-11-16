@@ -20,6 +20,9 @@ build:
 run: 
 	go run ./cmd/api/
 
+worker: 
+	go run ./cmd/worker/
+
 sqlc:
 	sqlc generate -f infra/db/sqlc.yaml
 

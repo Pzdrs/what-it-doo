@@ -1,15 +1,15 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { logout } from '$lib/api/client';
+	import user from '$lib/assets/user.png?enhanced';
 	import { AppRoute } from '$lib/constants';
 	import { userStore } from '$stores/user.svelte';
 	import ThemeSwitch from './ThemeSwitch.svelte';
-	import user from '$lib/assets/user.png?enhanced';
 	let menuOpen = false;
 
 	const _logout = async () => {
 		const { redirect_url } = await logout();
-		await goto(redirect_url ?? AppRoute.AUTH_LOGIN);
+		await goto(redirect_url ?? AppRoute.AUTH_LOGIN, { invalidateAll: true });
 	};
 </script>
 
@@ -25,33 +25,6 @@
 
 		<div class="divider divider-horizontal"></div>
 
-		<!-- Notifikace -->
-		<div class="dropdown dropdown-end">
-			<button aria-label="Notifications" class="btn btn-circle btn-ghost">
-				<div class="indicator">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-5 w-5"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-						/>
-					</svg>
-					<span class="indicator-item badge badge-xs badge-primary"></span>
-				</div>
-			</button>
-			<ul class="dropdown-content menu rounded-box bg-base-100 z-10 w-52 p-2 shadow-sm">
-				<li><a>Item 1</a></li>
-				<li><a>Item 2</a></li>
-			</ul>
-		</div>
-
 		<!-- Avatar -->
 		{#if userStore.user}
 			<div class="dropdown dropdown-end">
@@ -65,10 +38,6 @@
 					</div>
 				</div>
 				<ul class="dropdown-content menu menu-sm rounded-box bg-base-100 z-10 mt-3 w-52 p-2 shadow">
-					<li>
-						<a href="#profile" class="justify-between">Profile <span class="badge">New</span></a>
-					</li>
-					<li><a href="#settings">Settings</a></li>
 					<li><button onclick={_logout}>Logout</button></li>
 				</ul>
 			</div>
@@ -102,9 +71,6 @@
 	<div class="border-base-200 bg-base-100 border-t shadow-md lg:hidden">
 		<div class="flex flex-col items-center gap-3 p-4">
 			<ThemeSwitch />
-			<a href="#notifications" class="btn btn-ghost justify-start">Notifications</a>
-			<a href="#profile" class="btn btn-ghost justify-start">Profile</a>
-			<a href="#settings" class="btn btn-ghost justify-start">Settings</a>
 			<a href="#logout" class="btn btn-ghost justify-start">Logout</a>
 		</div>
 	</div>

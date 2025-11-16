@@ -1,6 +1,8 @@
 package common
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,7 +12,9 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"pycrs.cz/what-it-doo/internal/apiserver/model"
 	"pycrs.cz/what-it-doo/internal/apiserver/problem"
+	"pycrs.cz/what-it-doo/internal/config"
 )
 
 func validationErrorsToMap(ve validator.ValidationErrors) map[string]problem.FieldValidationError {
@@ -95,4 +99,20 @@ func ParseQueryTime(r *http.Request, name string, defaultValue time.Time) (time.
 		return time.Time{}, err
 	}
 	return parsedTime, nil
+}
+
+func GetAvatarUrl(user model.User, config config.GravatarConfig) string {
+	if user.AvatarUrl != "" {
+		return user.AvatarUrl
+	}
+
+	if config.Enabled {
+		hash := md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email))))
+		return strings.NewReplacer(
+			"{{hash}}", hex.EncodeToString(hash[:]),
+			"{{size}}", strconv.Itoa(80),
+		).Replace(config.Url)
+	}
+
+	return ""
 }

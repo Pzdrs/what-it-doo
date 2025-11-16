@@ -89,19 +89,6 @@
 		<Button {loading} loadingText={$t('sign_in_loading')} type="submit" class="w-full btn-primary">
 			{$t('sign_in')}
 		</Button>
-
-		<div class="divider">{$t('or_continue_with')}</div>
-
-		<div class="flex flex-wrap justify-center gap-3">
-			<button onclick={handleIdpLogin} type="button" class="btn w-full gap-2 btn-outline">
-				<img
-					src="https://www.svgrepo.com/show/303108/google-icon-logo.svg"
-					alt="Google"
-					class="h-5 w-5"
-				/>
-				Google
-			</button>
-		</div>
 	</form>
 
 	<p class="mt-6 text-center text-sm">

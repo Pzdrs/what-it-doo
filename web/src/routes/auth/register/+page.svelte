@@ -141,24 +141,6 @@
 		<Button {loading} loadingText={$t('sign_up_loading')} type="submit" class="w-full btn-primary">
 			{$t('sign_up')}
 		</Button>
-
-		<div class="divider">{$t('or_continue_with')}</div>
-
-		<!-- Social logins -->
-		<div class="grid grid-cols-2 gap-3">
-			<button type="button" class="btn w-full gap-2 btn-outline">
-				<img
-					src="https://www.svgrepo.com/show/303108/google-icon-logo.svg"
-					alt="Google"
-					class="h-5 w-5"
-				/>
-				Google
-			</button>
-			<button type="button" class="btn w-full gap-2 btn-outline">
-				<img src="https://www.svgrepo.com/show/217753/github.svg" alt="GitHub" class="h-5 w-5" />
-				GitHub
-			</button>
-		</div>
 	</form>
 
 	<p class="mt-6 text-center text-sm">
