@@ -54,21 +54,32 @@ func run(ctx context.Context) error {
 
 	wsConnectionManager := ws.NewConnectionManager()
 
-	// Construct the server plumbing
-	q := queries.New(connPool)
-	server := apiserver.NewServer(ctx, q, config, bus, gatewayID, wsConnectionManager)
+	authSvc, chatSvc, userSvc, sessionSvc := bootstrap.InitServices(queries.New(connPool), config)
 
-	if err := event.StartGatewayEventHandler(ctx, bus, gatewayID, wsConnectionManager, server.ChatService); err != nil {
+	// TODO: move websocket out of the controller so i dont have to pass in gatewayID and the root context
+	server := apiserver.NewServer(
+		ctx,
+		config,
+		authSvc,
+		chatSvc,
+		userSvc,
+		sessionSvc,
+		bus,
+		gatewayID,
+		wsConnectionManager,
+	)
+
+	if err := event.StartGatewayEventHandler(ctx, bus, gatewayID, wsConnectionManager, chatSvc); err != nil {
 		return fmt.Errorf("failed to start gateway event handler: %w", err)
 	}
 
-	if err := event.StartGlobalEventHandler(ctx, bus, wsConnectionManager, server.ChatService); err != nil {
+	if err := event.StartGlobalEventHandler(ctx, bus, wsConnectionManager, chatSvc); err != nil {
 		return fmt.Errorf("failed to start global event handler: %w", err)
 	}
 
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Server.Host, strconv.Itoa(config.Server.Port)),
-		Handler: server.Handler,
+		Handler: server,
 	}
 
 	// we run the server in a separate goroutine
