@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ChatMessage from '$lib/components/ChatMessage.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import TypingIndicator from '$lib/components/TypingIndicator.svelte';
 	import { messagingStore } from '$stores/chats.svelte';
 	import { userStore } from '$stores/user.svelte';
 	import { sendWebSocketMessage } from '$stores/websocket.svelte';
@@ -18,7 +19,8 @@
 	let autoScroll = $state(true);
 
 	$effect(() => {
-		const _ = messagingStore.currentMessages;
+		[messagingStore.currentMessages, messagingStore.currentTypingUsers];
+
 		if (scrollEl && autoScroll) {
 			requestAnimationFrame(() => {
 				scrollEl.scrollTop = scrollEl.scrollHeight;
@@ -27,11 +29,12 @@
 	});
 
 	$effect(() => {
+		const typing = activelyTyping();
 		if (!initialized) {
 			initialized = true;
 			return;
 		}
-		sendWebSocketMessage('typing', { typing: activelyTyping() });
+		sendWebSocketMessage('typing', { typing, chat_id: chat?.id  });
 	});
 
 	function sendMessage() {
@@ -92,13 +95,13 @@
 		</div>
 	{/if}
 
-	{#if messagingStore.currentMessages.length > 0 || messagingStore.currentOptimisticMessages.length > 0}
+	{#if messagingStore.currentMessages.length > 0}
 		{#each messagingStore.currentMessages as message (message.id)}
 			<ChatMessage {message} />
 		{/each}
 
-		{#each messagingStore.currentOptimisticMessages as message (message.id)}
-			<ChatMessage {message} />
+		{#each messagingStore.currentTypingUsers as user (user.id)}
+			<TypingIndicator {user} />
 		{/each}
 	{:else}
 		<p class="text-base-content/50 mt-20 text-center">No messages yet. Start the conversation!</p>

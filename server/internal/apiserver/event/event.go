@@ -6,10 +6,10 @@ import (
 
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
 	"pycrs.cz/what-it-doo/internal/apiserver/ws"
-	"pycrs.cz/what-it-doo/internal/bus"
+	b"pycrs.cz/what-it-doo/internal/bus"
 )
 
-func StartGatewayEventHandler(ctx context.Context, bus bus.CommnunicationBus, gatewayID string, connectionManager ws.ConnectionManager, chatService service.ChatService) error {
+func StartGatewayEventHandler(ctx context.Context, bus b.CommnunicationBus, gatewayID string, connectionManager ws.ConnectionManager, chatService service.ChatService) error {
 	eventsCh, err := bus.SubscribeGatewayEvents(ctx, gatewayID)
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func StartGatewayEventHandler(ctx context.Context, bus bus.CommnunicationBus, ga
 				}
 
 				switch ev.Type {
-				case "message_ack":
+				case b.MessageAckEventType:
 					handleMessageAck(ctx, ev, connectionManager, chatService)
 				default:
 					log.Printf("Unknown event type: %s", ev.Type)
@@ -40,7 +40,7 @@ func StartGatewayEventHandler(ctx context.Context, bus bus.CommnunicationBus, ga
 	return nil
 }
 
-func StartGlobalEventHandler(ctx context.Context, bus bus.CommnunicationBus, connectionManager ws.ConnectionManager, chatService service.ChatService) error {
+func StartGlobalEventHandler(ctx context.Context, bus b.CommnunicationBus, connectionManager ws.ConnectionManager, chatService service.ChatService) error {
 	eventsCh, err := bus.SubscribeGlobalEvents(ctx)
 	if err != nil {
 		return err
@@ -59,8 +59,10 @@ func StartGlobalEventHandler(ctx context.Context, bus bus.CommnunicationBus, con
 				}
 
 				switch ev.Type {
-				case "message_fanout":
+				case b.MessageFanoutEventType:
 					handleMessageFanout(ctx, ev, connectionManager, chatService)
+				case b.UserTypingEventType:
+					handleUserTyping(ctx, ev, connectionManager, chatService)
 				default:
 					log.Printf("Unknown event type: %s", ev.Type)
 				}

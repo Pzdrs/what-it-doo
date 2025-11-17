@@ -7,10 +7,12 @@ import {
 } from '$lib/api/client';
 import { INIT_LOAD_MESSAGES_COUNT, LOAD_OLDER_MESSAGES_COUNT } from '$lib/constants';
 import type { UUID } from 'crypto';
+import { SvelteSet } from 'svelte/reactivity';
 
 class MessagingStore {
 	chats = $state<DtoChat[]>([]);
 	messages = $state<Record<number, DtoChatMessage[]>>({}); // key = chatId, value = messages array
+	typingUsers = $state<Record<number, SvelteSet<UUID>>>({}); // key = chatId, value = set of user IDs typing
 
 	_currentChatId = $state<number | null>(null);
 	_fullyPopulatedChats = $state<number[]>([]);
@@ -33,14 +35,29 @@ class MessagingStore {
 
 	// List of all unique participants across all chats
 	allParticipants = $derived.by(() => {
-		const participantIds = new Set<UUID>();
+		const participantIds = new SvelteSet<UUID>();
 		return this.chats
 			.flatMap((chat) => chat.participants)
 			.filter((p) => {
-				if (participantIds.has(p.id)) return false;
+				if (participantIds.has(p?.id)) return false;
 				participantIds.add(p.id);
 				return true;
 			});
+	});
+
+	currentTypingUsers = $derived.by(() => {
+		if (this._currentChatId === null) return [];
+
+		const typingIds = this.typingUsers[this._currentChatId];
+		if (!typingIds) return [];
+
+		// Build a map for fast lookup: UUID → User
+		const participantMap = new Map(this.allParticipants.map((p) => [p.id, p]));
+
+		// Convert typing IDs into user objects
+		return [...typingIds]
+			.map((id) => participantMap.get(id))
+			.filter((u): u is DtoUserDetails => u !== undefined);
 	});
 
 	getChat(chatId: number): DtoChat | null {
@@ -59,9 +76,9 @@ class MessagingStore {
 
 	async initLoadMessages(chatId: number) {
 		if (this.messages[chatId]) return; // already loaded
-		await getChatMessages(chatId, {limit: INIT_LOAD_MESSAGES_COUNT}).then((dto) => {
+		await getChatMessages(chatId, { limit: INIT_LOAD_MESSAGES_COUNT }).then((dto) => {
 			this.messages[chatId] = dto.messages;
-			
+
 			if (!dto.has_more) {
 				this._fullyPopulatedChats.push(chatId);
 			}
@@ -71,23 +88,28 @@ class MessagingStore {
 	async loadOlderMessages() {
 		let loadedSome = false;
 
-		if (this._currentChatId === null || this._fullyPopulatedChats.includes(this._currentChatId)) return false;
+		if (this._currentChatId === null || this._fullyPopulatedChats.includes(this._currentChatId))
+			return false;
 
 		const chatId = this._currentChatId;
 		const currentMsgs = this.messages[chatId] || [];
-		const oldestMsg = currentMsgs.reduce((oldest, msg) => {
-			return !oldest || new Date(msg.sent_at) < new Date(oldest.sent_at) ? msg : oldest;
-		}, null as DtoChatMessage | null);
+		const oldestMsg = currentMsgs.reduce(
+			(oldest, msg) => {
+				return !oldest || new Date(msg.sent_at) < new Date(oldest.sent_at) ? msg : oldest;
+			},
+			null as DtoChatMessage | null
+		);
 
 		const before = oldestMsg ? new Date(oldestMsg.sent_at).toISOString() : undefined;
 		await getChatMessages(chatId, {
-			before, limit: LOAD_OLDER_MESSAGES_COUNT
+			before,
+			limit: LOAD_OLDER_MESSAGES_COUNT
 		}).then((dto) => {
 			loadedSome = dto.messages?.length > 0;
 			const existingMsgs = this.messages[chatId] || [];
 			// Prepend older messages
 			this.messages[chatId] = [...dto.messages, ...existingMsgs];
-			
+
 			if (!dto.has_more) {
 				this._fullyPopulatedChats.push(chatId);
 			}
@@ -132,6 +154,19 @@ class MessagingStore {
 				msgs[msgIndex].sent_at = sentAt.toISOString();
 				break;
 			}
+		}
+	}
+
+	addTypingUser(chatId: number, userId: UUID) {
+		if (!this.typingUsers[chatId]) {
+			this.typingUsers[chatId] = new SvelteSet<UUID>();
+		}
+		this.typingUsers[chatId].add(userId);
+	}
+
+	removeTypingUser(chatId: number, userId: UUID) {
+		if (this.typingUsers[chatId]) {
+			this.typingUsers[chatId].delete(userId);
 		}
 	}
 }

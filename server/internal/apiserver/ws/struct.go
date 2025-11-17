@@ -1,14 +1,17 @@
+// Payload definitions for WebSocket communication between clients and gateways.
 package ws
 
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
-	TypeChatMessage    = "new_message"
-	TypeChatMessageAck = "message_ack"
-	TypeTyping         = "typing"
+	NewMessageMessageType = "new_message"
+	MessageAckMessageType = "message_ack"
+	UserTypingMessageType = "typing"
 )
 
 type BaseMessage struct {
@@ -30,18 +33,13 @@ type ChatMessageAck struct {
 	SentAt    time.Time `json:"sent_at"`
 }
 
-
-type TypingMessage struct {
-	Typing bool `json:"typing"`
+type TypingPayload struct {
+	Typing bool  `json:"typing"`
+	ChatID int64 `json:"chat_id"`
 }
 
-func NewMessage(typ string, payload interface{}) BaseMessage {
-	json, err := json.Marshal(payload)
-	if err != nil {
-		panic("failed to marshal message")
-	}
-	return BaseMessage{
-		Type: typ,
-		Data: json,
-	}
+type TypingFanoutPayload struct {
+	ChatID int64 `json:"chat_id"`
+	UserID uuid.UUID `json:"user_id"`
+	Typing bool  `json:"typing"`
 }

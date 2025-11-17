@@ -2,6 +2,7 @@ package ws
 
 import (
 	"log"
+	"slices"
 	"sync"
 
 	"github.com/google/uuid"
@@ -19,8 +20,9 @@ type ConnectionManager interface {
 
 	GetConnectedUsers() []uuid.UUID
 	GetUserConnections(userID uuid.UUID) []WSConnection
+	GetUserConnectionIDs(userID uuid.UUID) []uuid.UUID
 
-	BroadcastToUser(userID uuid.UUID, message any)
+	BroadcastToUser(userID uuid.UUID, message any, excludeConnections []uuid.UUID)
 }
 
 type connectionManager struct {
@@ -121,6 +123,16 @@ func (m *connectionManager) GetUserConnections(userID uuid.UUID) []WSConnection 
 
 	return list
 }
+
+func (m *connectionManager) GetUserConnectionIDs(userID uuid.UUID) []uuid.UUID {
+	conns := m.GetUserConnections(userID)
+	var ids []uuid.UUID
+	for _, c := range conns {
+		ids = append(ids, c.ID)
+	}
+	return ids
+}
+
 func (m *connectionManager) GetSessionConnections(userID, sessionID uuid.UUID) []WSConnection {
 	m.mux.RLock()
 	defer m.mux.RUnlock()
@@ -132,15 +144,19 @@ func (m *connectionManager) GetSessionConnections(userID, sessionID uuid.UUID) [
 
 	return sessions[sessionID]
 }
-func (m *connectionManager) BroadcastToUser(userID uuid.UUID, message any) {
+func (m *connectionManager) BroadcastToUser(userID uuid.UUID, message any, excludeConnections []uuid.UUID) {
 	m.mux.RLock()
 	connections := m.GetUserConnections(userID)
 	m.mux.RUnlock()
 
 	for _, c := range connections {
+		if slices.Contains(excludeConnections, c.ID) {
+			continue
+		}
 		c.Conn.WriteJSON(message)
 	}
 }
+
 func (m *connectionManager) BroadcastToSession(userID, sessionID uuid.UUID, message any) {
 	m.mux.RLock()
 	connections := m.GetSessionConnections(userID, sessionID)

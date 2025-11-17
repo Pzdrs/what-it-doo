@@ -7,7 +7,13 @@ import (
 )
 
 const (
-	MessageTask = "message"
+	MessageTaskType = "message"
+)
+
+const (
+	MessageAckEventType    = "message_ack"
+	MessageFanoutEventType = "message_fanout"
+	UserTypingEventType    = "typing"
 )
 
 type CommnunicationBus interface {

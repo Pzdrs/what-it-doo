@@ -13,6 +13,7 @@ import (
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
 	"pycrs.cz/what-it-doo/internal/apiserver/ws"
 	"pycrs.cz/what-it-doo/internal/bus"
+	b "pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/bus/payload"
 )
 
@@ -21,7 +22,7 @@ type SocketController struct {
 
 	upgrader          websocket.Upgrader
 	connectionManager ws.ConnectionManager
-	bus               bus.CommnunicationBus
+	bus               b.CommnunicationBus
 	userService       service.UserService
 	gatewayID         string
 }
@@ -45,11 +46,11 @@ func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	connId := c.connectionManager.AddConnection(user.ID, session.ID, conn)
+	connID := c.connectionManager.AddConnection(user.ID, session.ID, conn)
 
 	go func() {
 		defer conn.Close()
-		defer c.connectionManager.RemoveConnection(user.ID, session.ID, connId)
+		defer c.connectionManager.RemoveConnection(user.ID, session.ID, connID)
 
 		for {
 			_, msgBytes, err := conn.ReadMessage()
@@ -57,8 +58,6 @@ func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Reques
 				fmt.Println("WebSocket closed:", err)
 				break
 			}
-
-			fmt.Println("Raw message:", string(msgBytes))
 
 			var base ws.BaseMessage
 			if err := json.Unmarshal(msgBytes, &base); err != nil {
@@ -75,12 +74,12 @@ func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Reques
 					continue
 				}
 
-				taskId, err := c.bus.DispatchTask(c.ctx, bus.MessageTask, payload.MessageTaskPayload{
+				taskId, err := c.bus.DispatchTask(c.ctx, b.MessageTaskType, payload.MessageTaskPayload{
 					Content:      chatMessage.Message,
 					SenderID:     user.ID,
 					TempID:       chatMessage.TempID,
 					ChatID:       chatMessage.ChatID,
-					ConnectionID: connId,
+					ConnectionID: connID,
 					GatewayID:    c.gatewayID,
 				})
 
@@ -90,7 +89,22 @@ func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Reques
 				}
 
 				log.Println("Enqueued message task with ID:", taskId)
+			case "typing":
+				var typingPayload ws.TypingPayload
+				if err := json.Unmarshal(base.Data, &typingPayload); err != nil {
+					fmt.Println("❌ Invalid typing payload:", err)
+					continue
+				}
 
+				if err := c.bus.DispatchGlobalEvent(c.ctx, b.UserTypingEventType, payload.UserTypingEventPayload{
+					UserID:             user.ID,
+					Typing:             typingPayload.Typing,
+					ChatID:             typingPayload.ChatID,
+					OriginConnectionID: connID,
+				}); err != nil {
+					fmt.Println("❌ Failed to dispatch typing event:", err)
+					continue
+				}
 			default:
 				log.Println("⚠️ Unknown message type:", base.Type)
 			}

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { User } from '$lib/types';
+	import type { DtoUserDetails } from '$lib/api/client';
 
 	interface Props {
-		user: User;
+		user: DtoUserDetails;
 	}
 
 	let { user }: Props = $props();
