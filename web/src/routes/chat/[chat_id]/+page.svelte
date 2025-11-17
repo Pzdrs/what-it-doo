@@ -7,6 +7,7 @@
 	import { mdiHandWaveOutline, mdiSendOutline } from '@mdi/js';
 
 	let scrollEl: HTMLDivElement | null = null;
+	let initialized = false;
 	const chat = $derived(messagingStore.currentChat);
 
 	let loadingOlder = $state(false);
@@ -26,6 +27,10 @@
 	});
 
 	$effect(() => {
+		if (!initialized) {
+			initialized = true;
+			return;
+		}
 		sendWebSocketMessage('typing', { typing: activelyTyping() });
 	});
 
