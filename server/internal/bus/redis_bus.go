@@ -23,7 +23,7 @@ func NewRedisCommunicationBus(r *redis.Client) CommnunicationBus {
 	return &redisCommunicationBus{r: r}
 }
 
-func (b *redisCommunicationBus) DispatchTask(ctx context.Context, typ string, payload any) (string, error) {
+func (b *redisCommunicationBus) EnqueueTask(ctx context.Context, typ string, payload any) (string, error) {
 	marshaledPayload, err := json.Marshal(payload)
 	if err != nil {
 		return "", err
@@ -163,4 +163,3 @@ func (b *redisCommunicationBus) SubscribeGlobalEvents(ctx context.Context) (<-ch
 
 	return out, nil
 }
-

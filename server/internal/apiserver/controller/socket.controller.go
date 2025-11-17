@@ -74,7 +74,7 @@ func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Reques
 					continue
 				}
 
-				taskId, err := c.bus.DispatchTask(c.ctx, b.MessageTaskType, payload.MessageTaskPayload{
+				taskId, err := c.bus.EnqueueTask(c.ctx, b.MessageTaskType, payload.MessageTaskPayload{
 					Content:      chatMessage.Message,
 					SenderID:     user.ID,
 					TempID:       chatMessage.TempID,

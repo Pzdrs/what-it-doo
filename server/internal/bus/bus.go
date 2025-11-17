@@ -17,8 +17,8 @@ const (
 )
 
 type CommnunicationBus interface {
-	// DispatchTask dispatches a task to be processed by a worker. It returns the ID of the dispatched task.
-	DispatchTask(ctx context.Context, typ string, payload any) (string, error)
+	// EnqueueTask dispatches a task to be processed by a worker. It returns the ID of the dispatched task.
+	EnqueueTask(ctx context.Context, typ string, payload any) (string, error)
 	// ConsumeTasks returns a channel that yields tasks to be processed by the worker.
 	ConsumeTasks(ctx context.Context) (<-chan payload.Task, error)
 	// AckTask acknowledges the completion of a task with the given ID.

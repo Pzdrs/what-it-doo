@@ -9,12 +9,12 @@ import (
 
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/app/worker"
 	"pycrs.cz/what-it-doo/internal/bootstrap"
 	"pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/bus/payload"
 	"pycrs.cz/what-it-doo/internal/config"
 	"pycrs.cz/what-it-doo/internal/queries"
-	"pycrs.cz/what-it-doo/internal/worker"
 )
 
 func runWorker(ctx context.Context, q *queries.Queries, bus bus.CommnunicationBus, config config.Configuration) error {
