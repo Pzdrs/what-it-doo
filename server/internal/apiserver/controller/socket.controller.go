@@ -8,12 +8,12 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/redis/go-redis/v9"
 	"pycrs.cz/what-it-doo/internal/apiserver/middleware"
 	"pycrs.cz/what-it-doo/internal/apiserver/problem"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
 	"pycrs.cz/what-it-doo/internal/apiserver/ws"
-	"pycrs.cz/what-it-doo/internal/worker"
+	"pycrs.cz/what-it-doo/internal/bus"
+	"pycrs.cz/what-it-doo/internal/bus/payload"
 )
 
 type SocketController struct {
@@ -21,12 +21,13 @@ type SocketController struct {
 
 	upgrader          websocket.Upgrader
 	connectionManager ws.ConnectionManager
-	redisClient       *redis.Client
+	bus               bus.CommnunicationBus
 	userService       service.UserService
+	gatewayID         string
 }
 
-func NewSocketController(ctx context.Context, upgrader websocket.Upgrader, connectionManager ws.ConnectionManager, redisClient *redis.Client, userService service.UserService) *SocketController {
-	return &SocketController{ctx: ctx, upgrader: upgrader, connectionManager: connectionManager, redisClient: redisClient, userService: userService}
+func NewSocketController(ctx context.Context, upgrader websocket.Upgrader, connectionManager ws.ConnectionManager, bus bus.CommnunicationBus, userService service.UserService, gatewayID string) *SocketController {
+	return &SocketController{ctx: ctx, upgrader: upgrader, connectionManager: connectionManager, bus: bus, userService: userService, gatewayID: gatewayID}
 }
 
 func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
@@ -74,37 +75,21 @@ func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Reques
 					continue
 				}
 
-				payload, err := json.Marshal(worker.MessagePayload{
+				taskId, err := c.bus.DispatchTask(c.ctx, bus.MessageTask, payload.MessageTaskPayload{
 					Content:      chatMessage.Message,
 					SenderID:     user.ID,
 					TempID:       chatMessage.TempID,
 					ChatID:       chatMessage.ChatID,
 					ConnectionID: connId,
+					GatewayID:    c.gatewayID,
 				})
-				if err != nil {
-					fmt.Println("❌ Failed to marshal message payload:", err)
-					continue
-				}
-
-				res, err := c.redisClient.XAdd(c.ctx, &redis.XAddArgs{
-					Stream: "stream:tasks",
-					Values: map[string]interface{}{
-						"type":    "message",
-						"payload": payload,
-					},
-				}).Result()
 
 				if err != nil {
 					fmt.Println("❌ Failed to enqueue message task:", err)
 					continue
 				}
 
-				log.Println("Enqueued message task with ID:", res)
-				// TODO: move sending ack to worker after message is stored in DB
-				// conn.WriteJSON(ws.NewMessage(ws.TypeChatMessageAck, ws.ChatMessageAck{
-				// 	TempID: chatMessage.TempID,
-				// 	SentAt: timestamp,
-				// }))
+				log.Println("Enqueued message task with ID:", taskId)
 
 			default:
 				log.Println("⚠️ Unknown message type:", base.Type)

@@ -89,3 +89,19 @@ INSERT INTO messages (chat_id, sender_id, content)
 VALUES ($1, $2, $3)
 RETURNING
     *;
+
+-- name: IsUserInChat :one
+SELECT
+    EXISTS (
+        SELECT 1
+        FROM chat_participants
+        WHERE chat_id = $2 AND user_id = $1
+    ) AS is_participant;
+
+-- name: GetMessageByID :one
+SELECT
+    *
+FROM
+    messages
+WHERE
+    id = $1;

@@ -113,11 +113,22 @@ class MessagingStore {
 		});
 	}
 
-	acknowledgeMessage(tempId: number, sentAt: Date) {
+	addIncomingMessage(message: DtoChatMessage, chatId: number) {
+		if (!this.messages[chatId]) {
+			this.messages[chatId] = [];
+		}
+		// Avoid duplicates
+		if (!this.messages[chatId].some((msg) => msg.id === message.id)) {
+			this.messages[chatId].push(message);
+		}
+	}
+
+	acknowledgeMessage(tempId: number, messageId: number, sentAt: Date) {
 		for (const chatId in this.messages) {
 			const msgs = this.messages[chatId];
 			const msgIndex = msgs.findIndex((msg) => msg.id === tempId);
 			if (msgIndex !== -1) {
+				msgs[msgIndex].id = messageId;
 				msgs[msgIndex].sent_at = sentAt.toISOString();
 				break;
 			}

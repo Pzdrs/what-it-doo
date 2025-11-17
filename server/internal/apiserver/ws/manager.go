@@ -16,6 +16,11 @@ type WSConnection struct {
 type ConnectionManager interface {
 	AddConnection(userID, sessionID uuid.UUID, conn *websocket.Conn) uuid.UUID
 	RemoveConnection(userID, sessionID, connectionID uuid.UUID)
+
+	GetConnectedUsers() []uuid.UUID
+	GetUserConnections(userID uuid.UUID) []WSConnection
+
+	BroadcastToUser(userID uuid.UUID, message any)
 }
 
 type connectionManager struct {
@@ -87,6 +92,18 @@ func (m *connectionManager) RemoveConnection(userID, sessionID, connectionID uui
 		delete(m.connections, userID)
 	}
 }
+
+func (m *connectionManager) GetConnectedUsers() []uuid.UUID {
+	m.mux.RLock()
+	defer m.mux.RUnlock()
+
+	var users []uuid.UUID
+	for userID := range m.connections {
+		users = append(users, userID)
+	}
+	return users
+}
+
 func (m *connectionManager) GetUserConnections(userID uuid.UUID) []WSConnection {
 	m.mux.RLock()
 	defer m.mux.RUnlock()

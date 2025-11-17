@@ -5,31 +5,32 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
-	"github.com/redis/go-redis/v9"
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "pycrs.cz/what-it-doo/api" // Swagger docs
 	"pycrs.cz/what-it-doo/internal/apiserver/controller"
 	"pycrs.cz/what-it-doo/internal/apiserver/middleware"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
 	"pycrs.cz/what-it-doo/internal/apiserver/ws"
+	"pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/config"
 )
 
 func addRoutes(
 	ctx context.Context,
 	r chi.Router,
+	gatewayID string,
 	authService service.AuthService,
 	chatService service.ChatService,
 	userService service.UserService,
 	sessionService service.SessionService,
 	config config.Configuration,
-	redisClient *redis.Client,
+	bus bus.CommnunicationBus,
+	connectionManager ws.ConnectionManager,
 ) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
-	connectionManager := ws.NewConnectionManager()
 
 	RequireAuthenticated := middleware.RequireAuthenticated(sessionService)
 	RequireUnauthenticated := middleware.RequireUnauthenticated(sessionService)
@@ -38,7 +39,7 @@ func addRoutes(
 	chatController := controller.NewChatController(chatService, config)
 	userController := controller.NewUserController(userService)
 	serverController := controller.NewServerController()
-	socketController := controller.NewSocketController(ctx, upgrader, connectionManager, redisClient, userService)
+	socketController := controller.NewSocketController(ctx, upgrader, connectionManager, bus, userService, gatewayID)
 
 	r.Route("/server", func(r chi.Router) {
 		r.Get("/about", serverController.HandleAbout)

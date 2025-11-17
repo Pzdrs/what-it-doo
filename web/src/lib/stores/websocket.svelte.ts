@@ -1,3 +1,4 @@
+import type { DtoChat, DtoChatMessage } from '$lib/api/client';
 import { messagingStore } from './chats.svelte';
 
 class WebsocketStore {
@@ -14,8 +15,13 @@ const onMessage = (event: MessageEvent) => {
 	const message = JSON.parse(event.data);
 	switch (message.type) {
 		case 'message_ack': {
-			const { temp_id, sent_at } = message.data as { temp_id: number; sent_at: string };
-			messagingStore.acknowledgeMessage(temp_id, new Date(sent_at));
+			const { message_id, temp_id, sent_at } = message.data as { message_id: number; temp_id: number; sent_at: string };
+			messagingStore.acknowledgeMessage(temp_id, message_id, new Date(sent_at));
+			break;
+		}
+		case 'new_message': {
+			const {chat_id, message : newMessage} = message.data as { chat_id: number; message: DtoChatMessage };
+			messagingStore.addIncomingMessage(newMessage, chat_id);
 			break;
 		}
 

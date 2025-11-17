@@ -13,7 +13,10 @@ import (
 	"time"
 
 	"pycrs.cz/what-it-doo/internal/apiserver"
+	"pycrs.cz/what-it-doo/internal/apiserver/event"
+	"pycrs.cz/what-it-doo/internal/apiserver/ws"
 	"pycrs.cz/what-it-doo/internal/bootstrap"
+	"pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/queries"
 	"pycrs.cz/what-it-doo/pkg/version"
 )
@@ -27,6 +30,8 @@ func run(ctx context.Context) error {
 	defer stop()
 
 	log.Printf("Starting what-it-doo server version %s\n", version.Version)
+
+	gatewayID := bootstrap.GenerateGatewayID()
 
 	config, err := bootstrap.InitConfig()
 	if err != nil {
@@ -45,8 +50,22 @@ func run(ctx context.Context) error {
 	}
 	defer redisClient.Close()
 
+	bus := bus.NewRedisCommunicationBus(redisClient)
+
+	wsConnectionManager := ws.NewConnectionManager()
+
+	// Construct the server plumbing
 	q := queries.New(connPool)
-	server := apiserver.NewServer(ctx, q, config, redisClient)
+	server := apiserver.NewServer(ctx, q, config, bus, gatewayID, wsConnectionManager)
+
+	if err := event.StartGatewayEventHandler(ctx, bus, gatewayID, wsConnectionManager, server.ChatService); err != nil {
+		return fmt.Errorf("failed to start gateway event handler: %w", err)
+	}
+
+	if err := event.StartGlobalEventHandler(ctx, bus, wsConnectionManager, server.ChatService); err != nil {
+		return fmt.Errorf("failed to start global event handler: %w", err)
+	}
+
 
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Server.Host, strconv.Itoa(config.Server.Port)),

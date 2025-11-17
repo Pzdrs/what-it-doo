@@ -23,6 +23,11 @@ type ChatService interface {
 	CreateChat(ctx context.Context, participants []string) (*model.Chat, error)
 	// SendMessage sends a message in a chat.
 	SendMessage(ctx context.Context, chatID int64, senderID uuid.UUID, content string) (model.Message, error)
+	// GetMessageByID retrieves a message by its ID.
+	GetMessageByID(ctx context.Context, messageID int64) (model.Message, error)
+
+	// IsUserInChat checks if a user is a participant in a specific chat.
+	IsUserInChat(ctx context.Context, userID uuid.UUID, chatID int64) (bool, error)
 }
 
 type chatService struct {
@@ -108,6 +113,14 @@ func (s *chatService) GetMessagesForChat(ctx context.Context, chatID int64, limi
 
 func (s *chatService) SendMessage(ctx context.Context, chatID int64, senderID uuid.UUID, content string) (model.Message, error) {
 	return s.repository.CreateMessage(ctx, chatID, senderID, content)
+}
+
+func (s *chatService) IsUserInChat(ctx context.Context, userID uuid.UUID, chatID int64) (bool, error) {
+	return s.repository.IsUserInChat(ctx, userID, chatID)
+}
+
+func (s *chatService) GetMessageByID(ctx context.Context, messageID int64) (model.Message, error) {
+	return s.repository.GetMessageByID(ctx, messageID)
 }
 
 var _ ChatService = (*chatService)(nil)

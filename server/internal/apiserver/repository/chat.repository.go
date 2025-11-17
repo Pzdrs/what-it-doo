@@ -17,9 +17,11 @@ type ChatRepository interface {
 	Create(ctx context.Context) (model.Chat, error)
 	AddParticipant(ctx context.Context, chatID int64, userID uuid.UUID) error
 	GetParticipants(ctx context.Context, chatID int64) ([]model.User, error)
+	IsUserInChat(ctx context.Context, userID uuid.UUID, chatID int64) (bool, error)
 
 	GetMessagesForChat(ctx context.Context, chatID int64, limit int32, beforeTime time.Time) ([]model.Message, error)
 	CreateMessage(ctx context.Context, chatID int64, senderID uuid.UUID, content string) (model.Message, error)
+	GetMessageByID(ctx context.Context, messageID int64) (model.Message, error)
 }
 
 type pgxChatRepository struct {
@@ -108,6 +110,13 @@ func (r *pgxChatRepository) AddParticipant(ctx context.Context, chatID int64, us
 	})
 }
 
+func (r *pgxChatRepository) IsUserInChat(ctx context.Context, userID uuid.UUID, chatID int64) (bool, error) {
+	return r.q.IsUserInChat(ctx, queries.IsUserInChatParams{
+		UserID: userID,
+		ChatID: chatID,
+	})
+}
+
 func (r *pgxChatRepository) GetParticipants(ctx context.Context, chatID int64) ([]model.User, error) {
 	u, err := r.q.GetChatParticipants(ctx, chatID)
 	if err != nil {
@@ -127,6 +136,15 @@ func (r *pgxChatRepository) CreateMessage(ctx context.Context, chatID int64, sen
 	}
 
 	return dbMessageToModel(message), nil
+}
+
+func (r *pgxChatRepository) GetMessageByID(ctx context.Context, messageID int64) (model.Message, error) {
+	msg, err := r.q.GetMessageByID(ctx, messageID)
+	if err != nil {
+		return model.Message{}, err
+	}
+
+	return dbMessageToModel(msg), nil
 }
 
 func dbChatToModel(c queries.Chat) model.Chat {

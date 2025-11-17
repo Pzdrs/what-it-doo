@@ -2,21 +2,36 @@ package worker
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/bus"
+	"pycrs.cz/what-it-doo/internal/bus/payload"
 )
 
-func ProcessMessageTask(ctx context.Context, chatService service.ChatService, payload MessagePayload) error {
-	fmt.Printf("Processing message from user %s in chat %d: %s\n", payload.SenderID, payload.ChatID, payload.Content)
-	fmt.Println(payload)
-	message, err := chatService.SendMessage(ctx, payload.ChatID, payload.SenderID, payload.Content)
-	_ = message
+func ProcessMessageTask(ctx context.Context, chatService service.ChatService, bus bus.CommnunicationBus, p payload.MessageTaskPayload) error {
+	log.Printf("Processing message from user %s in chat %d: %s\n", p.SenderID, p.ChatID, p.Content)
+	message, err := chatService.SendMessage(ctx, p.ChatID, p.SenderID, p.Content)
 	if err != nil {
 		return err
 	}
 
-	// TODO: send ack to the sending connection
+	if err := bus.DispatchGatewayEvent(ctx, p.GatewayID, payload.MessageAckEvent, payload.MessageAckEventPayload{
+		ConnectionID: p.ConnectionID,
+		ChatID:       p.ChatID,
+		TempID:       p.TempID,
+		MessageID:    message.ID,
+		SentAt:       message.SentAt,
+	}); err != nil {
+		return err
+	}
+
+	if err := bus.DispatchGlobalEvent(ctx, payload.MessageFanoutEvent, payload.MessageFanoutEventPayload{
+		ChatID:    p.ChatID,
+		MessageID: message.ID,
+	}); err != nil {
+		return err
+	}
 
 	return nil
 }

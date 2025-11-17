@@ -8,21 +8,25 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/redis/go-redis/v9"
 	"pycrs.cz/what-it-doo/internal/apiserver/repository"
 	"pycrs.cz/what-it-doo/internal/apiserver/service"
+	"pycrs.cz/what-it-doo/internal/apiserver/ws"
+	"pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/config"
 	"pycrs.cz/what-it-doo/internal/queries"
 )
 
 type Server struct {
-	ctx     context.Context
-	Handler http.Handler
+	ctx       context.Context
+	gatewayID string
+	connectionManager ws.ConnectionManager
+	
+	Handler   http.Handler
 
-	authService    service.AuthService
-	chatService    service.ChatService
-	userService    service.UserService
-	sessionService service.SessionService
+	AuthService    service.AuthService
+	ChatService    service.ChatService
+	UserService    service.UserService
+	SessionService service.SessionService
 }
 
 func spaHandler(staticDir string) http.HandlerFunc {
@@ -41,17 +45,19 @@ func spaHandler(staticDir string) http.HandlerFunc {
 	}
 }
 
-func NewServer(ctx context.Context, q *queries.Queries, config config.Configuration, redisClient *redis.Client) *Server {
+func NewServer(ctx context.Context, q *queries.Queries, config config.Configuration, bus bus.CommnunicationBus, gatewayID string, connectionManager ws.ConnectionManager) *Server {
 	userRepository := repository.NewUserRepository(q)
 	sessionRepository := repository.NewSessionRepository(q)
 	chatRepository := repository.NewChatRepository(q)
 
 	server := &Server{
 		ctx:            ctx,
-		authService:    service.NewAuthService(userRepository, sessionRepository, config),
-		chatService:    service.NewChatService(chatRepository, userRepository, config),
-		userService:    service.NewUserService(userRepository, config),
-		sessionService: service.NewSessionService(userRepository, sessionRepository, config),
+		gatewayID:     gatewayID,
+		AuthService:    service.NewAuthService(userRepository, sessionRepository, config),
+		ChatService:    service.NewChatService(chatRepository, userRepository, config),
+		UserService:    service.NewUserService(userRepository, config),
+		SessionService: service.NewSessionService(userRepository, sessionRepository, config),
+		connectionManager: connectionManager,
 	}
 
 	r := chi.NewRouter()
@@ -61,12 +67,14 @@ func NewServer(ctx context.Context, q *queries.Queries, config config.Configurat
 		addRoutes(
 			ctx,
 			api,
-			server.authService,
-			server.chatService,
-			server.userService,
-			server.sessionService,
+			gatewayID,
+			server.AuthService,
+			server.ChatService,
+			server.UserService,
+			server.SessionService,
 			config,
-			redisClient,
+			bus,
+			connectionManager,
 		)
 	})
 

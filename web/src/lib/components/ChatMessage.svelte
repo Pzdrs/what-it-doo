@@ -26,8 +26,8 @@
 		{#if origin === 'them'}
 			{sender?.name}
 		{/if}
-		{#if message.timestamp}
-			<time class="text-xs opacity-50">{formatDateOrTime(message.timestamp)}</time>
+		{#if message.sent_at}
+			<time class="text-xs opacity-50">{formatDateOrTime(message.sent_at)}</time>
 		{/if}
 	</div>
 	<div
@@ -43,7 +43,7 @@
 	{#if message.sender_id === userStore.user?.id}
 		<div class="chat-footer opacity-50">
 			{#if message.read_at}
-				<span class="text-xs">Seen at {formatDateOrTime(message.readAt)}</span>
+				<span class="text-xs">Seen at {formatDateOrTime(message.read_at)}</span>
 			{:else if message.delivered_at}
 				<span class="text-xs">Delivered</span>
 			{:else if message.sent_at}
