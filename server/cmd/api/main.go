@@ -12,12 +12,12 @@ import (
 	"sync"
 	"time"
 
-	"pycrs.cz/what-it-doo/internal/apiserver"
-	"pycrs.cz/what-it-doo/internal/apiserver/event"
-	"pycrs.cz/what-it-doo/internal/apiserver/ws"
+	"pycrs.cz/what-it-doo/internal/app/apiserver/event"
+	apiserver "pycrs.cz/what-it-doo/internal/app/apiserver/http"
 	"pycrs.cz/what-it-doo/internal/bootstrap"
 	"pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/queries"
+	"pycrs.cz/what-it-doo/internal/ws"
 	"pycrs.cz/what-it-doo/pkg/version"
 )
 
@@ -65,7 +65,6 @@ func run(ctx context.Context) error {
 	if err := event.StartGlobalEventHandler(ctx, bus, wsConnectionManager, server.ChatService); err != nil {
 		return fmt.Errorf("failed to start global event handler: %w", err)
 	}
-
 
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Server.Host, strconv.Itoa(config.Server.Port)),
