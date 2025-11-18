@@ -1,4 +1,4 @@
-package controller 
+package controller
 
 import (
 	"net/http"
@@ -25,7 +25,7 @@ func NewServerController() *ServerController {
 //	@Success		200	{object}	dto.ServerInfo
 //	@Router			/server/about [get]
 func (c *ServerController) HandleAbout(w http.ResponseWriter, r *http.Request) {
-	common.WriteJSON(w, 200, dto.ServerInfo{
+	common.Encode(w, r, 200, dto.ServerInfo{
 		Version: version.Version,
 	})
 }
@@ -40,5 +40,5 @@ func (c *ServerController) HandleAbout(w http.ResponseWriter, r *http.Request) {
 //	@Success		200	{object}	dto.ServerConfig
 //	@Router			/server/config [get]
 func (c *ServerController) HandleConfig(w http.ResponseWriter, r *http.Request) {
-	common.WriteJSON(w, 200, dto.ServerConfig{})
+	common.Encode(w, r, 200, dto.ServerConfig{})
 }

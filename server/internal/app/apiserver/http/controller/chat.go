@@ -43,7 +43,7 @@ func (c *ChatController) HandleMyChats(w http.ResponseWriter, r *http.Request) {
 		problem.Write(w, problem.NewInternalServerError(r, err))
 		return
 	}
-	common.WriteJSON(w, 200, chats)
+	common.Encode(w, r, 200, chats)
 }
 
 // HandleGetChat
@@ -82,7 +82,7 @@ func (c *ChatController) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 		problem.Write(w, problem.NewInternalServerError(r, err))
 		return
 	}
-	common.WriteJSON(w, 200, chat)
+	common.Encode(w, r, 200, chat)
 }
 
 // HandleCreateChat godoc
@@ -97,7 +97,7 @@ func (c *ChatController) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 //	@Success		201		{object}	dto.Chat
 //	@Router			/chats/ [post]
 func (c *ChatController) HandleCreateChat(w http.ResponseWriter, r *http.Request) {
-	req, ok := common.DecodeAndValidate[dto.CreateChatRequest](w, r)
+	req, ok := common.DecodeValidate[dto.CreateChatRequest](w, r)
 	if !ok {
 		return
 	}
@@ -116,7 +116,7 @@ func (c *ChatController) HandleCreateChat(w http.ResponseWriter, r *http.Request
 		}
 		return
 	}
-	common.WriteJSON(w, 201, chat)
+	common.Encode(w, r, 201, chat)
 }
 
 // HandleGetChatMessages
@@ -170,7 +170,7 @@ func (c *ChatController) HandleGetChatMessages(w http.ResponseWriter, r *http.Re
 		problem.Write(w, problem.NewInternalServerError(r, err))
 		return
 	}
-	common.WriteJSON(w, 200, dto.ChatMessages{
+	common.Encode(w, r, 200, dto.ChatMessages{
 		Messages: func() []dto.ChatMessage {
 			result := []dto.ChatMessage{}
 			for _, msg := range messages {

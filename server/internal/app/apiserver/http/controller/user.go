@@ -38,5 +38,5 @@ func (c *UserController) HandleGetMyself(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	common.WriteJSON(w, 200, user)
+	common.Encode(w, r, 200, user)
 }

@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-SWAG_INPUTS := $(shell find cmd/api/main.go internal/apiserver/controller -name "*.go")
+SWAG_INPUTS := $(shell find cmd/api/main.go internal/app/apiserver/http/controller -name "*.go")
 SWAG_OUTPUTS := api/docs.go
 
 TAG_NAME := $(shell git describe --abbrev=0 --tags)

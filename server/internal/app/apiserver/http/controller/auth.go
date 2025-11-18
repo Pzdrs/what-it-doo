@@ -35,7 +35,7 @@ func NewAuthController(authService service.AuthService, userService service.User
 //	@Param			request	body		dto.LoginRequest	true	"Login request"
 //	@Router			/auth/login [post]
 func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
-	req, ok := common.DecodeAndValidate[dto.LoginRequest](w, r)
+	req, ok := common.DecodeValidate[dto.LoginRequest](w, r)
 	if !ok {
 		return
 	}
@@ -58,7 +58,7 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	common.SetAuthCookies(w, &session, req.RememberMe)
-	common.WriteJSON(w, http.StatusCreated, dto.LoginResponse{
+	common.Encode(w, r, http.StatusCreated, dto.LoginResponse{
 		User: dto.MapUserToUserDetails(user),
 	})
 }
@@ -77,7 +77,7 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 //	@Param			autoLogin	query		bool					false	"Automatically log in the user after registration"
 //	@Router			/auth/register [post]
 func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) {
-	req, ok := common.DecodeAndValidate[dto.RegistrationRequest](w, r)
+	req, ok := common.DecodeValidate[dto.RegistrationRequest](w, r)
 	if !ok {
 		return
 	}
@@ -114,7 +114,7 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 		common.SetAuthCookies(w, &session, true)
 	}
 
-	common.WriteJSON(w, http.StatusCreated, dto.RegistrationResponse{
+	common.Encode(w, r, http.StatusCreated, dto.RegistrationResponse{
 		User: dto.MapUserToUserDetails(user),
 	})
 }
@@ -140,7 +140,7 @@ func (c *AuthController) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	common.WriteJSON(w, 200, dto.LogoutResponse{
+	common.Encode(w, r, 200, dto.LogoutResponse{
 		Success:     true,
 		RedirectUrl: "/auth/login",
 	})

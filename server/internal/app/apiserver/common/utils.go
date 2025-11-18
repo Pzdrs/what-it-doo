@@ -29,24 +29,24 @@ func validationErrorsToMap(ve validator.ValidationErrors) map[string]problem.Fie
 	return errors
 }
 
-func DecodeAndValidate[T any](w http.ResponseWriter, r *http.Request) (*T, bool) {
-	var req T
+func DecodeValidate[T any](w http.ResponseWriter, r *http.Request) (T, bool) {
+	var v T
 
 	// Decode JSON
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&req); err != nil {
+	if err := decoder.Decode(&v); err != nil {
 		problem.Write(w, problem.New(
 			r, http.StatusBadRequest,
 			"Invalid JSON",
 			"Request body contains invalid JSON",
 			"invalid-json",
 		))
-		return nil, false
+		return v, false
 	}
 
 	// Validate struct
 	validate := validator.New(validator.WithRequiredStructEnabled())
-	if err := validate.Struct(req); err != nil {
+	if err := validate.Struct(v); err != nil {
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
 			errMap := validationErrorsToMap(ve)
@@ -61,16 +61,19 @@ func DecodeAndValidate[T any](w http.ResponseWriter, r *http.Request) (*T, bool)
 				Errors: errMap,
 			})
 		}
-		return nil, false
+		return v, false
 	}
 
-	return &req, true
+	return v, true
 }
 
-func WriteJSON(w http.ResponseWriter, status int, data any) error {
+func Encode[T any](w http.ResponseWriter, r *http.Request, status int, v T) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	return json.NewEncoder(w).Encode(data)
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		return fmt.Errorf("encode json: %w", err)
+	}
+	return nil
 }
 
 func ParseQueryInt[T int | int8 | int16 | int32 | int64](r *http.Request, name string, defaultValue T) (T, error) {
