@@ -105,6 +105,11 @@ func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Reques
 					fmt.Println("❌ Failed to dispatch typing event:", err)
 					continue
 				}
+			case "dap_up":
+				if err := c.bus.DispatchGlobalEvent(c.ctx, b.DapUpEventType, nil); err != nil {
+					fmt.Println("❌ Failed to dispatch dap_up event:", err)
+					continue
+				}
 			default:
 				log.Println("⚠️ Unknown message type:", base.Type)
 			}

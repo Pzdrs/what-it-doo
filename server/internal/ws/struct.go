@@ -12,6 +12,7 @@ const (
 	NewMessageMessageType = "new_message"
 	MessageAckMessageType = "message_ack"
 	UserTypingMessageType = "typing"
+	DapUpMessageType      = "dap_up"
 )
 
 type BaseMessage struct {
@@ -39,7 +40,7 @@ type TypingPayload struct {
 }
 
 type TypingFanoutPayload struct {
-	ChatID int64 `json:"chat_id"`
+	ChatID int64     `json:"chat_id"`
 	UserID uuid.UUID `json:"user_id"`
-	Typing bool  `json:"typing"`
+	Typing bool      `json:"typing"`
 }

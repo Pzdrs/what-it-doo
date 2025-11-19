@@ -14,6 +14,7 @@ const (
 	MessageAckEventType    = "message_ack"
 	MessageFanoutEventType = "message_fanout"
 	UserTypingEventType    = "typing"
+	DapUpEventType         = "dap_up"
 )
 
 type CommnunicationBus interface {
@@ -24,10 +25,13 @@ type CommnunicationBus interface {
 	// AckTask acknowledges the completion of a task with the given ID.
 	AckTask(ctx context.Context, taskId any)
 
+	// DispatchGlobalEvent dispatches an event to all gateways.
 	DispatchGlobalEvent(ctx context.Context, typ string, payload any) error
+	// SubscribeGlobalEvents returns a channel that yields global events.
 	SubscribeGlobalEvents(ctx context.Context) (<-chan payload.Event, error)
 
 	// DispatchGatewayEvent dispatches an event to a given gateway.
 	DispatchGatewayEvent(ctx context.Context, gatewayId string, typ string, payload any) error
+	// SubscribeGatewayEvents returns a channel that yields events for a given gateway.
 	SubscribeGatewayEvents(ctx context.Context, gatewayId string) (<-chan payload.Event, error)
 }

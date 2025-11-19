@@ -63,6 +63,8 @@ func StartGlobalEventHandler(ctx context.Context, bus b.CommnunicationBus, conne
 					handleMessageFanout(ctx, ev, connectionManager, chatService)
 				case b.UserTypingEventType:
 					handleUserTyping(ctx, ev, connectionManager, chatService)
+				case b.DapUpEventType:
+					handleDapUp(ctx, connectionManager, chatService)
 				default:
 					log.Printf("Unknown event type: %s", ev.Type)
 				}

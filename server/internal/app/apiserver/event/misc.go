@@ -41,3 +41,7 @@ func handleUserTyping(ctx context.Context, ev payload.Event, connectionManager w
 		}, []uuid.UUID{payload.OriginConnectionID})
 	}
 }
+
+func handleDapUp(ctx context.Context, connectionManager ws.ConnectionManager, chatService service.ChatService) {
+	// TOOD: implement
+}
