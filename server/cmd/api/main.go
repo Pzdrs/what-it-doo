@@ -14,6 +14,7 @@ import (
 
 	"pycrs.cz/what-it-doo/internal/app/apiserver/event"
 	apiserver "pycrs.cz/what-it-doo/internal/app/apiserver/http"
+	"pycrs.cz/what-it-doo/internal/app/apiserver/presence"
 	"pycrs.cz/what-it-doo/internal/bootstrap"
 	"pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/queries"
@@ -56,6 +57,8 @@ func run(ctx context.Context) error {
 
 	authSvc, chatSvc, userSvc, sessionSvc := bootstrap.InitServices(queries.New(connPool), config)
 
+	presenceManager := presence.NewPresenceManager(redisClient, gatewayID, userSvc, bus)
+
 	// TODO: move websocket out of the controller so i dont have to pass in gatewayID and the root context
 	server := apiserver.NewServer(
 		ctx,
@@ -67,6 +70,7 @@ func run(ctx context.Context) error {
 		bus,
 		gatewayID,
 		wsConnectionManager,
+		presenceManager,
 	)
 
 	if err := event.StartGatewayEventHandler(ctx, bus, gatewayID, wsConnectionManager, chatSvc); err != nil {

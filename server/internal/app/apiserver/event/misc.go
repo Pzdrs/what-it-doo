@@ -3,7 +3,6 @@ package event
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/google/uuid"
@@ -19,8 +18,6 @@ func handleUserTyping(ctx context.Context, ev payload.Event, connectionManager w
 		return
 	}
 
-	fmt.Println(payload)
-
 	for _, userID := range connectionManager.GetConnectedUsers() {
 		is, err := chatService.IsUserInChat(ctx, userID, payload.ChatID)
 		if err != nil {
@@ -31,7 +28,7 @@ func handleUserTyping(ctx context.Context, ev payload.Event, connectionManager w
 			continue
 		}
 
-		connectionManager.BroadcastToUser(userID, map[string]interface{}{
+		connectionManager.BroadcastUser(userID, map[string]any{
 			"type": ws.UserTypingMessageType,
 			"data": ws.TypingFanoutPayload{
 				ChatID: payload.ChatID,
@@ -44,4 +41,20 @@ func handleUserTyping(ctx context.Context, ev payload.Event, connectionManager w
 
 func handleDapUp(ctx context.Context, connectionManager ws.ConnectionManager, chatService service.ChatService) {
 	// TOOD: implement
+}
+
+func handlePresenceChange(ev payload.Event, connectionManager ws.ConnectionManager) {
+	var payload payload.PresenceChangeEventPayload
+	if err := json.Unmarshal(ev.Payload, &payload); err != nil {
+		log.Printf("Failed to unmarshal PresenceChangeEventPayload: %v", err)
+		return
+	}
+
+	connectionManager.Broadcast(map[string]any{
+		"type": ws.PresenceChangeMessageType,
+		"data": ws.PresenceChangeFanoutPayload{
+			UserID: payload.UserID,
+			Online: payload.Online,
+		},
+	}, []uuid.UUID{})
 }

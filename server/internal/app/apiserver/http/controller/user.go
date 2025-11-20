@@ -23,7 +23,6 @@ func NewUserController(userService service.UserService) *UserController {
 //	@Id				getMyself
 //	@Tags			users
 //	@Produce		json
-//	@Success		200	{object}	model.User
 //	@Router			/users/me [get]
 func (c *UserController) HandleGetMyself(w http.ResponseWriter, r *http.Request) {
 	session, ok := middleware.SessionFromContext(r.Context())

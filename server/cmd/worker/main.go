@@ -12,8 +12,6 @@ import (
 	"pycrs.cz/what-it-doo/internal/queries"
 )
 
-
-
 func run(ctx context.Context) error {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 	defer stop()

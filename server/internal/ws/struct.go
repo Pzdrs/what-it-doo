@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	NewMessageMessageType = "new_message"
-	MessageAckMessageType = "message_ack"
-	UserTypingMessageType = "typing"
-	DapUpMessageType      = "dap_up"
+	NewMessageMessageType     = "new_message"
+	MessageAckMessageType     = "message_ack"
+	UserTypingMessageType     = "typing"
+	DapUpMessageType          = "dap_up"
+	PresenceChangeMessageType = "presence_change"
 )
 
 type BaseMessage struct {
@@ -43,4 +44,9 @@ type TypingFanoutPayload struct {
 	ChatID int64     `json:"chat_id"`
 	UserID uuid.UUID `json:"user_id"`
 	Typing bool      `json:"typing"`
+}
+
+type PresenceChangeFanoutPayload struct {
+	UserID uuid.UUID `json:"user_id"`
+	Online bool      `json:"online"`
 }

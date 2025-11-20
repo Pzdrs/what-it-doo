@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"pycrs.cz/what-it-doo/internal/app/apiserver/presence"
 	"pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/config"
 	"pycrs.cz/what-it-doo/internal/domain/service"
@@ -39,6 +40,7 @@ func NewServer(
 	bus bus.CommnunicationBus,
 	gatewayID string,
 	connectionManager ws.ConnectionManager,
+	presenceManager *presence.PresenceManager,
 ) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -55,6 +57,7 @@ func NewServer(
 			config,
 			bus,
 			connectionManager,
+			presenceManager,
 		)
 	})
 

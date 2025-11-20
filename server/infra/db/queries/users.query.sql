@@ -32,3 +32,20 @@ FROM
     users
 WHERE
     id = $1;
+
+-- name: SetUserOnline :exec
+UPDATE
+    users
+SET
+    is_online = TRUE
+WHERE
+    id = $1;
+
+-- name: SetUserOffline :exec
+UPDATE
+    users
+SET
+    is_online = FALSE,
+    last_active_at = $2
+WHERE
+    id = $1;

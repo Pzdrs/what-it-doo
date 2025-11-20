@@ -11,10 +11,11 @@ const (
 )
 
 const (
-	MessageAckEventType    = "message_ack"
-	MessageFanoutEventType = "message_fanout"
-	UserTypingEventType    = "typing"
-	DapUpEventType         = "dap_up"
+	MessageAckEventType     = "message_ack"
+	MessageFanoutEventType  = "message_fanout"
+	UserTypingEventType     = "typing"
+	DapUpEventType          = "dap_up"
+	PresenceChangeEventType = "presence_change"
 )
 
 type CommnunicationBus interface {

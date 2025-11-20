@@ -163,6 +163,8 @@ func dbUserToModel(u queries.User) model.User {
 		Email:          u.Email,
 		HashedPassword: u.HashedPassword.String,
 		Bio:            u.Bio.String,
+		Online:         u.IsOnline.Bool,
+		LastSeen:       u.LastActiveAt.Time,
 		CreatedAt:      u.CreatedAt.Time,
 		UpdatedAt:      u.UpdatedAt.Time,
 	}

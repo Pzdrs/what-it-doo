@@ -72,7 +72,7 @@ func handleMessageFanout(ctx context.Context, ev payload.Event, connectionManage
 			continue
 		}
 
-		connectionManager.BroadcastToUser(userID, map[string]interface{}{
+		connectionManager.BroadcastUser(userID, map[string]interface{}{
 			"type": ws.NewMessageMessageType,
 			"data": map[string]interface{}{
 				"chat_id": payload.ChatID,

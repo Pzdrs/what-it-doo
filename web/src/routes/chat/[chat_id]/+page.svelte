@@ -68,7 +68,7 @@
 
 <div class="flex">
 	<div class="flex items-center rounded-lg p-2 transition-colors duration-200">
-		<div class="avatar avatar-online">
+		<div class="avatar" class:avatar-online={true} class:avatar-offline={false}>
 			<div class="w-9 rounded-full">
 				<img src={'avatar_url'} alt="Chat Avatar" />
 			</div>

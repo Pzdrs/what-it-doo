@@ -169,6 +169,16 @@ class MessagingStore {
 			this.typingUsers[chatId].delete(userId);
 		}
 	}
+
+	updateUserPresence(user_id: string, online: boolean) {
+		for (const chat in this.chats) {
+			for (const participant of this.chats[chat].participants) {
+				if (participant.id === user_id) {
+					participant.online = online;
+				}
+			}
+		}
+	}
 }
 
 export const messagingStore = new MessagingStore();

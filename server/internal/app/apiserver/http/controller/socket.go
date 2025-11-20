@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"pycrs.cz/what-it-doo/internal/app/apiserver/http/middleware"
+	"pycrs.cz/what-it-doo/internal/app/apiserver/presence"
 	"pycrs.cz/what-it-doo/internal/app/apiserver/problem"
 	"pycrs.cz/what-it-doo/internal/bus"
 	b "pycrs.cz/what-it-doo/internal/bus"
@@ -22,13 +23,14 @@ type SocketController struct {
 
 	upgrader          websocket.Upgrader
 	connectionManager ws.ConnectionManager
+	presenceManager   *presence.PresenceManager
 	bus               b.CommnunicationBus
 	userService       service.UserService
 	gatewayID         string
 }
 
-func NewSocketController(ctx context.Context, upgrader websocket.Upgrader, connectionManager ws.ConnectionManager, bus bus.CommnunicationBus, userService service.UserService, gatewayID string) *SocketController {
-	return &SocketController{ctx: ctx, upgrader: upgrader, connectionManager: connectionManager, bus: bus, userService: userService, gatewayID: gatewayID}
+func NewSocketController(ctx context.Context, upgrader websocket.Upgrader, connectionManager ws.ConnectionManager, bus bus.CommnunicationBus, userService service.UserService, gatewayID string, presenceManager *presence.PresenceManager) *SocketController {
+	return &SocketController{ctx: ctx, upgrader: upgrader, connectionManager: connectionManager, bus: bus, userService: userService, gatewayID: gatewayID, presenceManager: presenceManager}
 }
 
 func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
@@ -47,10 +49,15 @@ func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Reques
 	}
 
 	connID := c.connectionManager.AddConnection(user.ID, session.ID, conn)
+	if err := c.presenceManager.AddConnection(c.ctx, user.ID); err != nil {
+		problem.Write(w, problem.NewInternalServerError(r, err))
+		return
+	}
 
 	go func() {
 		defer conn.Close()
 		defer c.connectionManager.RemoveConnection(user.ID, session.ID, connID)
+		defer c.presenceManager.RemoveConnection(c.ctx, user.ID)
 
 		for {
 			_, msgBytes, err := conn.ReadMessage()

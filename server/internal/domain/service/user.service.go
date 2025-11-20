@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"pycrs.cz/what-it-doo/internal/app/apiserver/common"
@@ -15,6 +16,7 @@ type UserService interface {
 	GetByID(ctx context.Context, userID uuid.UUID) (*model.User, error)
 	// GetByEmail retrieves a user by their email.
 	GetByEmail(ctx context.Context, email string) (model.User, error)
+	SetPresence(ctx context.Context, userID uuid.UUID, online bool) error
 }
 
 type userService struct {
@@ -42,6 +44,14 @@ func (s *userService) GetByEmail(ctx context.Context, email string) (model.User,
 	}
 
 	return *user, nil
+}
+
+func (s *userService) SetPresence(ctx context.Context, userID uuid.UUID, online bool) error {
+	if online {
+		return s.repository.SetOnline(ctx, userID)
+	} else {
+		return s.repository.SetOffline(ctx, userID, time.Now())
+	}
 }
 
 var _ UserService = (*userService)(nil)

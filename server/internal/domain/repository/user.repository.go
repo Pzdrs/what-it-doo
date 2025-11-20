@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -14,6 +15,9 @@ type UserRepository interface {
 	Create(ctx context.Context, user *model.User) error
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetByID(ctx context.Context, userID uuid.UUID) (*model.User, error)
+
+	SetOnline(ctx context.Context, userID uuid.UUID) error
+	SetOffline(ctx context.Context, userID uuid.UUID, lastSeen time.Time) error
 }
 
 type postgresUserRepository struct {
@@ -53,15 +57,8 @@ func (r *postgresUserRepository) GetByEmail(ctx context.Context, email string) (
 	if err != nil {
 		return nil, err
 	}
-	return &model.User{
-		ID:             user.ID,
-		Name:           user.Name.String,
-		Email:          user.Email,
-		HashedPassword: user.HashedPassword.String,
-		Bio:            user.Bio.String,
-		CreatedAt:      user.CreatedAt.Time,
-		UpdatedAt:      user.UpdatedAt.Time,
-	}, nil
+	userModel := mapUser(user)
+	return &userModel, nil
 }
 
 func (r *postgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID) (*model.User, error) {
@@ -69,15 +66,33 @@ func (r *postgresUserRepository) GetByID(ctx context.Context, userID uuid.UUID) 
 	if err != nil {
 		return nil, err
 	}
-	return &model.User{
+	userModel := mapUser(user)
+	return &userModel, nil
+}
+
+func (r *postgresUserRepository) SetOnline(ctx context.Context, userID uuid.UUID) error {
+	return r.q.SetUserOnline(ctx, userID)
+}
+
+func (r *postgresUserRepository) SetOffline(ctx context.Context, userID uuid.UUID, lastSeen time.Time) error {
+	return r.q.SetUserOffline(ctx, queries.SetUserOfflineParams{
+		ID:           userID,
+		LastActiveAt: pgtype.Timestamptz{Time: lastSeen, Valid: true},
+	})
+}
+
+func mapUser(user queries.User) model.User {
+	return model.User{
 		ID:             user.ID,
 		Name:           user.Name.String,
 		Email:          user.Email,
 		HashedPassword: user.HashedPassword.String,
 		Bio:            user.Bio.String,
+		Online:         user.IsOnline.Bool,
+		LastSeen:       user.LastActiveAt.Time,
 		CreatedAt:      user.CreatedAt.Time,
 		UpdatedAt:      user.UpdatedAt.Time,
-	}, nil
+	}
 }
 
 // Compile-time check

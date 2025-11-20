@@ -129,25 +129,6 @@ definitions:
       name:
         type: string
     type: object
-  model.User:
-    properties:
-      avatar_url:
-        type: string
-      bio:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      hashed_password:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
 info:
   contact: {}
   description: API for the messanger of the future - What-it-doo.
@@ -359,11 +340,7 @@ paths:
       operationId: getMyself
       produces:
       - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.User'
+      responses: {}
       summary: Get current user
       tags:
       - users

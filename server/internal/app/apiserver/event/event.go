@@ -31,7 +31,7 @@ func StartGatewayEventHandler(ctx context.Context, bus b.CommnunicationBus, gate
 				case b.MessageAckEventType:
 					handleMessageAck(ctx, ev, connectionManager, chatService)
 				default:
-					log.Printf("Unknown event type: %s", ev.Type)
+					log.Printf("Received unknown event type: %s", ev.Type)
 				}
 			}
 		}
@@ -65,8 +65,10 @@ func StartGlobalEventHandler(ctx context.Context, bus b.CommnunicationBus, conne
 					handleUserTyping(ctx, ev, connectionManager, chatService)
 				case b.DapUpEventType:
 					handleDapUp(ctx, connectionManager, chatService)
+				case b.PresenceChangeEventType:
+					handlePresenceChange(ev, connectionManager)
 				default:
-					log.Printf("Unknown event type: %s", ev.Type)
+					log.Printf("Received unknown event type: %s", ev.Type)
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-package apiserver 
+package apiserver
 
 const (
 	SESSION_COOKIE_NAME          = "wid_session"

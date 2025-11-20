@@ -38,3 +38,8 @@ type UserTypingEventPayload struct {
 	// We need to track the origin to avoid echoing back to the user who is typing
 	OriginConnectionID uuid.UUID `json:"origin_connection_id"`
 }
+
+type PresenceChangeEventPayload struct {
+	UserID uuid.UUID `json:"user_id"`
+	Online bool      `json:"online"`
+}

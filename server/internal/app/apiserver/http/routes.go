@@ -9,6 +9,7 @@ import (
 	_ "pycrs.cz/what-it-doo/api" // Swagger docs
 	"pycrs.cz/what-it-doo/internal/app/apiserver/http/controller"
 	"pycrs.cz/what-it-doo/internal/app/apiserver/http/middleware"
+	"pycrs.cz/what-it-doo/internal/app/apiserver/presence"
 	"pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/config"
 	"pycrs.cz/what-it-doo/internal/domain/service"
@@ -26,6 +27,7 @@ func addRoutes(
 	config config.Configuration,
 	bus bus.CommnunicationBus,
 	connectionManager ws.ConnectionManager,
+	presenceManager *presence.PresenceManager,
 ) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -39,7 +41,7 @@ func addRoutes(
 	chatController := controller.NewChatController(chatService, config)
 	userController := controller.NewUserController(userService)
 	serverController := controller.NewServerController()
-	socketController := controller.NewSocketController(ctx, upgrader, connectionManager, bus, userService, gatewayID)
+	socketController := controller.NewSocketController(ctx, upgrader, connectionManager, bus, userService, gatewayID, presenceManager)
 
 	r.Route("/server", func(r chi.Router) {
 		r.Get("/about", serverController.HandleAbout)

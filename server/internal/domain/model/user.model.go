@@ -13,6 +13,8 @@ type User struct {
 	HashedPassword string    `json:"hashed_password"`
 	AvatarUrl      string    `json:"avatar_url"`
 	Bio            string    `json:"bio"`
+	Online         bool      `json:"online"`
+	LastSeen       time.Time `json:"last_seen"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }

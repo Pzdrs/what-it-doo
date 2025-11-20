@@ -22,7 +22,9 @@ type ConnectionManager interface {
 	GetUserConnections(userID uuid.UUID) []WSConnection
 	GetUserConnectionIDs(userID uuid.UUID) []uuid.UUID
 
-	BroadcastToUser(userID uuid.UUID, message any, excludeConnections []uuid.UUID)
+	Broadcast(message any, excludeConnections []uuid.UUID)
+	BroadcastSession(userID, sessionID uuid.UUID, message any, excludeConnections []uuid.UUID)
+	BroadcastUser(userID uuid.UUID, message any, excludeConnections []uuid.UUID)
 }
 
 type connectionManager struct {
@@ -144,7 +146,7 @@ func (m *connectionManager) GetSessionConnections(userID, sessionID uuid.UUID) [
 
 	return sessions[sessionID]
 }
-func (m *connectionManager) BroadcastToUser(userID uuid.UUID, message any, excludeConnections []uuid.UUID) {
+func (m *connectionManager) BroadcastUser(userID uuid.UUID, message any, excludeConnections []uuid.UUID) {
 	m.mux.RLock()
 	connections := m.GetUserConnections(userID)
 	m.mux.RUnlock()
@@ -157,23 +159,27 @@ func (m *connectionManager) BroadcastToUser(userID uuid.UUID, message any, exclu
 	}
 }
 
-func (m *connectionManager) BroadcastToSession(userID, sessionID uuid.UUID, message any) {
+func (m *connectionManager) BroadcastSession(userID, sessionID uuid.UUID, message any, excludeConnections []uuid.UUID) {
 	m.mux.RLock()
 	connections := m.GetSessionConnections(userID, sessionID)
 	m.mux.RUnlock()
 
 	for _, c := range connections {
-		c.Conn.WriteJSON(message)
+		if !slices.Contains(excludeConnections, c.ID) {
+			c.Conn.WriteJSON(message)
+		}
 	}
 }
-func (m *connectionManager) BroadcastToAll(message any) {
+func (m *connectionManager) Broadcast(message any, excludeConnections []uuid.UUID) {
 	m.mux.RLock()
 	defer m.mux.RUnlock()
 
 	for _, sessions := range m.connections {
 		for _, conns := range sessions {
 			for _, c := range conns {
-				c.Conn.WriteJSON(message)
+				if !slices.Contains(excludeConnections, c.ID) {
+					c.Conn.WriteJSON(message)
+				}
 			}
 		}
 	}

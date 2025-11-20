@@ -34,7 +34,7 @@ swag: $(SWAG_OUTPUTS)
 
 $(SWAG_OUTPUTS): $(SWAG_INPUTS)
 	swag fmt
-	swag init -d ./cmd/api,./internal/apiserver -o ./api
+	swag init -d ./cmd/api,./internal/app/apiserver -o ./api
 
 clean:
 	rm -rf bin/*

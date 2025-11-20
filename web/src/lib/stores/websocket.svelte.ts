@@ -45,6 +45,14 @@ const onMessage = (event: MessageEvent) => {
 			}
 			break;
 		}
+		case 'presence_change': {
+			const { user_id, online } = message.data as {
+				user_id: UUID;
+				online: boolean;
+			};
+			messagingStore.updateUserPresence(user_id, online);
+			break;
+		}
 
 		default:
 			console.warn('Unknown message type:', message.type);
