@@ -59,7 +59,7 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	common.SetAuthCookies(w, &session, req.RememberMe)
 	common.Encode(w, r, http.StatusCreated, dto.LoginResponse{
-		User: dto.MapUserToUserDetails(user),
+		User: dto.ToUserDetails(*user),
 	})
 }
 
@@ -115,7 +115,7 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 	}
 
 	common.Encode(w, r, http.StatusCreated, dto.RegistrationResponse{
-		User: dto.MapUserToUserDetails(user),
+		User: dto.ToUserDetails(user),
 	})
 }
 

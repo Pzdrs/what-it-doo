@@ -15,7 +15,7 @@ type UserService interface {
 	// GetUserByID retrieves a user by their ID.
 	GetByID(ctx context.Context, userID uuid.UUID) (*model.User, error)
 	// GetByEmail retrieves a user by their email.
-	GetByEmail(ctx context.Context, email string) (model.User, error)
+	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	SetPresence(ctx context.Context, userID uuid.UUID, online bool) error
 }
 
@@ -37,13 +37,15 @@ func (s *userService) GetByID(ctx context.Context, userID uuid.UUID) (*model.Use
 	return user, nil
 }
 
-func (s *userService) GetByEmail(ctx context.Context, email string) (model.User, error) {
+func (s *userService) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 	user, err := s.repository.GetByEmail(ctx, email)
 	if err != nil {
-		return model.User{}, err
+		return nil, err
 	}
 
-	return *user, nil
+	user.AvatarUrl = common.GetAvatarUrl(*user, s.config.Gravatar)
+
+	return user, nil
 }
 
 func (s *userService) SetPresence(ctx context.Context, userID uuid.UUID, online bool) error {

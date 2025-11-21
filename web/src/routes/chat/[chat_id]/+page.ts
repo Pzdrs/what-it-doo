@@ -11,6 +11,7 @@ export const load: PageLoad = (async ({ params, url }) => {
 	await messagingStore.setCurrentChat(chatId);
 	await messagingStore.initLoadMessages(chatId);
 
+
 	return {
 		meta: {
 			title: messagingStore.currentChat?.title

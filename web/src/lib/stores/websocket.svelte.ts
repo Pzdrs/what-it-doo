@@ -1,4 +1,4 @@
-import type { DtoChat, DtoChatMessage } from '$lib/api/client';
+import type { DtoChatMessage } from '$lib/api/client';
 import type { UUID } from 'crypto';
 import { messagingStore } from './chats.svelte';
 

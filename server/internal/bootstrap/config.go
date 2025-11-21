@@ -38,8 +38,6 @@ func InitConfig() (config.Configuration, error) {
 		return config.Configuration{}, fmt.Errorf("invalid config: %w", err)
 	}
 
-	fmt.Println(cfg)
-
 	return cfg, nil
 }
 

@@ -9,9 +9,11 @@ import { INIT_LOAD_MESSAGES_COUNT, LOAD_OLDER_MESSAGES_COUNT } from '$lib/consta
 import type { UUID } from 'crypto';
 import { SvelteSet } from 'svelte/reactivity';
 
+type OptimisticChatMessage = Omit<DtoChatMessage, 'sent_at'>
+
 class MessagingStore {
 	chats = $state<DtoChat[]>([]);
-	messages = $state<Record<number, DtoChatMessage[]>>({}); // key = chatId, value = messages array
+	messages = $state<Record<number, (DtoChatMessage | OptimisticChatMessage)[]>>({}); // key = chatId, value = messages array
 	typingUsers = $state<Record<number, SvelteSet<UUID>>>({}); // key = chatId, value = set of user IDs typing
 
 	_currentChatId = $state<number | null>(null);
@@ -150,8 +152,11 @@ class MessagingStore {
 			const msgs = this.messages[chatId];
 			const msgIndex = msgs.findIndex((msg) => msg.id === tempId);
 			if (msgIndex !== -1) {
-				msgs[msgIndex].id = messageId;
-				msgs[msgIndex].sent_at = sentAt.toISOString();
+				msgs[msgIndex] = {
+					...msgs[msgIndex],
+					id: messageId,
+					sent_at: sentAt.toISOString()
+				};
 				break;
 			}
 		}

@@ -1,5 +1,5 @@
 import { AppRoute } from '$lib/constants.js';
-import { requireNoAuth } from '$lib/utils/auth.js';
+import { requireNoAuth } from '$lib/utils/auth';
 import { getFormatter } from '$lib/utils/i18n.js';
 
 export const load = async ({ url }) => {
@@ -10,7 +10,7 @@ export const load = async ({ url }) => {
 	return {
 		continueUrl: url.searchParams.get('continue') || AppRoute.HOME,
 		meta: {
-			title: $t('sign_in'),
+			title: $t('sign_in')
 		}
 	};
 };

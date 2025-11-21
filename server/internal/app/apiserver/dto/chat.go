@@ -20,7 +20,7 @@ type ChatMessage struct {
 	ID          int64      `json:"id" validate:"required"`
 	SenderID    *uuid.UUID `json:"sender_id"`
 	Content     string     `json:"content" validate:"required"`
-	SentAt      time.Time  `json:"sent_at"`
+	SentAt      time.Time  `json:"sent_at" validate:"required"`
 	DeliveredAt *time.Time `json:"delivered_at,omitempty"`
 	ReadAt      *time.Time `json:"read_at,omitempty"`
 }

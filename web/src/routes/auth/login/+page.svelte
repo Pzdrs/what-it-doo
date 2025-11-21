@@ -22,7 +22,7 @@
 	let loading = $state(false);
 
 	const onSuccess = async (user: DtoUserDetails) => {
-		userStore.user = user;	
+		userStore.setUser(user);	
 		await goto(data.continueUrl, { invalidateAll: true });
 	};
 

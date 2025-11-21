@@ -14,7 +14,7 @@ export const loadUser = async () => {
         const user = userStore.user;
         if (!user && hasAuthCookie()) {
             const [_user] = await Promise.all([getMyself()]);
-            return userStore.user = _user; 
+            return userStore.setUser(JSON.parse(_user)); 
         }
         return user;
     } catch {
@@ -47,7 +47,6 @@ export const authenticate = async (url: URL, options?: AuthOptions) => {
     
     if (!user) {
         redirect(302, `${AppRoute.AUTH_LOGIN}?continue=${encodeURIComponent(url.pathname + url.search)}`);
-        return;
     }
 
     openWebSocketConnection();

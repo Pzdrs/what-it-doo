@@ -58,6 +58,7 @@ definitions:
     required:
     - content
     - id
+    - sent_at
     type: object
   dto.ChatMessages:
     properties:
@@ -92,7 +93,6 @@ definitions:
     required:
     - email
     - password
-    - remember_me
     type: object
   dto.LoginResponse:
     properties:
@@ -143,6 +143,8 @@ definitions:
     type: object
   dto.UserDetails:
     properties:
+      avatar_url:
+        type: string
       bio:
         type: string
       email:
@@ -156,6 +158,7 @@ definitions:
       online:
         type: boolean
     required:
+    - avatar_url
     - email
     - id
     - last_seen

@@ -1,4 +1,4 @@
-import { requireNoAuth } from '$lib/utils/auth.js';
+import { requireNoAuth } from '$lib/utils/auth';
 import { getFormatter } from '$lib/utils/i18n.js';
 
 export const load = async () => {

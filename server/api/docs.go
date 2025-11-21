@@ -419,7 +419,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "content",
-                "id"
+                "id",
+                "sent_at"
             ],
             "properties": {
                 "content": {
@@ -479,8 +480,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "password",
-                "remember_me"
+                "password"
             ],
             "properties": {
                 "email": {
@@ -568,6 +568,7 @@ const docTemplate = `{
         "dto.UserDetails": {
             "type": "object",
             "required": [
+                "avatar_url",
                 "email",
                 "id",
                 "last_seen",
@@ -575,6 +576,9 @@ const docTemplate = `{
                 "online"
             ],
             "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
                 "bio": {
                     "type": "string"
                 },

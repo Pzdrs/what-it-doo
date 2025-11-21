@@ -412,7 +412,8 @@
             "type": "object",
             "required": [
                 "content",
-                "id"
+                "id",
+                "sent_at"
             ],
             "properties": {
                 "content": {
@@ -472,8 +473,7 @@
             "type": "object",
             "required": [
                 "email",
-                "password",
-                "remember_me"
+                "password"
             ],
             "properties": {
                 "email": {
@@ -561,6 +561,7 @@
         "dto.UserDetails": {
             "type": "object",
             "required": [
+                "avatar_url",
                 "email",
                 "id",
                 "last_seen",
@@ -568,6 +569,9 @@
                 "online"
             ],
             "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
                 "bio": {
                     "type": "string"
                 },

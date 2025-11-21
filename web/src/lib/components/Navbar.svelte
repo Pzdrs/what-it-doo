@@ -26,22 +26,20 @@
 		<div class="divider divider-horizontal"></div>
 
 		<!-- Avatar -->
-		{#if userStore.user}
-			<div class="dropdown dropdown-end">
-				<div tabindex="0" role="button" class="btn avatar btn-circle btn-ghost">
-					<div class="w-10 rounded-full">
-						{#if userStore.user.avatar_url}
-							<img alt="user avatar" src={userStore.user.avatar_url} />
-						{:else}
-							<enhanced:img alt="default user avatar" src={user} />
-						{/if}
-					</div>
+		<div class="dropdown dropdown-end">
+			<div tabindex="0" role="button" class="btn avatar btn-circle btn-ghost">
+				<div class="w-10 rounded-full">
+					{#if userStore.user?.avatar_url}
+						<img alt="user avatar" src={userStore.user?.avatar_url} />
+					{:else}
+						<enhanced:img alt="default user avatar" src={user} />
+					{/if}
 				</div>
-				<ul class="dropdown-content menu menu-sm rounded-box bg-base-100 z-10 mt-3 w-52 p-2 shadow">
-					<li><button onclick={_logout}>Logout</button></li>
-				</ul>
 			</div>
-		{/if}
+			<ul class="dropdown-content menu menu-sm rounded-box bg-base-100 z-10 mt-3 w-52 p-2 shadow">
+				<li><button onclick={_logout}>Logout</button></li>
+			</ul>
+		</div>
 	</div>
 
 	<!-- MOBILE BURGER -->
