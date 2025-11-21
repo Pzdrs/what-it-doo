@@ -11,7 +11,6 @@ import (
 	"pycrs.cz/what-it-doo/internal/app/apiserver/http/middleware"
 	"pycrs.cz/what-it-doo/internal/app/apiserver/presence"
 	"pycrs.cz/what-it-doo/internal/app/apiserver/problem"
-	"pycrs.cz/what-it-doo/internal/bus"
 	b "pycrs.cz/what-it-doo/internal/bus"
 	"pycrs.cz/what-it-doo/internal/bus/payload"
 	"pycrs.cz/what-it-doo/internal/domain/service"
@@ -29,7 +28,7 @@ type SocketController struct {
 	gatewayID         string
 }
 
-func NewSocketController(ctx context.Context, upgrader websocket.Upgrader, connectionManager ws.ConnectionManager, bus bus.CommnunicationBus, userService service.UserService, gatewayID string, presenceManager *presence.PresenceManager) *SocketController {
+func NewSocketController(ctx context.Context, upgrader websocket.Upgrader, connectionManager ws.ConnectionManager, bus b.CommnunicationBus, userService service.UserService, gatewayID string, presenceManager *presence.PresenceManager) *SocketController {
 	return &SocketController{ctx: ctx, upgrader: upgrader, connectionManager: connectionManager, bus: bus, userService: userService, gatewayID: gatewayID, presenceManager: presenceManager}
 }
 
