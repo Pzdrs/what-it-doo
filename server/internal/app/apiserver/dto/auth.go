@@ -1,20 +1,5 @@
 package dto
 
-import (
-	"time"
-
-	"github.com/google/uuid"
-)
-
-type UserDetails struct {
-	ID       uuid.UUID `json:"id" validate:"required"`
-	Name     string    `json:"name" validate:"required"`
-	Online   bool      `json:"online" validate:"required"`
-	LastSeen time.Time `json:"last_seen" validate:"required"`
-	Email    string    `json:"email" validate:"required"`
-	Bio      string    `json:"bio"`
-}
-
 type LoginRequest struct {
 	Email      string `json:"email" validate:"required,email"`
 	Password   string `json:"password" validate:"required"`

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"pycrs.cz/what-it-doo/internal/app/apiserver/common"
+	"pycrs.cz/what-it-doo/internal/app/apiserver/dto"
 	"pycrs.cz/what-it-doo/internal/app/apiserver/http/middleware"
 	"pycrs.cz/what-it-doo/internal/domain/service"
 )
@@ -37,5 +38,5 @@ func (c *UserController) HandleGetMyself(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	common.Encode(w, r, 200, user)
+	common.Encode(w, r, 200, dto.ToUserDetails(*user))
 }
