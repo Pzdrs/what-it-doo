@@ -22,7 +22,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "authentication"
                 ],
                 "summary": "Authenticate user",
                 "operationId": "login",
@@ -63,7 +63,7 @@ const docTemplate = `{
             "post": {
                 "description": "Logout the authenticated user",
                 "tags": [
-                    "Authentication"
+                    "authentication"
                 ],
                 "summary": "Logout user",
                 "operationId": "logout",
@@ -90,7 +90,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "authentication"
                 ],
                 "summary": "Register user",
                 "operationId": "register",
@@ -145,7 +145,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chats"
+                    "chats"
                 ],
                 "summary": "Get my chats",
                 "operationId": "GetMyChats",
@@ -170,7 +170,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chats"
+                    "chats"
                 ],
                 "summary": "Create a new chat",
                 "operationId": "CreateChat",
@@ -202,7 +202,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chats"
+                    "chats"
                 ],
                 "summary": "Get chat by ID",
                 "operationId": "GetChatByID",
@@ -235,7 +235,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chats"
+                    "chats"
                 ],
                 "summary": "Get chat messages",
                 "operationId": "GetChatMessages",
@@ -280,7 +280,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Server"
+                    "miscellaneous"
                 ],
                 "summary": "Get server information",
                 "operationId": "getServerInfo",
@@ -301,7 +301,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Server"
+                    "miscellaneous"
                 ],
                 "summary": "Get server configuration",
                 "operationId": "getServerConfig",
@@ -327,6 +327,31 @@ const docTemplate = `{
                 "summary": "Get current user",
                 "operationId": "getMyself",
                 "responses": {}
+            }
+        },
+        "/ws": {
+            "get": {
+                "description": "Establish a WebSocket connection for real-time communication",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "miscellaneous"
+                ],
+                "summary": "Handle WebSocket connections",
+                "operationId": "handleWebSocket",
+                "responses": {
+                    "101": {
+                        "description": "Switching Protocols",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
             }
         }
     },

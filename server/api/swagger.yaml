@@ -196,7 +196,7 @@ paths:
             $ref: '#/definitions/ProblemDetails'
       summary: Authenticate user
       tags:
-      - Authentication
+      - authentication
   /auth/logout:
     post:
       description: Logout the authenticated user
@@ -212,7 +212,7 @@ paths:
             $ref: '#/definitions/ProblemDetails'
       summary: Logout user
       tags:
-      - Authentication
+      - authentication
   /auth/register:
     post:
       consumes:
@@ -245,7 +245,7 @@ paths:
             $ref: '#/definitions/ProblemDetails'
       summary: Register user
       tags:
-      - Authentication
+      - authentication
   /chats/:
     get:
       description: Retrieves all chats the authenticated user is a participant of
@@ -263,7 +263,7 @@ paths:
       - SessionAuth: []
       summary: Get my chats
       tags:
-      - Chats
+      - chats
     post:
       consumes:
       - application/json
@@ -285,7 +285,7 @@ paths:
             $ref: '#/definitions/dto.Chat'
       summary: Create a new chat
       tags:
-      - Chats
+      - chats
   /chats/{chat_id}:
     get:
       description: Retrieves a chat by its ID
@@ -307,7 +307,7 @@ paths:
           description: Not Found
       summary: Get chat by ID
       tags:
-      - Chats
+      - chats
   /chats/{chat_id}/messages:
     get:
       description: Retrieves messages for a specific chat
@@ -338,7 +338,7 @@ paths:
             $ref: '#/definitions/dto.ChatMessages'
       summary: Get chat messages
       tags:
-      - Chats
+      - chats
   /server/about:
     get:
       description: Get information about the server
@@ -352,7 +352,7 @@ paths:
             $ref: '#/definitions/dto.ServerInfo'
       summary: Get server information
       tags:
-      - Server
+      - miscellaneous
   /server/config:
     get:
       description: Get server configuration
@@ -366,7 +366,7 @@ paths:
             $ref: '#/definitions/dto.ServerConfig'
       summary: Get server configuration
       tags:
-      - Server
+      - miscellaneous
   /users/me:
     get:
       description: Get details of the currently authenticated user
@@ -377,4 +377,21 @@ paths:
       summary: Get current user
       tags:
       - users
+  /ws:
+    get:
+      description: Establish a WebSocket connection for real-time communication
+      operationId: handleWebSocket
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Handle WebSocket connections
+      tags:
+      - miscellaneous
 swagger: "2.0"

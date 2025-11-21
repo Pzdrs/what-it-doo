@@ -17,7 +17,7 @@ func NewUserController(userService service.UserService) *UserController {
 	return &UserController{userService: userService}
 }
 
-// HandleGetMyself
+// HandleGetMyself retrieves the currently authenticated user's details
 //
 //	@Summary		Get current user
 //	@Description	Get details of the currently authenticated user

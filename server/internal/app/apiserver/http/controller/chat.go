@@ -25,12 +25,12 @@ func NewChatController(chatService service.ChatService, config config.Configurat
 	return &ChatController{chatService: chatService, config: config}
 }
 
-// HandleMyChats
+// HandleMyChats retrieves all chats the authenticated user is a participant of
 //
 //	@Summary		Get my chats
 //	@Id				GetMyChats
 //	@Description	Retrieves all chats the authenticated user is a participant of
-//	@Tags			Chats
+//	@Tags			chats
 //	@Produce		json
 //	@Success		200	{array}	dto.Chat
 //	@Security		SessionAuth
@@ -46,12 +46,12 @@ func (c *ChatController) HandleMyChats(w http.ResponseWriter, r *http.Request) {
 	common.Encode(w, r, 200, chats)
 }
 
-// HandleGetChat
+// HandleGetChat retrieves a chat by its ID
 //
 //	@Summary		Get chat by ID
 //	@Id				GetChatByID
 //	@Description	Retrieves a chat by its ID
-//	@Tags			Chats
+//	@Tags			chats
 //	@Produce		json
 //	@Param			chat_id	path		int	true	"Chat ID"
 //	@Success		200		{object}	dto.Chat
@@ -85,12 +85,12 @@ func (c *ChatController) HandleGetChat(w http.ResponseWriter, r *http.Request) {
 	common.Encode(w, r, 200, chat)
 }
 
-// HandleCreateChat godoc
+// HandleCreateChat creates a new chat
 //
 //	@Summary		Create a new chat
 //	@Id				CreateChat
 //	@Description	Creates a new chat with the specified participants
-//	@Tags			Chats
+//	@Tags			chats
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		dto.CreateChatRequest	true	"Chat creation request"
@@ -119,12 +119,12 @@ func (c *ChatController) HandleCreateChat(w http.ResponseWriter, r *http.Request
 	common.Encode(w, r, 201, chat)
 }
 
-// HandleGetChatMessages
+// HandleGetChatMessages retrieves messages for a specific chat
 //
 //	@Summary		Get chat messages
 //	@Id				GetChatMessages
 //	@Description	Retrieves messages for a specific chat
-//	@Tags			Chats
+//	@Tags			chats
 //	@Produce		json
 //	@Param			chat_id	path		int		true	"Chat ID"
 //	@Param			limit	query		int		false	"Maximum number of messages to retrieve"		default(50)

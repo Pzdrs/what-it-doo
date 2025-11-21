@@ -22,13 +22,13 @@ func NewAuthController(authService service.AuthService, userService service.User
 	return &AuthController{authService: authService, userService: userService, sessionService: sessionService}
 }
 
-// HandleLogin
+// HandleLogin godoc
 //
 //	@Summary		Authenticate user
 //	@Id				login
 //	@Description	Authenticate user with username and password
 //	@Accept			json
-//	@Tags			Authentication
+//	@Tags			authentication
 //	@Success		200		{object}	dto.LoginResponse
 //	@Failure		400		{object}	problem.ProblemDetails
 //	@Failure		401		{object}	problem.ProblemDetails
@@ -63,13 +63,13 @@ func (c *AuthController) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// HandleRegister
+// HandleRegister registers a new user
 //
 //	@Summary		Register user
 //	@Id				register
 //	@Description	Register a new user with credentials
 //	@Accept			json
-//	@Tags			Authentication
+//	@Tags			authentication
 //	@Success		201			{object}	dto.RegistrationResponse
 //	@Failure		400			{object}	problem.ProblemDetails
 //	@Failure		500			{object}	problem.ProblemDetails
@@ -119,12 +119,12 @@ func (c *AuthController) HandleRegister(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-// HandleLogout
+// HandleLogout logs out the authenticated user
 //
 //	@Summary		Logout user
 //	@Id				logout
 //	@Description	Logout the authenticated user
-//	@Tags			Authentication
+//	@Tags			authentication
 //	@Success		200	{object}	dto.LogoutResponse
 //	@Failure		401	{object}	problem.ProblemDetails
 //	@Router			/auth/logout [post]

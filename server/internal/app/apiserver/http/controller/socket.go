@@ -33,6 +33,16 @@ func NewSocketController(ctx context.Context, upgrader websocket.Upgrader, conne
 	return &SocketController{ctx: ctx, upgrader: upgrader, connectionManager: connectionManager, bus: bus, userService: userService, gatewayID: gatewayID, presenceManager: presenceManager}
 }
 
+// HandleWebSocket handles WebSocket connections
+//
+//	@Summary		Handle WebSocket connections
+//	@Description	Establish a WebSocket connection for real-time communication
+//	@Id				handleWebSocket
+//	@Tags			miscellaneous
+//	@Produce		json
+//	@Success		101	{string}	string	"Switching Protocols"
+//	@Failure		500	{object}	problem.Problem
+//	@Router			/ws [get]
 func (c *SocketController) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	session, _ := middleware.SessionFromContext(r.Context())
 	user, err := c.userService.GetByID(r.Context(), session.UserID)
