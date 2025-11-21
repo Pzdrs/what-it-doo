@@ -29,13 +29,10 @@ sqlc:
 migrate:
 	goose up
 
-swag: $(SWAG_OUTPUTS)
-	@echo "api docs are up to date"
-
-$(SWAG_OUTPUTS): $(SWAG_INPUTS)
+swag:
 	swag fmt
-	swag init -d ./cmd/api,./internal/app/apiserver -o ./api
-
+	swag init -g ./internal/app/apiserver/http/server.go --parseInternal -o ./api
+	
 clean:
 	rm -rf bin/*
 

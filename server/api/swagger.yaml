@@ -12,6 +12,12 @@ definitions:
         type: string
       type:
         type: string
+    required:
+    - detail
+    - instance
+    - status
+    - title
+    - type
     type: object
   dto.Chat:
     properties:
@@ -29,6 +35,11 @@ definitions:
         type: string
       updated_at:
         type: string
+    required:
+    - created_at
+    - id
+    - participants
+    - updated_at
     type: object
   dto.ChatMessage:
     properties:
@@ -44,6 +55,9 @@ definitions:
         type: string
       sent_at:
         type: string
+    required:
+    - content
+    - id
     type: object
   dto.ChatMessages:
     properties:
@@ -53,6 +67,9 @@ definitions:
         items:
           $ref: '#/definitions/dto.ChatMessage'
         type: array
+    required:
+    - has_more
+    - messages
     type: object
   dto.CreateChatRequest:
     properties:
@@ -75,6 +92,7 @@ definitions:
     required:
     - email
     - password
+    - remember_me
     type: object
   dto.LoginResponse:
     properties:
@@ -89,6 +107,9 @@ definitions:
         type: string
       success:
         type: boolean
+    required:
+    - redirect_url
+    - success
     type: object
   dto.RegistrationRequest:
     properties:
@@ -117,6 +138,8 @@ definitions:
     properties:
       version:
         type: string
+    required:
+    - version
     type: object
   dto.UserDetails:
     properties:
@@ -126,8 +149,18 @@ definitions:
         type: string
       id:
         type: string
+      last_seen:
+        type: string
       name:
         type: string
+      online:
+        type: boolean
+    required:
+    - email
+    - id
+    - last_seen
+    - name
+    - online
     type: object
 info:
   contact: {}

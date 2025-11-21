@@ -22,10 +22,6 @@ import (
 	"pycrs.cz/what-it-doo/pkg/version"
 )
 
-// @title			What-it-doo API
-// @version		1.0
-// @description	API for the messanger of the future - What-it-doo.
-// @BasePath		/api/v1
 func run(ctx context.Context) error {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 	defer stop()

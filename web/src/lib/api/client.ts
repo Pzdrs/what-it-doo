@@ -17,27 +17,29 @@ export const servers = {
 export type DtoLoginRequest = {
     email: string;
     password: string;
-    remember_me?: boolean;
+    remember_me: boolean;
 };
 export type DtoUserDetails = {
     bio?: string;
-    email?: string;
-    id?: string;
-    name?: string;
+    email: string;
+    id: string;
+    last_seen: string;
+    name: string;
+    online: boolean;
 };
 export type DtoLoginResponse = {
     user: DtoUserDetails;
 };
 export type ProblemDetails = {
-    detail?: string;
-    instance?: string;
-    status?: number;
-    title?: string;
-    "type"?: string;
+    detail: string;
+    instance: string;
+    status: number;
+    title: string;
+    "type": string;
 };
 export type DtoLogoutResponse = {
-    redirect_url?: string;
-    success?: boolean;
+    redirect_url: string;
+    success: boolean;
 };
 export type DtoRegistrationRequest = {
     email: string;
@@ -48,42 +50,32 @@ export type DtoRegistrationResponse = {
     user: DtoUserDetails;
 };
 export type DtoChat = {
-    created_at?: string;
-    id?: number;
+    created_at: string;
+    id: number;
     last_message?: string;
-    participants?: DtoUserDetails[];
+    participants: DtoUserDetails[];
     title?: string;
-    updated_at?: string;
+    updated_at: string;
 };
 export type DtoCreateChatRequest = {
     participants: string[];
 };
 export type DtoChatMessage = {
-    content?: string;
+    content: string;
     delivered_at?: string;
-    id?: number;
+    id: number;
     read_at?: string;
     sender_id?: string;
     sent_at?: string;
 };
 export type DtoChatMessages = {
-    has_more?: boolean;
-    messages?: DtoChatMessage[];
+    has_more: boolean;
+    messages: DtoChatMessage[];
 };
 export type DtoServerInfo = {
-    version?: string;
+    version: string;
 };
 export type DtoServerConfig = object;
-export type ModelUser = {
-    avatar_url?: string;
-    bio?: string;
-    created_at?: string;
-    email?: string;
-    hashed_password?: string;
-    id?: string;
-    name?: string;
-    updated_at?: string;
-};
 /**
  * Authenticate user
  */
@@ -221,10 +213,7 @@ export function getServerConfig(opts?: Oazapfts.RequestOpts) {
  * Get current user
  */
 export function getMyself(opts?: Oazapfts.RequestOpts) {
-    return oazapfts.ok(oazapfts.fetchJson<{
-        status: 200;
-        data: ModelUser;
-    }>("/users/me", {
+    return oazapfts.ok(oazapfts.fetchText("/users/me", {
         ...opts
     }));
 }

@@ -333,6 +333,13 @@ const docTemplate = `{
     "definitions": {
         "ProblemDetails": {
             "type": "object",
+            "required": [
+                "detail",
+                "instance",
+                "status",
+                "title",
+                "type"
+            ],
             "properties": {
                 "detail": {
                     "type": "string"
@@ -353,6 +360,12 @@ const docTemplate = `{
         },
         "dto.Chat": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "participants",
+                "updated_at"
+            ],
             "properties": {
                 "created_at": {
                     "type": "string"
@@ -379,6 +392,10 @@ const docTemplate = `{
         },
         "dto.ChatMessage": {
             "type": "object",
+            "required": [
+                "content",
+                "id"
+            ],
             "properties": {
                 "content": {
                     "type": "string"
@@ -402,6 +419,10 @@ const docTemplate = `{
         },
         "dto.ChatMessages": {
             "type": "object",
+            "required": [
+                "has_more",
+                "messages"
+            ],
             "properties": {
                 "has_more": {
                     "type": "boolean"
@@ -433,7 +454,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "password"
+                "password",
+                "remember_me"
             ],
             "properties": {
                 "email": {
@@ -460,6 +482,10 @@ const docTemplate = `{
         },
         "dto.LogoutResponse": {
             "type": "object",
+            "required": [
+                "redirect_url",
+                "success"
+            ],
             "properties": {
                 "redirect_url": {
                     "type": "string"
@@ -505,6 +531,9 @@ const docTemplate = `{
         },
         "dto.ServerInfo": {
             "type": "object",
+            "required": [
+                "version"
+            ],
             "properties": {
                 "version": {
                     "type": "string"
@@ -513,6 +542,13 @@ const docTemplate = `{
         },
         "dto.UserDetails": {
             "type": "object",
+            "required": [
+                "email",
+                "id",
+                "last_seen",
+                "name",
+                "online"
+            ],
             "properties": {
                 "bio": {
                     "type": "string"
@@ -523,8 +559,14 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "last_seen": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
+                },
+                "online": {
+                    "type": "boolean"
                 }
             }
         }

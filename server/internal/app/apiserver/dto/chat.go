@@ -8,26 +8,26 @@ import (
 )
 
 type Chat struct {
-	ID           int64         `json:"id"`
+	ID           int64         `json:"id" validate:"required"`
 	Title        string        `json:"title"`
-	Participants []UserDetails `json:"participants"`
-	LastMessage  string        `json:"last_message,omitempty"`
-	CreatedAt    time.Time     `json:"created_at"`
-	UpdatedAt    time.Time     `json:"updated_at"`
+	Participants []UserDetails `json:"participants" validate:"required"`
+	LastMessage  string        `json:"last_message"`
+	CreatedAt    time.Time     `json:"created_at" validate:"required"`
+	UpdatedAt    time.Time     `json:"updated_at" validate:"required"`
 }
 
 type ChatMessage struct {
-	ID          int64      `json:"id"`
+	ID          int64      `json:"id" validate:"required"`
 	SenderID    *uuid.UUID `json:"sender_id"`
-	Content     string     `json:"content"`
+	Content     string     `json:"content" validate:"required"`
 	SentAt      time.Time  `json:"sent_at"`
 	DeliveredAt *time.Time `json:"delivered_at,omitempty"`
 	ReadAt      *time.Time `json:"read_at,omitempty"`
 }
 
 type ChatMessages struct {
-	Messages []ChatMessage `json:"messages"`
-	HasMore  bool          `json:"has_more"`
+	Messages []ChatMessage `json:"messages" validate:"required"`
+	HasMore  bool          `json:"has_more" validate:"required"`
 }
 
 type CreateChatRequest struct {

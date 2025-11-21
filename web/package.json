@@ -12,6 +12,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
+		"predev": "pnpm run gen:api",
 		"gen:api": "npx oazapfts --optimistic --useEnumType ../server/api/swagger.json src/lib/api/client.ts"
 	},
 	"devDependencies": {

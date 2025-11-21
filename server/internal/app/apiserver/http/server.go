@@ -31,6 +31,10 @@ func spaHandler(staticDir string) http.HandlerFunc {
 	}
 }
 
+// @title			What-it-doo API
+// @version		1.0
+// @description	API for the messanger of the future - What-it-doo.
+// @BasePath		/api/v1
 func NewServer(
 	ctx context.Context, config config.Configuration,
 	authService service.AuthService,

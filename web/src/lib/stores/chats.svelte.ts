@@ -29,7 +29,7 @@ class MessagingStore {
 
 		// return a sorted copy
 		return [...msgs].sort(
-			(a, b) => new Date(a?.sent_at).getTime() - new Date(b?.sent_at).getTime()
+			(a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime()
 		);
 	});
 
@@ -39,7 +39,7 @@ class MessagingStore {
 		return this.chats
 			.flatMap((chat) => chat.participants)
 			.filter((p) => {
-				if (participantIds.has(p?.id)) return false;
+				if (participantIds.has(p.id)) return false;
 				participantIds.add(p.id);
 				return true;
 			});
@@ -95,7 +95,7 @@ class MessagingStore {
 		const currentMsgs = this.messages[chatId] || [];
 		const oldestMsg = currentMsgs.reduce(
 			(oldest, msg) => {
-				return !oldest || new Date(msg.sent_at) < new Date(oldest.sent_at) ? msg : oldest;
+				return !oldest || new Date(msg?.sent_at) < new Date(oldest?.sent_at) ? msg : oldest;
 			},
 			null as DtoChatMessage | null
 		);
@@ -105,7 +105,7 @@ class MessagingStore {
 			before,
 			limit: LOAD_OLDER_MESSAGES_COUNT
 		}).then((dto) => {
-			loadedSome = dto.messages?.length > 0;
+			loadedSome = dto.messages.length > 0;
 			const existingMsgs = this.messages[chatId] || [];
 			// Prepend older messages
 			this.messages[chatId] = [...dto.messages, ...existingMsgs];
@@ -131,7 +131,7 @@ class MessagingStore {
 		this.messages[chatId].push({
 			id: messageId,
 			sender_id: senderId,
-			content: content
+			content: content,
 		});
 	}
 

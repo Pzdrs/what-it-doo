@@ -1,6 +1,8 @@
 .direnv/
 .env
 
+src/lib/api/
+
 # OS
 .DS_Store
 Thumbs.db

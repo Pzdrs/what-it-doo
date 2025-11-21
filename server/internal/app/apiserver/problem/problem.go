@@ -9,24 +9,6 @@ import (
 	"pycrs.cz/what-it-doo/internal"
 )
 
-type ProblemDetails struct {
-	Status   int    `json:"status,omitempty"`
-	Title    string `json:"title,omitempty"`
-	Detail   string `json:"detail,omitempty"`
-	Type     string `json:"type,omitempty"`
-	Instance string `json:"instance,omitempty"`
-} //	@name	ProblemDetails
-
-type FieldValidationError struct {
-	Type    string `json:"type"`
-	Message string `json:"message"`
-} //	@name	FieldValidationError
-
-type ValidationProblemDetails struct {
-	ProblemDetails
-	Errors map[string]FieldValidationError `json:"errors,omitempty"`
-}
-
 type Problem interface {
 	GetStatus() int
 	GetTitle() string
