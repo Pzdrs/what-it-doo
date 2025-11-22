@@ -34,6 +34,10 @@ func InitConfig() (config.Configuration, error) {
 		config.DbConfigStructLevelValidation,
 		config.DBConfig{},
 	)
+	validate.RegisterStructValidation(
+		config.RedisConfigStructLevelValidation,
+		config.RedisConfig{},
+	)
 	if err := validate.Struct(cfg); err != nil {
 		return config.Configuration{}, fmt.Errorf("invalid config: %w", err)
 	}

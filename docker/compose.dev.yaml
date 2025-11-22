@@ -4,21 +4,20 @@ volumes:
 
 name: whatitdoo-dev
 services:
-  # server:
-  #   container_name: wid-server
-  #   build:
-  #     context: ..
-  #   ports:
-  #     - "8081:8080"
-  #   environment:
-  #     - WID_DATABASE_HOST=database
-  #     - WID_DATABASE_USER=postgres
-  #     - WID_DATABASE_PASSWORD=postgres
-  #     - WID_DATABASE_NAME=whatitdoo
-  #   volumes:
-  #     - ./wid.example.yaml:/etc/whatitdoo/wid.yaml:ro
-  #   depends_on:
-  #     - database
+  worker:
+    container_name: wid-worker
+    image: registry.gitlab.pycrs.cz/tul/what-it-doo/server:0.4.0
+    command: worker 
+    environment:
+      - WID_DATABASE_HOST=database
+      - WID_DATABASE_USER=postgres
+      - WID_DATABASE_PASSWORD=postgres
+      - WID_DATABASE_NAME=whatitdoo
+      - WID_REDIS_HOST=redis
+      - WID_EXTERNAL_URL=http://localhost:8080
+    depends_on:
+      - database
+      - redis
 
   redis:
     container_name: wid-redis

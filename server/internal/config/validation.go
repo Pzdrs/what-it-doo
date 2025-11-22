@@ -30,3 +30,11 @@ func DbConfigStructLevelValidation(sl validator.StructLevel) {
 		}
 	}
 }
+
+func RedisConfigStructLevelValidation(sl validator.StructLevel) {
+	cfg := sl.Current().Interface().(RedisConfig)
+
+	if cfg.Host == "" {
+		sl.ReportError(cfg.Host, "host", "Host", "required", "")
+	}
+}

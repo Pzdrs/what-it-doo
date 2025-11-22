@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
 
-echo "Starting server..."
-./bin/server
+COMMAND=${1:-server}
+
+./bin/$COMMAND "$@"
