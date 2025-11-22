@@ -5,6 +5,7 @@ class UserStore {
 
 	setUser(user: DtoUserDetails) {
 		this.user = user;
+		return this.user;
 	}
 }
 
