@@ -70,3 +70,17 @@ There are two methods of communication:
 ##### Sending a message
 
 [![](https://mermaid.ink/img/pako:eNp1k19r2zAUxb_KRS9rIDPx3yR6KHQthDEGJiUEhl9U-8YRtqVMkpN1Id9913E9F9L6xb7S79xzJFlnlusCGWcWf7eocnySojSiyRTQcxDGyVwehHKwAWFhY9HAN6NP9L5FVh2yxZdnnVdIpXB4Eq9w95B-h2c0RzSTW9G6E62xkPZ2bnttqE31kVvaTabautIgaXtg8_X-fsXB98hQFdCgtaJEOEoxBuvJFZFrDoEHaftSS7sHJ2wFTr8PsyZoyyHsoLruiZ3RzXtmS0zKISJLpw2C2-PgOwLkFHvwJO1BuHwPD48_AI-o3KfEkHwnlG7dmIYWl3hkn6M84tgH7iytF80XC2W_7ZPPNH3HQaYprhk0djLuzYbDvFu2HbOIvFL6VGNRYtOJP4SlynUjVTmo2JSVRhaMO9PilDVoGtGV7NzJM0b-DWaM02chTJWxTF1IQ0f8S-tmkBndlnvGd6K2VLWHggK__ar_R811Bx51qxzjYRzF1y6Mn9kfxv1g6fmxn8RxNPODRRjQ7Cvjy9Dzk2geRuHMD5NkvrxM2d-r78xbJGHgz5PYX0TRLIjmU0aHTkf8s78x14tz-Qfr8wX8?type=png)](https://mermaid.live/edit#pako:eNp1k19r2zAUxb_KRS9rIDPx3yR6KHQthDEGJiUEhl9U-8YRtqVMkpN1Id9913E9F9L6xb7S79xzJFlnlusCGWcWf7eocnySojSiyRTQcxDGyVwehHKwAWFhY9HAN6NP9L5FVh2yxZdnnVdIpXB4Eq9w95B-h2c0RzSTW9G6E62xkPZ2bnttqE31kVvaTabautIgaXtg8_X-fsXB98hQFdCgtaJEOEoxBuvJFZFrDoEHaftSS7sHJ2wFTr8PsyZoyyHsoLruiZ3RzXtmS0zKISJLpw2C2-PgOwLkFHvwJO1BuHwPD48_AI-o3KfEkHwnlG7dmIYWl3hkn6M84tgH7iytF80XC2W_7ZPPNH3HQaYprhk0djLuzYbDvFu2HbOIvFL6VGNRYtOJP4SlynUjVTmo2JSVRhaMO9PilDVoGtGV7NzJM0b-DWaM02chTJWxTF1IQ0f8S-tmkBndlnvGd6K2VLWHggK__ar_R811Bx51qxzjYRzF1y6Mn9kfxv1g6fmxn8RxNPODRRjQ7Cvjy9Dzk2geRuHMD5NkvrxM2d-r78xbJGHgz5PYX0TRLIjmU0aHTkf8s78x14tz-Qfr8wX8)
+
+## Miscellaneous
+
+### Presence tracking
+
+User presence is tracked using a combination of WebSocket connections and Redis. Each user has a corresponding SET in Redis tracking gateways that are maintaining an active WebSocket connection for that user. 
+
+When a user connects or disconnects, the API server updates the SET accordingly and broadcasts presence updates via the global channel.
+
+When there are no gateways left in the SET for a user, they are considered offline.
+
+### Typing indicators
+
+Typing indicators are implemented using Redis Pub/Sub. When a user starts or stops typing, the API server publishes a typing event to the global channel, which is caught by all API servers and according to their respective connection maps, forwarded to relevant clients.
