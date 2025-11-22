@@ -1,11 +1,14 @@
 <script lang="ts">
+	import type { DtoUserDetails } from '$lib/api/client';
 	import ChatMessage from '$lib/components/ChatMessage.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import TypingIndicator from '$lib/components/TypingIndicator.svelte';
+	import { getGroupChatTitle, getOtherChatParticipants, getTheOtherParticipant } from '$lib/utils/chat';
 	import { messagingStore } from '$stores/chats.svelte';
 	import { userStore } from '$stores/user.svelte';
 	import { sendWebSocketMessage } from '$stores/websocket.svelte';
 	import { mdiHandWaveOutline, mdiSendOutline } from '@mdi/js';
+	import { t } from 'svelte-i18n';
 
 	let scrollEl: HTMLDivElement | null = null;
 	let initialized = false;
@@ -34,7 +37,7 @@
 			initialized = true;
 			return;
 		}
-		sendWebSocketMessage('typing', { typing, chat_id: chat?.id  });
+		sendWebSocketMessage('typing', { typing, chat_id: chat?.id });
 	});
 
 	function sendMessage() {
@@ -66,21 +69,50 @@
 	}
 </script>
 
+{#snippet avatarGroupMember(participant: DtoUserDetails)}
+	<div class="avatar" title={participant.name}>
+		<div class="w-9">
+			<img alt={participant.name} src={participant.avatar_url} />
+		</div>
+	</div>
+{/snippet}
+
 <div class="flex">
 	<div class="flex items-center rounded-lg p-2 transition-colors duration-200">
-		<div class="avatar" class:avatar-online={true} class:avatar-offline={false}>
-			<div class="w-9 rounded-full">
-				<img src={'avatar_url'} alt="Chat Avatar" />
+		{#if chat?.participants.length == 2}
+			<div class="avatar" class:avatar-online={true} class:avatar-offline={false}>
+				<div class="w-9 rounded-full">
+					<img src={getTheOtherParticipant(chat, userStore.user!)?.avatar_url} alt="Chat Avatar" />
+				</div>
 			</div>
-		</div>
+		{:else if chat?.participants.length == 3}
+			<div class="avatar-group -space-x-6">
+				{#each getOtherChatParticipants(chat, userStore.user!).slice(0, 2) as participant}
+					{@render avatarGroupMember(participant)}
+				{/each}
+			</div>
+		{:else if chat?.participants.length! > 3}
+			<div class="avatar-group -space-x-6">
+				{#each getOtherChatParticipants(chat!, userStore.user!).slice(0, 2) as participant}
+					{@render avatarGroupMember(participant)}
+				{/each}
+
+				<div class="avatar avatar-placeholder">
+					<div class="bg-neutral text-neutral-content w-9">
+						<span>+{chat!.participants.length - 3}</span>
+					</div>
+				</div>
+			</div>
+		{/if}
+
 		<div class="ml-4">
 			<h3 class="font-bold">
-				{#if chat.title}
+				{#if chat?.title}
 					{chat.title}
-				{:else if chat.participants?.length === 2}
-					{chat.participants?.find((p) => p.id !== userStore.user?.id)?.name || 'Unknown User'}
+				{:else if chat?.participants?.length === 2}
+					{getTheOtherParticipant(chat, userStore.user!)?.name || 'Unknown User'}
 				{:else}
-					group chat
+					{getGroupChatTitle(chat!, userStore.user!, 50)}
 				{/if}
 			</h3>
 			<p class="text-base-content/75 text-sm">Active now</p>

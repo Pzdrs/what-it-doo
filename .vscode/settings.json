@@ -1,14 +1,11 @@
 {
-    "i18n-ally.localesPaths": [
-        "web/src/i18n"
-    ],
-    "i18n-ally.enabledFrameworks": [
-        "svelte"
-    ],
-    "yaml.schemas": {
-        "kubernetes://schema/apps/v1@deployment": [
-            "file:///Users/pycrs/school/pwa/what-it-doo/deployment/deployment.yaml",
-        ]
-    },
-    "i18n-ally.sourceLanguage": "en"
+  "i18n-ally.localesPaths": ["web/src/i18n"],
+  "i18n-ally.enabledFrameworks": ["svelte"],
+  "yaml.schemas": {
+    "kubernetes://schema/apps/v1@deployment": [
+      "file:///Users/pycrs/school/pwa/what-it-doo/deployment/deployment.yaml"
+    ]
+  },
+  "i18n-ally.sourceLanguage": "en",
+  "i18n-ally.keystyle": "nested"
 }

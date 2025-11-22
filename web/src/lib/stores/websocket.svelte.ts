@@ -53,6 +53,10 @@ const onMessage = (event: MessageEvent) => {
 			messagingStore.updateUserPresence(user_id, online);
 			break;
 		}
+		case 'dap_up': {
+			alert("dapup");
+			break;
+		}
 
 		default:
 			console.warn('Unknown message type:', message.type);

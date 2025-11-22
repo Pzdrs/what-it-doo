@@ -1,20 +1,29 @@
 <script lang="ts">
-	import { getMyChats, type ModelChat } from '$lib/api/client';
+	import { type DtoUserDetails, getMyChats } from '$lib/api/client';
 	import { messagingStore } from '$lib/stores/chats.svelte';
+	import { getGroupChatTitle, getOtherChatParticipants, getTheOtherParticipant } from '$lib/utils/chat';
 	import { userStore } from '$stores/user.svelte';
+	import { t } from 'svelte-i18n';
 	import { format } from 'timeago.js';
 
 	interface Props {}
 
 	let {}: Props = $props();
 
-	function loadChats() {
-		return getMyChats().then((fetchedChats) => {
-			messagingStore.chats = fetchedChats;
-			return fetchedChats;
-		});
+	async function loadChats() {
+		const fetchedChats = await getMyChats();
+		messagingStore.chats = fetchedChats;
+		return fetchedChats;
 	}
 </script>
+
+{#snippet avatarGroupMember(participant: DtoUserDetails)}
+	<div class="avatar" title={participant.name}>
+		<div class="w-12">
+			<img alt={participant.name} src={participant.avatar_url} />
+		</div>
+	</div>
+{/snippet}
 
 <ul class="menu flex w-full flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden">
 	{#await loadChats()}
@@ -27,26 +36,39 @@
 				<a
 					data-sveltekit-preload-data="tap"
 					href="/chat/{chat.id}"
-					class:menu-active={messagingStore.currentChat === chat.id}
+					class:menu-active={messagingStore.currentChat &&
+						messagingStore.currentChat.id === chat.id}
 				>
 					<div class="rounded-box flex items-center p-2 transition-colors duration-200">
-						<div class="avatar" class:avatar-online={false} class:avatar-offline={true}>
-							<div class="w-12 rounded-full">
-								<img src={''} alt="Chat Avatar" />
+						{#if chat.participants.length == 2}
+							<div class="avatar" class:avatar-online={true} class:avatar-offline={false}>
+								<div class="w-12 rounded-full">
+									<img
+										src={getTheOtherParticipant(chat, userStore.user!)?.avatar_url}
+										alt="Chat Avatar"
+									/>
+								</div>
 							</div>
-						</div>
+						{:else if chat.participants.length > 2}
+							<div class="avatar avatar-placeholder">
+								<div class="bg-neutral text-neutral-content w-12 rounded-full">
+									<span class="text-3xl">{chat.participants.length}</span>
+								</div>
+							</div>
+						{/if}
+
 						<div class="ml-4">
 							<h3 class="font-bold">
 								{#if chat.title}
 									{chat.title}
 								{:else if chat.participants?.length == 2}
-									{chat.participants?.find((p) => p.id !== userStore.user?.id)?.name || 'Unknown User'}
+									{getTheOtherParticipant(chat, userStore.user!)?.name || 'Unknown User'}
 								{:else}
-									group chat
+									{getGroupChatTitle(chat!, userStore.user!, 20)}
 								{/if}
 							</h3>
 							<p class="text-sm">
-								<span>{'Last message'}</span> &middot;
+								<span>{$t('last_message')}</span> &middot;
 								<span>{format(Date.now())}</span>
 							</p>
 						</div>

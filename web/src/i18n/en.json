@@ -28,6 +28,9 @@
     "passwords_must_match": "Passwords must match",
     "server_status_online": "Server Online",
     "server_status_offline": "Server Offline",
+    "group_chat": "Group Chat",
+    "active_now": "Active now",
+    "last_message": "Last message",
     "errors": {
         "unknown_error": "An unknown error occurred. Please try again.",
         "auth": {
