@@ -22,7 +22,7 @@ spec:
 
       containers:
       - name: server
-        image: registry.gitlab.pycrs.cz/tul/what-it-doo/server:0.4.0
+        image: registry.gitlab.pycrs.cz/tul/what-it-doo/server:1.0.0
         args:
           - server
         imagePullPolicy: Always
@@ -59,7 +59,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: registry.gitlab.pycrs.cz/tul/what-it-doo/server:0.4.0
+        image: registry.gitlab.pycrs.cz/tul/what-it-doo/server:1.0.0
         args:
           - worker
         imagePullPolicy: Always
