@@ -166,10 +166,19 @@ func (c *ChatController) HandleGetChatMessages(w http.ResponseWriter, r *http.Re
 	}
 
 	messages, more, err := c.chatService.GetMessagesForChat(r.Context(), chat_id, limit, before)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		problem.Write(w, problem.New(
+			r, http.StatusNotFound,
+			"Chat not found",
+			"No chat found with the specified ID",
+			"chats/chat-not-found",
+		))
+		return
+	} else if err != nil {
 		problem.Write(w, problem.NewInternalServerError(r, err))
 		return
 	}
+
 	common.Encode(w, r, 200, dto.ChatMessages{
 		Messages: func() []dto.ChatMessage {
 			result := []dto.ChatMessage{}
