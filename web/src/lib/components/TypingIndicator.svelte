@@ -12,7 +12,7 @@
 	<!-- Avatar -->
 	<div class="chat-image avatar">
 		<div class="w-10 rounded-full">
-			<img src={user.avatarUrl} alt={user.name} />
+			<img src={user.avatar_url} alt={user.name} />
 		</div>
 	</div>
 
