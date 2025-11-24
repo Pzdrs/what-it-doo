@@ -1,6 +1,9 @@
 package bootstrap
 
 import (
+	"os"
+
+	"github.com/google/uuid"
 	"pycrs.cz/what-it-doo/internal/config"
 	"pycrs.cz/what-it-doo/internal/domain/repository"
 	"pycrs.cz/what-it-doo/internal/domain/service"
@@ -8,7 +11,11 @@ import (
 )
 
 func GenerateGatewayID() string {
-	return "gateway-1"
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "gateway-"+uuid.NewString()
+	}
+	return hostname
 }
 
 func InitServices(q *queries.Queries, config config.Configuration) (
